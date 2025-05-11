@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-configmap
+data:
+  config.yaml: |
+    ---
+    originRequest:
+      originServerName: "external.#{ cloudflare_domain }#"
+
+    ingress:
+      - hostname: "#{ cloudflare_domain }#"
+        service: &svc https://ingress-nginx-external-controller.network.svc.cluster.local:443
+      - hostname: "*.#{ cloudflare_domain }#"
+        service: *svc
+      - service: http_status:404
