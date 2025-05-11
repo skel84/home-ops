@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/cert-manager.io/certificate_v1.json
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: rbl-lol-production
+spec:
+  secretName: rbl-lol-production-tls
+  issuerRef:
+    name: letsencrypt-production
+    kind: ClusterIssuer
+  commonName: rbl.lol
+  dnsNames:
+    - rbl.lol
+    - '*.rbl.lol'
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+    - recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBITVNPdWdxTFJaeGh1OUFS
+        eE81eFhsZ3grbFVicEUzVTgrOHBRQVpBWHpRCkhybVhrTlhVZTN6RTlMRHB1bnlv
+        ZDBBWU9Va3BVaVhGdDlXS2o0R29SdGcKLS0tIGNPY0R5Rmk0ak1zdG5vN2xtRGdu
+        bDdUa1NUNkR2RldiYi9YVFFGSjZ5QmMK7lKAWkcEcqvr9Yfv7gyuDsJ7aBCoxfwh
+        MA1a+6K4Q3wdXvVYG8Xm2SCLs8G53YYi3dME7RLP4d19zQj74GND4g==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2025-05-11T20:11:03Z"
+  mac: ENC[AES256_GCM,data:pW+W/KhUsrdEOlNIJ04EMPs+MpXGIsdliAXBFmlRAZMPf3WYN2nAQM/aYzcbRQ2UBGHh+cCkGAhUZmi/K6tSJ3HOm0KFWE1OgoDmsoEvABofSe/2ZiHsr/yAggZwx3C+756U2/psUIR0NodjEW+7SX/6TJBItfcwUMkRZ3V/M28=,iv:wb5GZAL739FytyJcgApHhjLNgn0lFRJ0m076iS4wmTg=,tag:aTG+6j0WGlu1mRdvW4UuWQ==,type:str]
+  pgp: []
+  encrypted_regex: ^(data|stringData|githubSecret)$
+  mac_only_encrypted: true
+  version: 3.9.4

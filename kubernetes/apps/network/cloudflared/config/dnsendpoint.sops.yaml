@@ -1,0 +1,31 @@
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: cloudflared
+spec:
+  endpoints:
+    - dnsName: external.rbl.lol
+      recordType: CNAME
+      targets:
+        - 27868c16-6502-41ac-9f9f-8c19d79c0130.cfargotunnel.com
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+    - recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBoN3gwdkp2R1ZOQlpINEFk
+        QVBhalpDWjJpU01GV1AyUmsxcWprVHlWcVZrCjBZaVhCMjczdVh0WXhrb0s2ZGdH
+        dExJNzZ1SS9nd05yMm1Na3UzRU5oNUUKLS0tIDR2YmtjeHVJMDloYXpXVUxUaTNF
+        OXNLOE9oOGR6S1RwNEtDeWtwMzdvbXcKfLnLQJihAsE8WuuT5saXsYmsD/HyzcCD
+        /NoL+Y8wGZKcC2EYaZg9BmNlRSJQtWLZpwA+iOzRGJ0W/e67U0djJQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2025-05-11T20:11:03Z"
+  mac: ENC[AES256_GCM,data:Z05ab5SfrmuEJjPwcgqXtvxJoE4B90WhGKKOiR2WaWyp73G641WMWqEn5MVTDGK15wFwx4JBENpdQZdvwzwrwhSq44IFjfrMWzT24cLDyMrGy2yinIiyop4f3iAVCu7bm0wolRzhU6CGN9wutS/vU3YGEnayPLSXTGgLAEfSeP8=,iv:W+y3SXfWatMoS/6w4uk0JXsq/nkjcoaGZvqvX37tu88=,tag:6q1aglsk+c/EnL9DRFIJXw==,type:str]
+  pgp: []
+  encrypted_regex: ^(data|stringData|githubSecret)$
+  mac_only_encrypted: true
+  version: 3.9.4

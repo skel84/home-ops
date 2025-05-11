@@ -1,0 +1,33 @@
+fullnameOverride: k8s-gateway
+domain: rbl.lol
+ttl: 1
+service:
+  type: LoadBalancer
+  port: 53
+  annotations:
+    io.cilium/lb-ipam-ips: 192.168.0.50
+  externalTrafficPolicy: Cluster
+watchedResources:
+  - Ingress
+  - Service
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+    - recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA1YVl2L0w0Y0d6UjIyUTM0
+        VFZKRitRRlZ1K0pGZ2hvdW9jeDFGZ3pyMTBRClYwbzhiK3AzNTJuK281T2IrL2VQ
+        dzk3a1ZtYXhJK1N0NDFwei94Smw3QUEKLS0tIFYzVXRzczJ5TG5zb1dEV0lHaXdx
+        OGlVam9TSjVWaGZucTJ4TG5sWno3Y2MKHzZ/ObZgj1rAmeGluTbLfOrZtapHNxbm
+        cOpdubo5RpQ2tVI3ds6eTINwlnXnzZQ5RmJiRj6dOxuCpStpOCfT0w==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2025-05-11T20:11:03Z"
+  mac: ENC[AES256_GCM,data:x+3MjBg49pzclrc4WJ80jx5kiQH/twKwBkwMENQAxK2fwxzHoGAVtLNF1K6E4/gDV8EWbtgezzXT/CuM9IJ6jbRK0jMVAHbQhN2fURSLHdvDohJJrn1TkFbK608SBeLPqetqe01zdyc6Su/cCG1/b/Fn+0triRlYJxPOWWzYihE=,iv:K6GaDzatMt0Ku7AErj5AC7FwnbL1UuVML2Tc62d9DRw=,tag:2yVkLRR+gBlArky8h9TIvg==,type:str]
+  pgp: []
+  encrypted_regex: ^(data|stringData|githubSecret)$
+  mac_only_encrypted: true
+  version: 3.9.4
