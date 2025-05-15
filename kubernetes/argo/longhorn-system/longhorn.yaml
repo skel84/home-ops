@@ -8,7 +8,7 @@ spec:
   project: kubernetes
   sources:
     - repoURL: "https://github.com/skel84/home-ops.git"
-      path: kubernetes/apps/longhorn-system/
+      path: kubernetes/apps/longhorn-system/longhorn/
       targetRevision: main
       ref: repo
     - chart: longhorn
