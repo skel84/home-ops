@@ -20,7 +20,7 @@ spec:
             jobEnabled: false
   destination:
     name: in-cluster
-    namespace: kube-system
+    namespace: longhorn-system
   syncPolicy:
     automated:
       allowEmpty: true
