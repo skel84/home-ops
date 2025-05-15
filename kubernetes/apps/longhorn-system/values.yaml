@@ -1,0 +1,7 @@
+---
+defaultSettings:
+  defaultReplicaCount: 2
+ingress:
+  enabled: true
+  ingressClassName: internal
+  host: longhorn.rbl.lol
