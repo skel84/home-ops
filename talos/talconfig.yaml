@@ -39,6 +39,47 @@ nodes:
         mtu: 1500
         vip:
           ip: "192.168.0.200"
+  - hostname: "rbl-02"
+    ipAddress: "192.168.0.27"
+    installDiskSelector:
+      serial: "2225454CAF8F"
+    machineSpec:
+      secureboot: false
+    talosImageURL: factory.talos.dev/installer/5fb99bb2ad1d41e0eb6cf2249ca38994d6b30640aa686d912881296c7b1679ad
+    controlPlane: true
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "e8:ff:1e:d8:10:fa"
+        dhcp: false
+        addresses:
+          - "192.168.0.27/24"
+        routes:
+          - network: "0.0.0.0/0"
+            gateway: "192.168.0.1"
+        mtu: 1500
+        vip:
+          ip: "192.168.0.200"
+
+  - hostname: "rbl-03"
+    ipAddress: "192.168.0.17"
+    installDiskSelector:
+      serial: "234545069F56"
+    machineSpec:
+      secureboot: false
+    talosImageURL: factory.talos.dev/installer/5fb99bb2ad1d41e0eb6cf2249ca38994d6b30640aa686d912881296c7b1679ad
+    controlPlane: true
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "e8:ff:1e:d8:d0:96"
+        dhcp: false
+        addresses:
+          - "192.168.0.17/24"
+        routes:
+          - network: "0.0.0.0/0"
+            gateway: "192.168.0.1"
+        mtu: 1500
+        vip:
+          ip: "192.168.0.200"
 
 # Global patches
 patches:
@@ -53,4 +94,3 @@ controlPlane:
   patches:
     - "@./patches/controller/admission-controller-patch.yaml"
     - "@./patches/controller/cluster.yaml"
-
