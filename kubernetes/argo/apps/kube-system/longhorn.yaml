@@ -3,11 +3,12 @@ metadata:
   name: longhorn
   namespace: argo-system
 spec:
-  syncPolicy:
-    syncOptions:
-      - CreateNamespace=true
-  project: default
+  project: kubernetes
   sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/kube-system/longhorn
+      targetRevision: main
+      ref: repo
     - chart: longhorn
       repoURL: https://charts.longhorn.io/
       targetRevision: v1.8.1 # Replace with the Longhorn version you'd like to install or upgrade to
@@ -16,5 +17,14 @@ spec:
           preUpgradeChecker:
             jobEnabled: false
   destination:
-    server: https://kubernetes.default.svc
+    name: in-cluster
     namespace: kube-system
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
