@@ -22,7 +22,7 @@ spec:
           - $repo/kubernetes/apps/kube-system/reloader/values.yaml
   destination:
     name: in-cluster
-    namespace: reloader
+    namespace: kube-system
   syncPolicy:
     automated:
       allowEmpty: true
