@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: igpu
+  name: intel-device-plugins-operator
   namespace: argo-system
   annotations:
     argocd.argoproj.io/sync-wave: "0"
@@ -14,12 +14,12 @@ spec:
       targetRevision: main
       ref: repo
     - repoURL: https://intel.github.io/helm-charts/
-      chart: intel-device-plugins-gpu
+      chart: device-plugin-operator
       targetRevision: 0.32.1
       helm:
-        releaseName: igpu
+        releaseName: intel-device-plugins-operator
         valueFiles:
-          - $repo/kubernetes/apps/kube-system/igpu/values.yaml
+          - $repo/kubernetes/apps/kube-system/igpu/operator-values.yaml
   destination:
     name: in-cluster
     namespace: kube-system
