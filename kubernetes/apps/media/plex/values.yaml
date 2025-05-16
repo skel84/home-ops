@@ -13,7 +13,7 @@ service:
   type: LoadBalancer
   port: 32400
   annotations:
-    lbipam.cilium.io/ips: 192.168.0.201
+    lbipam.cilium.io/ips: 192.168.0.50
     external-dns.alpha.kubernetes.io/hostname: plex.rbl.lol
   externalTrafficPolicy: Cluster
 
