@@ -1,0 +1,13 @@
+ingress:
+  # -- Specify if an ingress resource for the pms server should be created or not
+  enabled: true
+  url: plex.rbl.lol
+  ingressClassName: internal
+
+pms:
+  claimSecret:
+    name: "plex-claim-secret"
+    key: "plex-claim-secret"
+
+extraEnv:
+  ALLOWED_NETWORKS: "192.168.0.0/24"
