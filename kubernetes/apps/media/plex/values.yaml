@@ -29,6 +29,7 @@ pms:
   #   failureThreshold: 3
   securityContext:
     privileged: true
+    supplementalGroups: [44]
 
 extraEnv:
   ALLOWED_NETWORKS: "192.168.0.0/24"
