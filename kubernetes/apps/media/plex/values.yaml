@@ -4,6 +4,10 @@ ingress:
   url: plex.rbl.lol
   ingressClassName: internal
 
+image:
+  repository: ghcr.io/home-operations/plex
+  tag: 1.41.6
+
 pms:
   claimSecret:
     name: "plex-claim-secret"
