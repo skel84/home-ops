@@ -10,7 +10,7 @@ spec:
   project: kubernetes
   sources:
     - repoURL: "https://github.com/skel84/home-ops.git"
-      path: kubernetes/apps/kube-system/igpu
+      path: kubernetes/apps/kube-system/intel-device-plugin
       targetRevision: main
       ref: repo
     - repoURL: https://intel.github.io/helm-charts/
@@ -19,7 +19,7 @@ spec:
       helm:
         releaseName: intel-device-plugins-gpu
         valueFiles:
-          - $repo/kubernetes/apps/kube-system/igpu/plugin-values.yaml
+          - $repo/kubernetes/apps/kube-system/intel-device-plugin/plugin-values.yaml
   destination:
     name: in-cluster
     namespace: kube-system
