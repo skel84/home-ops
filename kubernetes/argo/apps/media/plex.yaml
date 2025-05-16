@@ -11,9 +11,9 @@ spec:
       path: kubernetes/apps/media/plex/
       targetRevision: main
       ref: repo
-    - chart: plex
+    - chart: plex-media-server
       repoURL: https://raw.githubusercontent.com/plexinc/pms-docker/gh-pages
-      # targetRevision: 1.0.2
+      targetRevision: 1.0.2
       helm:
         valueFiles:
           - $repo/kubernetes/apps/media/plex/values.yaml
