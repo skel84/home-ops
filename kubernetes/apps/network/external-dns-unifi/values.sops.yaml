@@ -1,34 +1,75 @@
 fullnameOverride: external-dns-unifi
-logLevel: debug
-
+logLevel: &logLevel debug
 provider:
   name: webhook
   webhook:
     image:
       repository: ghcr.io/kashalls/external-dns-unifi-webhook
-      tag: v0.5.2 # Use the latest stable release
+      tag: v0.5.2 # replace with a versioned release tag
     env:
       - name: UNIFI_HOST
-        value: https://unifi # <-- Set your UniFi controller IP/hostname
+        value: https://192.168.0.1 # replace with the address to your UniFi router/controller
+      - name: UNIFI_EXTERNAL_CONTROLLER
+        value: "false"
       - name: UNIFI_API_KEY
         valueFrom:
           secretKeyRef:
             name: external-dns-unifi-secret
             key: api-key
       - name: LOG_LEVEL
-        value: debug
-
+        value: *logLevel
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: http-webhook
+      initialDelaySeconds: 10
+      timeoutSeconds: 5
+    readinessProbe:
+      httpGet:
+        path: /readyz
+        port: http-webhook
+      initialDelaySeconds: 10
+      timeoutSeconds: 5
 extraArgs:
-  - --annotation-filter=external-dns.alpha.kubernetes.io/target
-  - --ingress-class=internal
   - --ignore-ingress-tls-spec
-  - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
-  - --crd-source-kind=DNSEndpoint
-  - --events
-
+  - --ingress-class=internal
 policy: sync
-sources: ["ingress", "service"] # Watch both Ingress and Service resources
+sources: ["ingress", "service"]
 txtOwnerId: default
 txtPrefix: k8s.
-domainFilters: ["rbl.lol"] # Only manage this domain
+domainFilters: ["rbl.lol"] # replace with your domain
+
+# fullnameOverride: external-dns-unifi
+# logLevel: debug
+
+# provider:
+#   name: webhook
+#   webhook:
+#     image:
+#       repository: ghcr.io/kashalls/external-dns-unifi-webhook
+#       tag: v0.5.2 # Use the latest stable release
+#     env:
+#       - name: UNIFI_HOST
+#         value: https://unifi # <-- Set your UniFi controller IP/hostname
+#       - name: UNIFI_API_KEY
+#         valueFrom:
+#           secretKeyRef:
+#             name: external-dns-unifi-secret
+#             key: api-key
+#       - name: LOG_LEVEL
+#         value: debug
+
+# extraArgs:
+#   - --annotation-filter=external-dns.alpha.kubernetes.io/target
+#   - --ingress-class=internal
+#   - --ignore-ingress-tls-spec
+#   - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
+#   - --crd-source-kind=DNSEndpoint
+#   - --events
+
+# policy: sync
+# sources: ["ingress", "service"] # Watch both Ingress and Service resources
+# txtOwnerId: default
+# txtPrefix: k8s.
+# domainFilters: ["rbl.lol"] # Only manage this domain
 
