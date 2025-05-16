@@ -25,7 +25,6 @@ extraArgs:
   - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
   - --crd-source-kind=DNSEndpoint
   - --events
-  - --ignore-ingress-tls-spec
 
 policy: sync
 sources: ["ingress", "service"] # Watch both Ingress and Service resources
