@@ -10,16 +10,16 @@ spec:
   project: kubernetes
   sources:
     - repoURL: "https://github.com/skel84/home-ops.git"
-      path: kubernetes/apps/kube-system/igpu
+      path: kubernetes/apps/kube-system/intel-device-plugin
       targetRevision: main
       ref: repo
     - repoURL: https://intel.github.io/helm-charts/
-      chart: device-plugin-operator
+      chart: intel-device-plugins-operator
       targetRevision: 0.32.1
       helm:
         releaseName: intel-device-plugins-operator
         valueFiles:
-          - $repo/kubernetes/apps/kube-system/igpu/operator-values.yaml
+          - $repo/kubernetes/apps/kube-system/intel-device-plugin/operator-values.yaml
   destination:
     name: in-cluster
     namespace: kube-system
