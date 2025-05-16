@@ -1,6 +1,5 @@
 # values.yaml for intel-device-plugins-gpu
-nodeFeatureRule:
-  enabled: true
+nodeFeatureRule: true
 
 devicePlugin:
   enabled: true
