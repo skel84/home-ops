@@ -1,13 +1,21 @@
-ingress:
-  # -- Specify if an ingress resource for the pms server should be created or not
-  enabled: true
-  url: plex.rbl.lol
-  ingressClassName: internal
+# ingress:
+#   # -- Specify if an ingress resource for the pms server should be created or not
+#   enabled: true
+#   url: plex.rbl.lol
+#   ingressClassName: internal
 
 pms:
   claimSecret:
     name: "plex-claim-secret"
     key: "plex-claim-secret"
+
+service:
+  type: LoadBalancer
+  port: 32400
+  annotations:
+    lbipam.cilium.io/ips: 192.168.0.201
+    external-dns.alpha.kubernetes.io/hostname: plex.rbl.lol
+  externalTrafficPolicy: Cluster
 
   # livenessProbe:
   #   httpGet:
