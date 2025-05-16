@@ -13,7 +13,7 @@ spec:
       ref: repo
     - chart: plex
       repoURL: https://raw.githubusercontent.com/plexinc/pms-docker/gh-pages
-      targetRevision: 1.0.2 # Replace with the Longhorn version you'd like to install or upgrade to
+      # targetRevision: 1.0.2
       helm:
         valueFiles:
           - $repo/kubernetes/apps/media/plex/values.yaml
