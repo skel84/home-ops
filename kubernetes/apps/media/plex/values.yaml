@@ -5,7 +5,8 @@ ingress:
   ingressClassName: internal
 
 image:
-  repository: ghcr.io/home-operations/plex
+  registry: ghcr.io
+  repository: home-operations/plex
   tag: 1.41.6
 
 pms:
