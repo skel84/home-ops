@@ -11,6 +11,7 @@ spec:
     path: /Media
     server: 192.168.0.217
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -23,3 +24,4 @@ spec:
     requests:
       storage: 10Ti
   volumeName: media-nfs-pv
+  storageClassName: ""
