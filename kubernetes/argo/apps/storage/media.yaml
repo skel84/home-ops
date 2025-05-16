@@ -1,23 +1,23 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: storage-media
-  namespace: argo-system
-spec:
-  project: kubernetes
-  sources:
-    - repoURL: "https://github.com/skel84/home-ops.git"
-      path: kubernetes/apps/storage/media
-      targetRevision: main
-      ref: repo
-  destination:
-    name: in-cluster
-    namespace: storage
-  syncPolicy:
-    automated:
-      allowEmpty: true
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: storage-media
+#   namespace: argo-system
+# spec:
+#   project: kubernetes
+#   sources:
+#     - repoURL: "https://github.com/skel84/home-ops.git"
+#       path: kubernetes/apps/storage/media
+#       targetRevision: main
+#       ref: repo
+#   destination:
+#     name: in-cluster
+#     namespace: storage
+#   syncPolicy:
+#     automated:
+#       allowEmpty: true
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
+#       - ServerSideApply=true
