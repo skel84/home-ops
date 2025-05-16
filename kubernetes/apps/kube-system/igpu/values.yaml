@@ -1,0 +1,21 @@
+# values.yaml for intel-device-plugins-gpu
+nodeFeatureRule:
+  enabled: true
+
+devicePlugin:
+  enabled: true
+  image:
+    repository: intel/intel-gpu-plugin
+    tag: 0.32.1
+  logLevel: 2
+  sharedDevNum: 1
+  # resources:
+  #   limits:
+  #     cpu: 100m
+  #     memory: 128Mi
+  #   requests:
+  #     cpu: 100m
+  #     memory: 128Mi
+
+monitoring:
+  enabled: false

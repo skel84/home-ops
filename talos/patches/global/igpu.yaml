@@ -1,0 +1,13 @@
+- op: add
+  path: /machine/kernel
+  value:
+    modules:
+      - name: i915
+      - name: i915_spi
+      - name: i915_bpo
+      - name: intel_vsec
+
+- op: add
+  path: /machine/sysctls
+  value:
+    net.core.bpf_jit_harden: 1
