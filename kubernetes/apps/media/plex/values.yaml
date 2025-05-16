@@ -9,36 +9,44 @@ pms:
     name: "plex-claim-secret"
     key: "plex-claim-secret"
 
-  livenessProbe:
-    httpGet:
-      path: /identity
-      port: 32400
-    # initialDelaySeconds: 60
-    periodSeconds: 60
-    timeoutSeconds: 1
-    failureThreshold: 3
+  # livenessProbe:
+  #   httpGet:
+  #     path: /identity
+  #     port: 32400
+  #   # initialDelaySeconds: 60
+  #   periodSeconds: 60
+  #   timeoutSeconds: 1
+  #   failureThreshold: 3
 
-  # -- Add kubernetes readiness probe to pms container.
-  readinessProbe:
-    httpGet:
-      path: /identity
-      port: 32400
-    # initialDelaySeconds: 60
-    periodSeconds: 60
-    timeoutSeconds: 1
-    failureThreshold: 3
+  # # -- Add kubernetes readiness probe to pms container.
+  # readinessProbe:
+  #   httpGet:
+  #     path: /identity
+  #     port: 32400
+  #   # initialDelaySeconds: 60
+  #   periodSeconds: 60
+  #   timeoutSeconds: 1
+  #   failureThreshold: 3
 
 extraEnv:
   ALLOWED_NETWORKS: "192.168.0.0/24"
 
-# Mount the media volume from NFS
 extraVolumeMounts:
+  # Mount the media volume from NFS
   - name: media
     mountPath: /data
     readOnly: false
+  # intel igpu device plugin
+  - name: dev-dri
+    mountPath: /dev/dri
 
-# Reference the existing media NFS PVC
 extraVolumes:
+  # Reference the existing media NFS PVC
   - name: media
     persistentVolumeClaim:
       claimName: media-nfs-pvc
+  # intel igpu device plugin
+  - name: dev-dri
+    hostPath:
+      path: /dev/dri
+      type: Directory
