@@ -30,3 +30,15 @@ pms:
 
 extraEnv:
   ALLOWED_NETWORKS: "192.168.0.0/24"
+
+# Mount the media volume from NFS
+extraVolumeMounts:
+  - name: media
+    mountPath: /data
+    readOnly: false
+
+# Reference the existing media NFS PVC
+extraVolumes:
+  - name: media
+    persistentVolumeClaim:
+      claimName: media-nfs-pvc
