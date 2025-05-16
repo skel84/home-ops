@@ -15,7 +15,7 @@ service:
   annotations:
     lbipam.cilium.io/ips: 192.168.0.51
     external-dns.alpha.kubernetes.io/hostname: plex.rbl.lol
-  externalTrafficPolicy: Cluster
+  externalTrafficPolicy: Local
 
   # livenessProbe:
   #   httpGet:
