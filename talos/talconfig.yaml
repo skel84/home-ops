@@ -25,7 +25,7 @@ nodes:
       serial: "2225454CAF93"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/5fb99bb2ad1d41e0eb6cf2249ca38994d6b30640aa686d912881296c7b1679ad
+    talosImageURL: factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -45,7 +45,7 @@ nodes:
       serial: "2225454CAF8F"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/5fb99bb2ad1d41e0eb6cf2249ca38994d6b30640aa686d912881296c7b1679ad
+    talosImageURL: factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -66,7 +66,7 @@ nodes:
       serial: "234545069F56"
     machineSpec:
       secureboot: false
-    talosImageURL: factory.talos.dev/installer/5fb99bb2ad1d41e0eb6cf2249ca38994d6b30640aa686d912881296c7b1679ad
+    talosImageURL: factory.talos.dev/installer/613e1592b2da41ae5e265e8789429f22e121aab91cb4deb6bc3c0b6262961245
     controlPlane: true
     networkInterfaces:
       - deviceSelector:
@@ -88,6 +88,7 @@ patches:
   - "@./patches/global/machine-network.yaml"
   - "@./patches/global/machine-sysctls.yaml"
   - "@./patches/global/machine-time.yaml"
+  - "@./patches/global/longhorn-mounts.yaml"
 
 # Controller patches
 controlPlane:
