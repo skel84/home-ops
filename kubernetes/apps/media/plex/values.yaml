@@ -27,6 +27,8 @@ pms:
   #   periodSeconds: 60
   #   timeoutSeconds: 1
   #   failureThreshold: 3
+  securityContext:
+    privileged: true
 
 extraEnv:
   ALLOWED_NETWORKS: "192.168.0.0/24"
