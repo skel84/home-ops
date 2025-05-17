@@ -41,7 +41,7 @@ service:
 
 extraEnv:
   ALLOWED_NETWORKS: "192.168.0.0/24"
-  PLEX_ADVERTISE_URL: https://plex-ext.rbl.io:443,http://192.168.0.51:32400
+  PLEX_ADVERTISE_URL: http://plex.rbl.lol:32400,http://192.168.0.52:32400
 
 extraVolumeMounts:
   # Mount the media volume from NFS
