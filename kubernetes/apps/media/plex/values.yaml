@@ -1,21 +1,21 @@
-ingress:
-  # -- Specify if an ingress resource for the pms server should be created or not
-  enabled: true
-  url: plex.rbl.lol
-  ingressClassName: internal
+# ingress:
+#   # -- Specify if an ingress resource for the pms server should be created or not
+#   enabled: true
+#   url: plex.rbl.lol
+#   ingressClassName: internal
 
 pms:
   claimSecret:
     name: "plex-claim-secret"
     key: "plex-claim-secret"
 
-  # service:
-  #   type: LoadBalancer
-  #   port: 32400
-  #   annotations:
-  #     lbipam.cilium.io/ips: 192.168.0.51
-  #     external-dns.alpha.kubernetes.io/hostname: plex.rbl.lol
-  #   externalTrafficPolicy: Cluster
+  service:
+    type: LoadBalancer
+    port: 32400
+    annotations:
+      lbipam.cilium.io/ips: 192.168.0.51
+      external-dns.alpha.kubernetes.io/hostname: plex.rbl.lol
+    externalTrafficPolicy: Cluster
 
   # livenessProbe:
   #   httpGet:
@@ -41,6 +41,7 @@ pms:
 
 extraEnv:
   ALLOWED_NETWORKS: "192.168.0.0/24"
+  PLEX_ADVERTISE_URL: https://plex-ext.rbl.io:443,http://192.168.0.51:32400
 
 extraVolumeMounts:
   # Mount the media volume from NFS
