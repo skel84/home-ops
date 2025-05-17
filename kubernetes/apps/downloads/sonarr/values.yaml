@@ -109,18 +109,18 @@ ingress:
   app:
     className: internal
     hosts:
-      - host: "{{ .Release.Name }}-internal.rbl.lol"
+      - host: "{{ .Release.Name }}.rbl.lol"
         paths:
           - path: /
             service:
               identifier: app
               port: *port
-  # app-external:
-  #   className: external
-  #   hosts:
-  #     - host: "{{ .Release.Name }}.rbl.lol"
-  #       paths:
-  #         - path: /
-  #           service:
-  #             identifier: app
-  #             port: *port
+  app-external:
+    className: external
+    hosts:
+      - host: "{{ .Release.Name }}-ext.rbl.lol"
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: *port
