@@ -9,14 +9,6 @@ pms:
     name: "plex-claim-secret"
     key: "plex-claim-secret"
 
-  service:
-    type: LoadBalancer
-    port: 32400
-    annotations:
-      lbipam.cilium.io/ips: 192.168.0.52
-      external-dns.alpha.kubernetes.io/hostname: plex.rbl.lol
-    externalTrafficPolicy: Cluster
-
   # livenessProbe:
   #   httpGet:
   #     path: /identity
@@ -38,6 +30,14 @@ pms:
   securityContext:
     privileged: true
     # supplementalGroups: [44]
+
+service:
+  type: LoadBalancer
+  port: 32400
+  annotations:
+    lbipam.cilium.io/ips: 192.168.0.52
+    external-dns.alpha.kubernetes.io/hostname: plex.rbl.lol
+  externalTrafficPolicy: Cluster
 
 extraEnv:
   ALLOWED_NETWORKS: "192.168.0.0/24"
