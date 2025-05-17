@@ -82,14 +82,14 @@ service:
 persistence:
   config:
     enabled: true
-    type: pvc
+    type: persistentVolumeClaim
     accessMode: ReadWriteOnce
     size: 2Gi
     storageClass: longhorn
     mountPath: /config
   config-cache:
     enabled: true
-    type: pvc
+    type: persistentVolumeClaim
     accessMode: ReadWriteOnce
     size: 10Gi
     storageClass: longhorn
