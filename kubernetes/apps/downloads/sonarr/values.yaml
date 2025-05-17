@@ -13,6 +13,23 @@ controllers:
         supplementalGroups:
           - 65542 # gladius:external-services
 
+    initContainers:
+      init-permission:
+        image: busybox:latest
+        command:
+          [
+            "/bin/sh",
+            "-c",
+            "chown -R 1000:1000 /config && chmod -R 755 /config",
+          ]
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+          - name: config
+            mountPath: /config
+          - name: config-cache
+            mountPath: /config/MediaCover
+
     containers:
       app:
         image:
@@ -56,21 +73,13 @@ controllers:
           capabilities:
             drop:
               - ALL
-
-    initContainers:
-      01-init-permissions:
-        image:
-          repository: busybox
-          tag: latest
-        command:
-          - /bin/sh
-          - -c
-          - |
-            chown -R 1000:1000 /config
-            chmod -R 755 /config
-        securityContext:
-          runAsUser: 0
-          privileged: true
+        volumeMounts:
+          - name: config
+            mountPath: /config
+          - name: config-cache
+            mountPath: /config/MediaCover
+          - name: media
+            mountPath: /data/nas-media
 
 service:
   app:
