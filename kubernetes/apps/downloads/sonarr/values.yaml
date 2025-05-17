@@ -71,6 +71,7 @@ persistence:
     accessMode: ReadWriteOnce
     size: 2Gi
     storageClass: longhorn
+    mountPath: /config
   add-ons:
     type: emptyDir
   tmp:
