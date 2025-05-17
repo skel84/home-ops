@@ -115,14 +115,14 @@ ingress:
             service:
               identifier: app
               port: *port
-  app-external:
-    annotations:
-      external-dns.alpha.kubernetes.io/target: external.rbl.lol
-    className: external
-    hosts:
-      - host: "{{ .Release.Name }}-ext2.rbl.lol"
-        paths:
-          - path: /
-            service:
-              identifier: app
-              port: *port
+  # app-external:
+  #   annotations:
+  #     external-dns.alpha.kubernetes.io/target: external.rbl.lol
+  #   className: external
+  #   hosts:
+  #     - host: "{{ .Release.Name }}-ext2.rbl.lol"
+  #       paths:
+  #         - path: /
+  #           service:
+  #             identifier: app
+  #             port: *port
