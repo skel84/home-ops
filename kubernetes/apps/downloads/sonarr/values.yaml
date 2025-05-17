@@ -65,8 +65,12 @@ service:
         port: *port
 
 persistence:
-  # config:
-  #   existingClaim: sonarr-config
+  config:
+    enabled: true
+    type: pvc
+    accessMode: ReadWriteOnce
+    size: 2Gi
+    storageClass: longhorn
   add-ons:
     type: emptyDir
   tmp:
