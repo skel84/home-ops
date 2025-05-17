@@ -19,7 +19,7 @@ spec:
       helm:
         releaseName: sonarr
         valueFiles:
-          - $repo/kubernetes/apps/downloads/sonarr/values.sops.yaml
+          - $repo/kubernetes/apps/downloads/sonarr/values.yaml
   destination:
     name: in-cluster
     namespace: downloads
