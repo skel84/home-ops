@@ -78,15 +78,14 @@ persistence:
     globalMounts:
       - path: /data/nas-media
 
-route:
+ingress:
   app:
-    hostnames:
-      - sonarr.rbl.lol
-    parentRefs:
-      - name: internal
-        namespace: kube-system
-        sectionName: https
-    rules:
-      - backendRefs:
-          - identifier: app
-            port: *port
+    className: internal
+    hosts:
+      - host: "{{ .Release.Name }}.rbl.lol"
+        paths:
+          - path: /
+            service:
+              name: app
+              port:
+                number: *port
