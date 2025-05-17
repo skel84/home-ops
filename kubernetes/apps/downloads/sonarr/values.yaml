@@ -72,6 +72,13 @@ persistence:
     size: 2Gi
     storageClass: longhorn
     mountPath: /config
+  config-cache:
+    enabled: true
+    type: pvc
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    storageClass: longhorn
+    mountPath: /config/MediaCover
   add-ons:
     type: emptyDir
   tmp:
