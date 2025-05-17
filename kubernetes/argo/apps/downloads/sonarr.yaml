@@ -13,9 +13,9 @@ spec:
       path: kubernetes/apps/downloads/sonarr
       targetRevision: main
       ref: repo
-    - repoURL: ghcr.io/bjw-s/helm
+    - repoURL: https://bjw-s-labs.github.io/helm-charts
       chart: app-template
-      targetRevision: 3.7.3
+      targetRevision: 4.0.1
       helm:
         releaseName: sonarr
         valueFiles:
