@@ -14,6 +14,9 @@ spec:
     - chart: plex-media-server
       repoURL: https://raw.githubusercontent.com/plexinc/pms-docker/gh-pages
       targetRevision: 1.0.2
+      # - chart: bjw-s/app-template
+      #   repoURL: https://bjw-s-labs.github.io/helm-charts
+      #   targetRevision: 4.0.1
       helm:
         valueFiles:
           - $repo/kubernetes/apps/media/plex/values.yaml
