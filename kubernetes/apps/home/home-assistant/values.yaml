@@ -24,6 +24,7 @@ controllers:
           limits:
             memory: 2Gi
 defaultPodOptions:
+  hostNetwork: true
   securityContext:
     runAsNonRoot: true
     runAsUser: 1000
@@ -36,8 +37,6 @@ service:
     ports:
       http:
         port: &port 8123
-
-hostNetwork: true
 
 ingress:
   app:
