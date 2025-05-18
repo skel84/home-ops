@@ -2,8 +2,6 @@ controllers:
   home-assistant:
     annotations:
       reloader.stakater.com/auto: "true"
-    podOptions:
-      hostNetwork: true
     containers:
       app:
         image:
@@ -38,6 +36,8 @@ service:
     ports:
       http:
         port: &port 8123
+
+hostNetwork: true
 
 ingress:
   app:
