@@ -1,0 +1,93 @@
+controllers:
+  home-assistant:
+    annotations:
+      reloader.stakater.com/auto: "true"
+    containers:
+      app:
+        image:
+          repository: ghcr.io/home-operations/home-assistant
+          tag: 2025.5.2@sha256:92594f14fd3cc0795c1934690aa7ea0bc99622edf0029df8a52a23e95ad3af2f
+        env:
+          TZ: Europe/Rome
+          # HASS_HTTP_TRUSTED_PROXY_1: 192.168.42.0/24
+          # HASS_HTTP_TRUSTED_PROXY_2: 10.42.0.0/16
+        # envFrom:
+        #   - secretRef:
+        #       name: home-assistant-secret
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities: { drop: ["ALL"] }
+        resources:
+          requests:
+            cpu: 10m
+          limits:
+            memory: 2Gi
+defaultPodOptions:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    fsGroupChangePolicy: OnRootMismatch
+service:
+  app:
+    controller: home-assistant
+    ports:
+      http:
+        port: &port 8123
+
+ingress:
+  app:
+    className: internal
+    hosts:
+      - host: "{{ .Release.Name }}.rbl.lol"
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: *port
+
+persistence:
+  config:
+    enabled: true
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 2Gi
+    storageClass: longhorn
+    globalMounts:
+      - path: /config
+  config-cache:
+    enabled: true
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 2Gi
+    storageClass: longhorn
+    globalMounts:
+      - path: /config/.venv
+  config-logs:
+    type: emptyDir
+    globalMounts:
+      - path: /config/logs
+  config-tts:
+    type: emptyDir
+    globalMounts:
+      - path: /config/tts
+  tmp:
+    type: emptyDir
+    globalMounts:
+      - path: /tmp
+# TODO: use cilium with gateway api
+# route:
+#   app:
+#     hostnames:
+#       - "{{ .Release.Name }}.rbl.lol"
+#       - hass.rbl.lol
+#     parentRefs:
+#       - name: external
+#         namespace: kube-system
+#         sectionName: https
+#     rules:
+#       - backendRefs:
+#           - identifier: app
+#             port: *port
