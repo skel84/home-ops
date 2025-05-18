@@ -5,8 +5,8 @@ controllers:
     containers:
       app:
         image:
-          repository: ghcr.io/home-assistant/home-assistant
-          tag: 2025.5.2
+          repository: ghcr.io/home-operations/home-assistant
+          tag: 2025.5.2@sha256:92594f14fd3cc0795c1934690aa7ea0bc99622edf0029df8a52a23e95ad3af2f
         env:
           TZ: Europe/Rome
           HASS_HTTP_TRUSTED_PROXY_1: 192.168.0.0/24
@@ -15,8 +15,8 @@ controllers:
         #   - secretRef:
         #       name: home-assistant-secret
         securityContext:
-          allowPrivilegeEscalation: true
-          readOnlyRootFilesystem: false
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
           capabilities: { drop: ["ALL"] }
         resources:
           requests:
@@ -47,12 +47,12 @@ controllers:
 
 defaultPodOptions:
   hostNetwork: true
-  # securityContext:
-  #   runAsNonRoot: false
-  #   runAsUser: 1000
-  #   runAsGroup: 1000
-  #   fsGroup: 1000
-  #   fsGroupChangePolicy: OnRootMismatch
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    fsGroupChangePolicy: OnRootMismatch
 
 service:
   app:
