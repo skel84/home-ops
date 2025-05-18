@@ -63,7 +63,7 @@ service:
     externalTrafficPolicy: Local
     loadBalancerIP: 192.168.0.54
     annotations:
-      external-dns.alpha.kubernetes.io/hostname: home-assistant-lb.rbl.lol
+      external-dns.alpha.kubernetes.io/hostname: home-assistant.rbl.lol
     ports:
       http:
         port: 8123
@@ -82,15 +82,15 @@ ingress:
             service:
               identifier: app
               port: 8123
-  app-lan:
-    className: internal
-    hosts:
-      - host: "home-assistant.rbl.lol"
-        paths:
-          - path: /
-            service:
-              identifier: app
-              port: 8123
+  # app-lan:
+  #   className: internal
+  #   hosts:
+  #     - host: "home-assistant.rbl.lol"
+  #       paths:
+  #         - path: /
+  #           service:
+  #             identifier: app
+  #             port: 8123
 
 persistence:
   config:
