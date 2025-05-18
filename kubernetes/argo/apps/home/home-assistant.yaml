@@ -1,33 +1,33 @@
----
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: home-assistant
-  namespace: argo-system
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
-spec:
-  project: kubernetes
-  sources:
-    - repoURL: "https://github.com/skel84/home-ops.git"
-      path: kubernetes/apps/home/home-assistant
-      targetRevision: main
-      ref: repo
-    - repoURL: https://bjw-s-labs.github.io/helm-charts
-      chart: app-template
-      targetRevision: 3.7.3
-      helm:
-        releaseName: home-assistant
-        valueFiles:
-          - $repo/kubernetes/apps/home/home-assistant/values.yaml
-  destination:
-    name: in-cluster
-    namespace: home
-  syncPolicy:
-    automated:
-      allowEmpty: true
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
+# ---
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: home-assistant
+#   namespace: argo-system
+#   annotations:
+#     argocd.argoproj.io/sync-wave: "0"
+# spec:
+#   project: kubernetes
+#   sources:
+#     - repoURL: "https://github.com/skel84/home-ops.git"
+#       path: kubernetes/apps/home/home-assistant
+#       targetRevision: main
+#       ref: repo
+#     - repoURL: https://bjw-s-labs.github.io/helm-charts
+#       chart: app-template
+#       targetRevision: 3.7.3
+#       helm:
+#         releaseName: home-assistant
+#         valueFiles:
+#           - $repo/kubernetes/apps/home/home-assistant/values.yaml
+#   destination:
+#     name: in-cluster
+#     namespace: home
+#   syncPolicy:
+#     automated:
+#       allowEmpty: true
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
+#       - ServerSideApply=true
