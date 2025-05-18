@@ -11,6 +11,7 @@ controllers:
           TZ: Europe/Rome
           HASS_HTTP_TRUSTED_PROXY_1: 192.168.0.0/24
           HASS_HTTP_TRUSTED_PROXY_2: 10.42.0.0/16
+          UV_SYSTEM_PYTHON: "true"
         # envFrom:
         #   - secretRef:
         #       name: home-assistant-secret
