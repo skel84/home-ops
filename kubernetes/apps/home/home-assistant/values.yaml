@@ -2,6 +2,7 @@ controllers:
   home-assistant:
     annotations:
       reloader.stakater.com/auto: "true"
+    hostNetwork: true # Add this li
     containers:
       app:
         image:
