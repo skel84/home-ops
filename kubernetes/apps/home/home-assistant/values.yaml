@@ -50,6 +50,8 @@ service:
 ingress:
   app:
     className: external
+    annotations:
+      external-dns.alpha.kubernetes.io/target: external.rbl.lol
     hosts:
       - host: "hass.rbl.lol"
         paths:
