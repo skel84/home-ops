@@ -5,20 +5,24 @@ controllers:
     containers:
       app:
         image:
-          repository: ghcr.io/home-operations/home-assistant
-          tag: 2025.5.2@sha256:92594f14fd3cc0795c1934690aa7ea0bc99622edf0029df8a52a23e95ad3af2f
+          repository: ghcr.io/home-assistant/home-assistant
+          tag: 2025.5.2
         env:
           TZ: Europe/Rome
           HASS_HTTP_TRUSTED_PROXY_1: 192.168.0.0/24
           HASS_HTTP_TRUSTED_PROXY_2: 10.42.0.0/16
+          PYTHONPATH: "/config/deps"
           UV_SYSTEM_PYTHON: "true"
+          UV_NO_CACHE: "true"
+          VENV_FOLDER: /venv
+
         # envFrom:
         #   - secretRef:
         #       name: home-assistant-secret
-        securityContext:
-          allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          capabilities: { drop: ["ALL"] }
+        # securityContext:
+        #   allowPrivilegeEscalation: false
+        #   readOnlyRootFilesystem: true
+        #   capabilities: { drop: ["ALL"] }
         resources:
           requests:
             cpu: 10m
@@ -40,6 +44,9 @@ controllers:
             "12321",
             "/config",
           ]
+        env:
+          HASS_SERVER: http://localhost:8123
+          TZ: Europe/Rome
         resources:
           requests:
             cpu: 10m
