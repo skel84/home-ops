@@ -84,6 +84,8 @@ ingress:
               port: 8123
   app-lan:
     className: internal
+    annotations:
+      external-dns.alpha.kubernetes.io/target: internal.rbl.lol
     hosts:
       - host: "home-assistant.rbl.lol"
         paths:
