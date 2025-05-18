@@ -39,9 +39,9 @@ service:
     forceRename: home-assistant
     type: LoadBalancer
     externalTrafficPolicy: Local
-  annotations:
-    lbipam.cilium.io/ips: 192.168.0.54
-    external-dns.alpha.kubernetes.io/hostname: home-assistant.rbl.lol
+    annotations:
+      lbipam.cilium.io/ips: 192.168.0.54
+      external-dns.alpha.kubernetes.io/hostname: home-assistant.rbl.lol
     ports:
       http:
         port: 8123
