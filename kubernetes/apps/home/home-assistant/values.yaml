@@ -5,8 +5,8 @@ controllers:
     containers:
       app:
         image:
-          repository: ghcr.io/home-operations/home-assistant
-          tag: 2025.5.2@sha256:92594f14fd3cc0795c1934690aa7ea0bc99622edf0029df8a52a23e95ad3af2f
+          repository: ghcr.io/home-assistant/home-assistant
+          tag: 2025.5.2
         env:
           TZ: Europe/Rome
           HASS_HTTP_TRUSTED_PROXY_1: 192.168.0.0/24
