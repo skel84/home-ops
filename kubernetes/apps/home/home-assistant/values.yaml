@@ -82,6 +82,11 @@ ingress:
             service:
               identifier: app
               port: 8123
+          - path: /vscode(/|$)(.*)
+            pathType: Prefix
+            service:
+              identifier: app
+              port: 12321
 
 persistence:
   config:
