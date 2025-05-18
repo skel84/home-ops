@@ -82,6 +82,15 @@ ingress:
             service:
               identifier: app
               port: 8123
+  app-lan:
+    className: internal
+    hosts:
+      - host: "home-assistant.rbl.lol"
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: 8123
 
 persistence:
   config:
