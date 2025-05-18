@@ -47,16 +47,16 @@ service:
       http:
         port: 8123
 
-# ingress:
-#   app:
-#     className: external
-#     hosts:
-#       - host: "hass.rbl.lol"
-#         paths:
-#           - path: /
-#             service:
-#               identifier: app
-#               port: *port
+ingress:
+  app:
+    className: external
+    hosts:
+      - host: "hass.rbl.lol"
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: 8123
 
 persistence:
   config:
