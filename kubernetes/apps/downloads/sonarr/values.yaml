@@ -5,10 +5,10 @@ controllers:
 
     pod:
       securityContext:
-        runAsUser: 1000
-        runAsGroup: 1000
+        runAsUser: 999
+        runAsGroup: 999
         runAsNonRoot: true
-        fsGroup: 1000
+        fsGroup: 999
         fsGroupChangePolicy: "OnRootMismatch"
         supplementalGroups:
           - 65542 # gladius:external-services
