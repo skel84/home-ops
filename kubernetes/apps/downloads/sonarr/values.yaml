@@ -101,13 +101,13 @@ persistence:
   media:
     type: nfs
     server: 192.168.0.217
-    path: /volume1/Media/Shows
+    path: /volume1/Shows
     globalMounts:
       - path: /media
   downloads:
     type: nfs
     server: 192.168.0.217
-    path: /volume1/Media/Download
+    path: /volume1/Download
     globalMounts:
       - path: /downloads
 
