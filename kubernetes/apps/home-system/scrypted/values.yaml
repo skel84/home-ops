@@ -73,7 +73,7 @@ persistence:
   recs:
     type: nfs
     server: 192.168.0.217
-    path: /volume1/Media/Recordings
+    path: /volume1/Recordings
     advancedMounts:
       scrypted:
         app:
