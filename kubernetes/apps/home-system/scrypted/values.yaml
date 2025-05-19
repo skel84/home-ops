@@ -35,6 +35,8 @@ service:
         port: 37861
       rebroadcast2:
         port: 37862
+      bridgeport: # homekit
+        port: 35492
     externalTrafficPolicy: Local
     annotations:
       external-dns.alpha.kubernetes.io/hostname: scrypted.rbl.lol
