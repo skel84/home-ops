@@ -26,7 +26,6 @@ service:
     type: LoadBalancer
     controller: scrypted
     primary: true
-    forceRename: scrypted
     loadBalancerIP: 192.168.0.55
     ports:
       http:
