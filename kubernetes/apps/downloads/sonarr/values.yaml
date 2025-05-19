@@ -104,6 +104,12 @@ persistence:
     path: /volume1/Media/Shows
     globalMounts:
       - path: /media
+  downloads:
+    type: nfs
+    server: 192.168.0.217
+    path: /volume1/Media/Download
+    globalMounts:
+      - path: /downloads
 
 ingress:
   app:
