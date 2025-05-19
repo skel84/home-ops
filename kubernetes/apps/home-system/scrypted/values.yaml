@@ -1,0 +1,78 @@
+controllers:
+  home-assistant:
+    annotations:
+      reloader.stakater.com/auto: "true"
+    containers:
+      app:
+        image:
+          repository: ghcr.io/bjw-s-labs/scrypted
+          tag: 0.139.0@sha256:3dc62108e502fdff3c55cf80ba9986a1337ed9a28a059546e6325008ca3efb41
+        probes:
+          liveness:
+            enabled: true
+          readiness:
+            enabled: true
+        resources:
+          requests:
+            cpu: 136m
+            memory: 1024Mi
+            gpu.intel.com/i915: 1
+          limits:
+            gpu.intel.com/i915: 1
+            memory: 8192Mi
+
+service:
+  app:
+    controller: scrypted
+    ports:
+      http:
+        port: 11080
+        primary: true
+      rebroadcast1:
+        port: 37861
+      rebroadcast2:
+        port: 37862
+    ipFamilyPolicy: PreferDualStack
+
+ingress:
+  app:
+    className: "internal"
+    annotations:
+      gethomepage.dev/enabled: "true"
+      gethomepage.dev/description: NVR
+      gethomepage.dev/group: Home
+      gethomepage.dev/icon: scrypted.png
+      gethomepage.dev/name: Scrypted
+    hosts:
+      - host: scrypted.rbl.lol
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
+
+persistence:
+  config:
+    enabled: true
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 2Gi
+    storageClass: longhorn
+    advancedMounts:
+      scrypted:
+        app:
+          - path: /server/volume
+  cache:
+    type: emptyDir
+    globalMounts:
+      - path: /.cache
+  cache-npm:
+    type: emptyDir
+    globalMounts:
+      - path: /.npm
+  recs:
+    existingClaim: nfs-nvr
+    advancedMounts:
+      scrypted:
+        app:
+          - path: /recs
