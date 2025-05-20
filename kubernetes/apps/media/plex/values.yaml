@@ -76,18 +76,17 @@ persistence:
     globalMounts:
       - path: /config
   # Separate PVC for cache to avoid backing up cache files
-  # This must be commented on initial install in order to avoid permission issues in '/config/Library/Application Support/Plex Media Server'
-  plex-cache:
-    storageClass: "longhorn"
-    accessMode: ReadWriteOnce
-    size: "20Gi"
-    globalMounts:
-      - path: /config/Library/Application Support/Plex Media Server/Cache
-  # This must be commented on initial install in order to avoid permission issues in '/config/Library/Application Support/Plex Media Server'
-  logs:
-    type: emptyDir
-    globalMounts:
-      - path: /config/Library/Application Support/Plex Media Server/Logs
+  # Uncomment these only after initial setup is complete
+  # plex-cache:
+  #   storageClass: "longhorn"
+  #   accessMode: ReadWriteOnce
+  #   size: "20Gi"
+  #   globalMounts:
+  #     - path: /config/Library/Application Support/Plex Media Server/Cache
+  # logs:
+  #   type: emptyDir
+  #   globalMounts:
+  #     - path: /config/Library/Application Support/Plex Media Server/Logs
   nfs-nas-media:
     type: nfs
     server: 192.168.0.217
