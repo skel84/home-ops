@@ -1,5 +1,20 @@
 controllers:
   plex:
+    initContainers:
+      01-permissions:
+        image:
+          repository: busybox
+          tag: 1.36.1
+        command:
+          - /bin/sh
+          - -c
+          - |
+            mkdir -p "/config/Library/Application Support/Plex Media Server"
+            chmod -R 777 "/config/Library/Application Support/Plex Media Server"
+            chown -R 1000:1000 "/config"
+        securityContext:
+          runAsUser: 0
+          runAsNonRoot: false
     containers:
       app:
         image:
@@ -32,7 +47,7 @@ controllers:
               periodSeconds: 10
         securityContext:
           allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
+          readOnlyRootFilesystem: false
           capabilities:
             drop:
               - ALL
@@ -77,16 +92,16 @@ persistence:
       - path: /config
   # Separate PVC for cache to avoid backing up cache files
   # Uncomment these only after initial setup is complete
-  # plex-cache:
-  #   storageClass: "longhorn"
-  #   accessMode: ReadWriteOnce
-  #   size: "20Gi"
-  #   globalMounts:
-  #     - path: /config/Library/Application Support/Plex Media Server/Cache
-  # logs:
-  #   type: emptyDir
-  #   globalMounts:
-  #     - path: /config/Library/Application Support/Plex Media Server/Logs
+  plex-cache:
+    storageClass: "longhorn"
+    accessMode: ReadWriteOnce
+    size: "20Gi"
+    globalMounts:
+      - path: /config/Library/Application Support/Plex Media Server/Cache
+  logs:
+    type: emptyDir
+    globalMounts:
+      - path: /config/Library/Application Support/Plex Media Server/Logs
   nfs-nas-media:
     type: nfs
     server: 192.168.0.217
