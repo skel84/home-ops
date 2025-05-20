@@ -1,132 +1,119 @@
-# ingress:
-#   # -- Specify if an ingress resource for the pms server should be created or not
-#   enabled: true
-#   url: plex.rbl.lol
-#   ingressClassName: internal
-
-pms:
-  claimSecret:
-    name: "plex-claim-secret"
-    key: "plex-claim-secret"
-
-  # livenessProbe:
-  #   httpGet:
-  #     path: /identity
-  #     port: 32400
-  #   # initialDelaySeconds: 60
-  #   periodSeconds: 60
-  #   timeoutSeconds: 1
-  #   failureThreshold: 3
-
-  # # -- Add kubernetes readiness probe to pms container.
-  # readinessProbe:
-  #   httpGet:
-  #     path: /identity
-  #     port: 32400
-  #   # initialDelaySeconds: 60
-  #   periodSeconds: 60
-  #   timeoutSeconds: 1
-  #   failureThreshold: 3
-  securityContext:
-    privileged: true
-    # supplementalGroups: [44]
-
-service:
-  app:
-    controller: plex
-    primary: true
-    type: LoadBalancer
-    loadBalancerIP: 192.168.0.52
-    externalTrafficPolicy: Cluster
-    annotations:
-      lbipam.cilium.io/ips: 192.168.0.52
-      external-dns.alpha.kubernetes.io/hostname: plex.rbl.lol
-    ports:
-      http:
-        port: 32400
-
-extraEnv:
-  ALLOWED_NETWORKS: "192.168.0.0/24"
-  PLEX_ADVERTISE_URL: http://plex.rbl.lol:32400,http://192.168.0.52:32400
-
-extraVolumeMounts:
-  # Mount the media volume from NFS
-  - name: media
-    mountPath: /data
-    readOnly: false
-  # intel igpu device plugin
-  - name: dev-dri
-    mountPath: /dev/dri
-
-extraVolumes:
-  # Reference the existing media NFS PVC
-  - name: media
-    persistentVolumeClaim:
-      claimName: media-nfs-pvc
-  # intel igpu device plugin
-  - name: dev-dri
-    hostPath:
-      path: /dev/dri
-      type: Directory
-
 controllers:
   plex:
     containers:
       app:
         image:
-          repository: plexinc/pms-docker
-          tag: latest
+          repository: ghcr.io/home-operations/plex
+          tag: 1.41.6.9685
         env:
-          ALLOWED_NETWORKS: "192.168.0.0/24"
-          PLEX_ADVERTISE_URL: "http://plex.rbl.lol:32400,http://192.168.0.52:32400"
+          TZ: "Europe/Rome"
+          PLEX_ADVERTISE_URL: http://192.168.0.52:32400,https://plex.rbl.com:443
+          PLEX_NO_AUTH_NETWORKS: "172.17.0.0/16,192.168.0.0/24,10.42.0.0/16"
+        envFrom:
+          - secretRef:
+              name: plex-secret
+        probes:
+          liveness: &probes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /identity
+                port: 32400
+              initialDelaySeconds: 0
+              periodSeconds: 10
+              timeoutSeconds: 1
+              failureThreshold: 3
+          readiness: *probes
+          startup:
+            enabled: true
+            spec:
+              failureThreshold: 30
+              periodSeconds: 10
         securityContext:
-          privileged: true
-        resources: {}
-        # Add liveness/readiness probes if needed
-    pod:
-      securityContext: {}
-    extraVolumeMounts:
-      - name: media
-        mountPath: /data
-        readOnly: false
-      - name: dev-dri
-        mountPath: /dev/dri
-    extraVolumes:
-      - name: media
-        persistentVolumeClaim:
-          claimName: media-nfs-pvc
-      - name: dev-dri
-        hostPath:
-          path: /dev/dri
-          type: Directory
-
-ingress:
-  external:
-    className: external
-    annotations:
-      external-dns.alpha.kubernetes.io/target: external.rbl.lol
-    hosts:
-      - host: "plex.rbl.lol"
-        paths:
-          - path: /
-            service:
-              identifier: app
-              port: 32400
-  internal:
-    className: internal
-    hosts:
-      - host: "pms.rbl.lol"
-        paths:
-          - path: /
-            service:
-              identifier: app
-              port: 32400
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+        resources:
+          requests:
+            gpu.intel.com/i915: 1
+            cpu: 500m
+            memory: 2Gi
+          limits:
+            gpu.intel.com/i915: 1
+            memory: 5Gi
+defaultPodOptions:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    fsGroupChangePolicy: OnRootMismatch
+    supplementalGroups: [44]
+  nodeSelector:
+    intel.feature.node.kubernetes.io/gpu: "true"
+service:
+  app:
+    controller: plex
+    type: LoadBalancer
+    loadBalancerIP: 192.168.0.52
+    externalTrafficPolicy: Local
+    ports:
+      http:
+        port: &port 32400
 persistence:
-  media:
+  config:
+    suffix: config
     enabled: true
     type: persistentVolumeClaim
     accessMode: ReadWriteOnce
-    size: 100Gi # adjust as needed
-    storageClass: longhorn # adjust as needed
+    size: 10Gi
+    storageClass: longhorn
+    globalMounts:
+      - path: /config
+  # Separate PVC for cache to avoid backing up cache files
+  # This must be commented on initial install in order to avoid permission issues in '/config/Library/Application Support/Plex Media Server'
+  plex-cache:
+    storageClass: "longhorn"
+    accessMode: ReadWriteOnce
+    size: "20Gi"
+    globalMounts:
+      - path: /config/Library/Application Support/Plex Media Server/Cache
+  # This must be commented on initial install in order to avoid permission issues in '/config/Library/Application Support/Plex Media Server'
+  logs:
+    type: emptyDir
+    globalMounts:
+      - path: /config/Library/Application Support/Plex Media Server/Logs
+  nfs-nas-media:
+    type: nfs
+    server: 192.168.0.217
+    path: /volume1/Media/
     globalMounts:
       - path: /data
+  transcode:
+    type: emptyDir
+    globalMounts:
+      - path: /transcode
+  tmp:
+    type: emptyDir
+ingress:
+  app:
+    enabled: true
+    # ensure that external DNS (cloudflare) has an entry for this directed to the router
+    # ensure that internal DNS for this zone (coredns) has an entry for this directed to nginx LB IP
+    className: external
+    annotations:
+      nginx.ingress.kubernetes.io/app-root: /web
+    hosts:
+      - host: &host plex.rbl.lol
+        paths:
+          - path: /
+            pathType: Prefix
+            service:
+              identifier: app
+              port: http
+    tls:
+      - hosts:
+          - *host
