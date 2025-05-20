@@ -2,12 +2,12 @@
 kind: Application
 apiVersion: argoproj.io/v1alpha1
 metadata:
-  name: kubernetes-secret-generator
+  name: node-feature-discovery
   namespace: argo-system
 spec:
   project: kubernetes
   sources:
-    - chart: kubernetes-secret-generator
+    - chart: node-feature-discovery
       repoURL: https://kubernetes-sigs.github.io/node-feature-discovery/charts
       targetRevision: 0.17.3
   destination:
