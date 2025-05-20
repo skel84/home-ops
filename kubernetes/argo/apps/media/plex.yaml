@@ -1,37 +1,32 @@
----
-kind: Application
-apiVersion: argoproj.io/v1alpha1
-metadata:
-  name: plex
-  namespace: argo-system
-spec:
-  project: kubernetes
-  sources:
-    - repoURL: "https://github.com/skel84/home-ops.git"
-      path: kubernetes/apps/media/plex/
-      targetRevision: main
-      ref: repo
-    - chart: plex-media-server
-      repoURL: https://raw.githubusercontent.com/plexinc/pms-docker/gh-pages
-      targetRevision: 1.0.2
-      # - chart: bjw-s/app-template
-      #   repoURL: https://bjw-s-labs.github.io/helm-charts
-      #   targetRevision: 4.0.1
-      helm:
-        valueFiles:
-          - $repo/kubernetes/apps/media/plex/values.yaml
-        values: |
-          preUpgradeChecker:
-            jobEnabled: false
-  destination:
-    name: in-cluster
-    namespace: media
-  syncPolicy:
-    automated:
-      allowEmpty: true
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
-      - RespectIgnoreDifferences=true
+# ---
+# kind: Application
+# apiVersion: argoproj.io/v1alpha1
+# metadata:
+#   name: plex
+#   namespace: argo-system
+# spec:
+#   project: kubernetes
+#   sources:
+#     - repoURL: "https://github.com/skel84/home-ops.git"
+#       path: kubernetes/apps/media/plex
+#       targetRevision: main
+#       ref: repo
+#     - repoURL: https://bjw-s-labs.github.io/helm-charts
+#       chart: app-template
+#       targetRevision: 4.0.1
+#       helm:
+#         releaseName: plex
+#         valueFiles:
+#           - $repo/kubernetes/apps/media/plex/values.yaml
+#   destination:
+#     name: in-cluster
+#     namespace: media
+#   syncPolicy:
+#     automated:
+#       allowEmpty: true
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
+#       - ServerSideApply=true
+#       - RespectIgnoreDifferences=true

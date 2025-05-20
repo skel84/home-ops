@@ -32,12 +32,18 @@ pms:
     # supplementalGroups: [44]
 
 service:
-  type: LoadBalancer
-  port: 32400
-  annotations:
-    lbipam.cilium.io/ips: 192.168.0.52
-    external-dns.alpha.kubernetes.io/hostname: plex.rbl.lol
-  externalTrafficPolicy: Cluster
+  app:
+    controller: plex
+    primary: true
+    type: LoadBalancer
+    loadBalancerIP: 192.168.0.52
+    externalTrafficPolicy: Cluster
+    annotations:
+      lbipam.cilium.io/ips: 192.168.0.52
+      external-dns.alpha.kubernetes.io/hostname: plex.rbl.lol
+    ports:
+      http:
+        port: 32400
 
 extraEnv:
   ALLOWED_NETWORKS: "192.168.0.0/24"
@@ -62,3 +68,65 @@ extraVolumes:
     hostPath:
       path: /dev/dri
       type: Directory
+
+controllers:
+  plex:
+    containers:
+      app:
+        image:
+          repository: plexinc/pms-docker
+          tag: latest
+        env:
+          ALLOWED_NETWORKS: "192.168.0.0/24"
+          PLEX_ADVERTISE_URL: "http://plex.rbl.lol:32400,http://192.168.0.52:32400"
+        securityContext:
+          privileged: true
+        resources: {}
+        # Add liveness/readiness probes if needed
+    pod:
+      securityContext: {}
+    extraVolumeMounts:
+      - name: media
+        mountPath: /data
+        readOnly: false
+      - name: dev-dri
+        mountPath: /dev/dri
+    extraVolumes:
+      - name: media
+        persistentVolumeClaim:
+          claimName: media-nfs-pvc
+      - name: dev-dri
+        hostPath:
+          path: /dev/dri
+          type: Directory
+
+ingress:
+  external:
+    className: external
+    annotations:
+      external-dns.alpha.kubernetes.io/target: external.rbl.lol
+    hosts:
+      - host: "plex.rbl.lol"
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: 32400
+  internal:
+    className: internal
+    hosts:
+      - host: "pms.rbl.lol"
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: 32400
+persistence:
+  media:
+    enabled: true
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 100Gi # adjust as needed
+    storageClass: longhorn # adjust as needed
+    globalMounts:
+      - path: /data
