@@ -122,6 +122,7 @@ ingress:
     # ensure that internal DNS for this zone (coredns) has an entry for this directed to nginx LB IP
     className: external
     annotations:
+      external-dns.alpha.kubernetes.io/target: external.rbl.lol
       nginx.ingress.kubernetes.io/app-root: /web
     hosts:
       - host: &host plex.rbl.lol
