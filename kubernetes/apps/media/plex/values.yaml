@@ -76,6 +76,7 @@ service:
     loadBalancerIP: 192.168.0.52
     externalTrafficPolicy: Local
     annotations:
+      lbipam.cilium.io/ips: 192.168.0.52
       external-dns.alpha.kubernetes.io/hostname: pms.rbl.lol
     ports:
       http:
