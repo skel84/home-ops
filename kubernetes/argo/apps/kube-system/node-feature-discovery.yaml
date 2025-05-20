@@ -8,11 +8,11 @@ spec:
   project: kubernetes
   sources:
     - chart: kubernetes-secret-generator
-      repoURL: https://helm.mittwald.de
-      targetRevision: 3.4.1
+      repoURL: https://kubernetes-sigs.github.io/node-feature-discovery/charts
+      targetRevision: 0.17.3
   destination:
     name: in-cluster
-    namespace: security
+    namespace: kube-system
   syncPolicy:
     automated:
       allowEmpty: true
