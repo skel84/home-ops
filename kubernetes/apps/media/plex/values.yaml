@@ -22,7 +22,7 @@ controllers:
           tag: 1.41.6.9685
         env:
           TZ: "Europe/Rome"
-          PLEX_ADVERTISE_URL: http://192.168.0.52:32400,https://plex.rbl.com:443
+          PLEX_ADVERTISE_URL: http://192.168.0.52:32400,https://plex.rbl.lol:443
           PLEX_NO_AUTH_NETWORKS: "172.17.0.0/16,192.168.0.0/24,10.42.0.0/16"
         # envFrom:
         #   - secretRef:
