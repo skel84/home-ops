@@ -92,10 +92,7 @@ defaultPodOptions:
     runAsGroup: 999
     fsGroup: 999
     fsGroupChangePolicy: OnRootMismatch
-  volumes:
-    - name: onepassword-token
-      secret:
-        secretName: onepassword-secret
+
 service:
   app:
     controller: onepassword-connect
