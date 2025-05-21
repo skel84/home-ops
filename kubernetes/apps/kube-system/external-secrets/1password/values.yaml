@@ -60,10 +60,6 @@ controllers:
               secretKeyRef:
                 name: onepassword-secret
                 key: 1password-credentials.json
-        volumeMounts:
-          - name: onepassword-token
-            mountPath: /home/opuser/.op/1password-credentials.json
-            subPath: 1password-credentials.json
         probes:
           liveness:
             enabled: true
