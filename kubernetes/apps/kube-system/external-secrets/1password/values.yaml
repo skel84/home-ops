@@ -16,6 +16,10 @@ controllers:
               secretKeyRef:
                 name: onepassword-secret
                 key: 1password-credentials.json
+        volumeMounts:
+          - name: onepassword-token
+            mountPath: /home/opuser/.op/1password-credentials.json
+            subPath: 1password-credentials.json
         probes:
           liveness:
             enabled: true
@@ -60,6 +64,10 @@ controllers:
               secretKeyRef:
                 name: onepassword-secret
                 key: 1password-credentials.json
+        volumeMounts:
+          - name: onepassword-token
+            mountPath: /home/opuser/.op/1password-credentials.json
+            subPath: 1password-credentials.json
         probes:
           liveness:
             enabled: true
@@ -88,6 +96,10 @@ defaultPodOptions:
     runAsGroup: 999
     fsGroup: 999
     fsGroupChangePolicy: OnRootMismatch
+  volumes:
+    - name: onepassword-token
+      secret:
+        secretName: onepassword-secret
 service:
   app:
     controller: onepassword-connect
