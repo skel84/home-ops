@@ -20,3 +20,4 @@ talosconfig
 .DS_Store
 .examples/
 Thumbs.db
+1password-credentials.json
