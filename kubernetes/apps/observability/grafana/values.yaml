@@ -220,14 +220,14 @@ plugins:
   - vonage-status-panel
 serviceMonitor:
   enabled: true
-route:
-  main:
-    enabled: true
-    hostnames: ["{{ .Release.Name }}.rbl.lol"]
-    parentRefs:
-      - name: internal
-        namespace: kube-system
-        sectionName: https
+ingress:
+  enabled: true
+  className: internal
+  hosts:
+    - host: "{{ .Release.Name }}.rbl.lol"
+      paths:
+        - path: /
+          pathType: Prefix
 persistence:
   enabled: false
 testFramework:
