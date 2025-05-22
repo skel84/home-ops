@@ -1,0 +1,32 @@
+---
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: unpoller
+  namespace: argo-system
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/observability/unpoller
+      targetRevision: main
+      ref: repo
+    - repoURL: https://bjw-s-labs.github.io/helm-charts
+      chart: app-template
+      targetRevision: 4.0.1
+      helm:
+        releaseName: unpoller
+        valueFiles:
+          - $repo/kubernetes/apps/observability/unpoller/values.yaml
+  destination:
+    name: in-cluster
+    namespace: observability
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true

@@ -1,0 +1,14 @@
+# Promtail configuration
+config:
+  clients:
+    - url: http://loki:3100/loki/api/v1/push
+
+daemonset:
+  enabled: true
+
+resources:
+  limits:
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi

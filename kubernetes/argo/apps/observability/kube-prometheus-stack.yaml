@@ -1,0 +1,32 @@
+---
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: kube-prometheus-stack
+  namespace: argo-system
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/observability/kube-prometheus-stack
+      targetRevision: main
+      ref: repo
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: v0.82.2
+      helm:
+        releaseName: kube-prometheus-stack
+        valueFiles:
+          - $repo/kubernetes/apps/observability/kube-prometheus-stack/values.yaml
+  destination:
+    name: in-cluster
+    namespace: observability
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true

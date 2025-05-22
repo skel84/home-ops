@@ -1,0 +1,32 @@
+---
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: grafana
+  namespace: argo-system
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/observability/grafana
+      targetRevision: main
+      ref: repo
+    - repoURL: https://grafana.github.io/helm-charts
+      chart: grafana
+      targetRevision: 9.1.1
+      helm:
+        releaseName: grafana
+        valueFiles:
+          - $repo/kubernetes/apps/observability/grafana/values.yaml
+  destination:
+    name: in-cluster
+    namespace: observability
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
