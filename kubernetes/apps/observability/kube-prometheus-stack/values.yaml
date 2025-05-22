@@ -31,10 +31,9 @@ kubeProxy:
 prometheus:
   ingress:
     enabled: true
-    className: internal
+    ingressClassName: internal
     hosts:
       - prometheus.rbl.lol
-
     prometheusSpec:
     #   image:
     #     registry: docker.io
