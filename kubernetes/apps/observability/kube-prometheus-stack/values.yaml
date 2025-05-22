@@ -14,10 +14,6 @@ alertmanager:
           - path: /
             pathType: Prefix
   alertmanagerSpec:
-    alertmanagerConfiguration:
-      name: alertmanager
-      global:
-        resolveTimeout: 5m
     externalUrl: https://alertmanager.rbl.lol
     storage:
       volumeClaimTemplate:
@@ -45,7 +41,7 @@ prometheus:
     image:
       registry: docker.io
       repository: prom/prometheus
-      tag: 2.53.2-0.2.5
+      tag: v2.53.4
     securityContext:
       runAsNonRoot: true
       runAsUser: 64535
