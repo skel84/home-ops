@@ -5,7 +5,6 @@ controllers:
       configmap.reloader.stakater.com/reload: frigate-configmap
     pod:
       nodeSelector:
-        google.feature.node.kubernetes.io/coral: "true"
         intel.feature.node.kubernetes.io/gpu: "true"
     containers:
       main:
