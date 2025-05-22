@@ -32,7 +32,7 @@ prometheus:
     annotations: {}
     hosts:
       - prometheus.rbl.lol
-    prometheusSpec:
+  prometheusSpec:
     #   image:
     #     registry: docker.io
     #     repository: prom/prometheus
@@ -47,6 +47,16 @@ prometheus:
     ruleSelectorNilUsesHelmValues: false
     scrapeConfigSelectorNilUsesHelmValues: false
     serviceMonitorSelectorNilUsesHelmValues: false
+    # Enable discovery of ServiceMonitors with any labels
+    serviceMonitorSelector: {}
+    # Enable discovery of PodMonitors with any labels
+    podMonitorSelector: {}
+    # Enable discovery of PrometheusRules with any labels
+    ruleSelector: {}
+    # Enable discovery of Probes with any labels
+    probeSelector: {}
+    # Enable discovery of ScrapeConfigs with any labels
+    scrapeConfigSelector: {}
     retention: 14d
     retentionSize: 50GB
     resources:
