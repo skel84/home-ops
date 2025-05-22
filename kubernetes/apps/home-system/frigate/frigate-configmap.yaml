@@ -101,7 +101,7 @@ data:
           password: admin1234
 
       camera_letto:
-        enabled: true
+        enabled: false  # Disabled until connectivity is fixed
         ffmpeg:
           inputs:
             - path: rtsp://127.0.0.1:8554/camera_letto
@@ -208,7 +208,7 @@ data:
         type: openvino
         device: GPU
         model:
-          path: /openvino-model/FP16/ssdlite_mobilenet_v2.xml
+          path: /config/model/ssdlite_mobilenet_v2.xml
 
     # model:
     #   model_type: yolonas

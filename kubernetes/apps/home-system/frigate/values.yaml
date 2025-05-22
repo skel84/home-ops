@@ -101,3 +101,8 @@ persistence:
     sizeLimit: 4Gi
     globalMounts:
       - path: /dev/shm
+  models:
+    enabled: true
+    type: emptyDir
+    globalMounts:
+      - path: /config/model
