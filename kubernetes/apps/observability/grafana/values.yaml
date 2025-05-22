@@ -1,5 +1,6 @@
 deploymentStrategy:
   type: Recreate
+assertNoLeakedSecrets: false
 admin:
   existingSecret: grafana-admin-secret
 env:
