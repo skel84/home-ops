@@ -226,10 +226,7 @@ ingress:
   className: internal
   annotations: {}
   hosts:
-    - host: grafana.rbl.lol
-      paths:
-        - path: /
-          pathType: Prefix
+    - grafana.rbl.lol
 persistence:
   enabled: false
 testFramework:
