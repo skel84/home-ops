@@ -191,10 +191,18 @@ data:
         - cat
         - bird
 
-    # Use the default Frigate model configuration
-    # model:
-    #   width: 640
-    #   height: 640
+    # Configure OpenVINO detector with GPU acceleration
+    detectors:
+      ov:
+        type: openvino
+        device: GPU
+
+    model:
+      width: 300
+      height: 300
+      input_tensor: nhwc
+      input_pixel_format: bgr
+      path: /openvino-model/ssdlite_mobilenet_v2.xml
 
     # version: 0.14
     version: 0.15.1
