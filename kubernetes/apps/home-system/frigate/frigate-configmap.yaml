@@ -111,11 +111,11 @@ data:
             - path: rtsp://127.0.0.1:8554/camera_letto_sub
               roles:
                 - detect
-        onvif:
-          host: 192.168.0.148
-          port: 8000
-          user: admin
-          password: {FRIGATE_RTSP_PASSWORD}
+        # onvif:
+        #   host: 192.168.0.148
+        #   port: 8000
+        #   user: admin
+        #   password: {FRIGATE_RTSP_PASSWORD}
 
       terrazzo_ovest:
         enabled: true
