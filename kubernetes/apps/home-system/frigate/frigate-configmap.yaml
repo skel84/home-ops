@@ -192,9 +192,9 @@ data:
         - bird
 
     # Use the default Frigate model configuration
-    model:
-      width: 640
-      height: 640
+    # model:
+    #   width: 640
+    #   height: 640
 
     # version: 0.14
     version: 0.15.1
