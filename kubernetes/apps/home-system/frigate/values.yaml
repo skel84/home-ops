@@ -85,11 +85,9 @@ persistence:
         subPath: config.yml
         readOnly: true
   media:
-    type: custom
-    volumeSpec:
-      nfs:
-        server: 192.168.0.217
-        path: /volume1/Media/Recordings
+    type: nfs
+    server: 192.168.0.217
+    path: /volume1/Media/Recordings
     globalMounts:
       - path: /media
   cache:
