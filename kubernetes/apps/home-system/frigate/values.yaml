@@ -14,9 +14,9 @@ controllers:
         env:
           TZ: Europe/Rome
           FRIGATE_DISABLE_AUTH: "true"
-        envFrom:
-          - secretRef:
-              name: frigate-secret
+        # envFrom:
+        #   - secretRef:
+        #       name: frigate-secret
         securityContext:
           privileged: true
         # probes:
