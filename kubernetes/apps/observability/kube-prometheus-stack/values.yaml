@@ -32,6 +32,7 @@ prometheus:
   ingress:
     enabled: true
     ingressClassName: internal
+    annotations: {}
     hosts:
       - prometheus.rbl.lol
     prometheusSpec:
