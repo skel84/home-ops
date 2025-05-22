@@ -171,18 +171,18 @@ data:
         - -rtsp_transport
         - tcp
 
-    record:
-      enabled: True
-      retain:
-        days: 0
-        mode: motion
-      events:
-        retain:
-          default: 14
-          mode: active_objects
-          objects:
-            cat: 7
-            bird: 7
+    # record:
+    #   enabled: True
+    #   retain:
+    #     days: 0
+    #     mode: motion
+    #   events:
+    #     retain:
+    #       default: 14
+    #       mode: active_objects
+    #       objects:
+    #         cat: 7
+    #         bird: 7
 
     objects:
       track:
@@ -226,4 +226,4 @@ data:
     #   input_pixel_format: bgr
     #   labelmap_path: /openvino-model/coco_91cl_bkgr.txt
     # version: 0.14
-    version: 0.14
+    version: 0.15.1
