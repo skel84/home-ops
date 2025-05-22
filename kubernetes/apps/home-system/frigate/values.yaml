@@ -83,8 +83,8 @@ persistence:
     globalMounts:
       - path: /config
   config-file:
-    type: secret
-    name: frigate-secret
+    type: configMap
+    name: frigate-configmap
     globalMounts:
       - path: /config/config.yml
         subPath: config.yml
