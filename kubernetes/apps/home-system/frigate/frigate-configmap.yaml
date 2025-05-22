@@ -158,19 +158,6 @@ data:
     detect:
       enabled: true
 
-    record:
-      enabled: True
-      retain:
-        days: 0
-        mode: motion
-      events:
-        retain:
-          default: 14
-          mode: active_objects
-          objects:
-            cat: 7
-            bird: 7
-
     detectors:
       ov:
         type: openvino
