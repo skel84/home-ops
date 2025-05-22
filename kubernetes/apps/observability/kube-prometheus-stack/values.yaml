@@ -7,12 +7,9 @@ cleanPrometheusOperatorObjectNames: true
 alertmanager:
   ingress:
     enabled: true
-    className: internal
+    ingressClassName: internal
     hosts:
-      - host: alertmanager.rbl.lol
-        paths:
-          - path: /
-            pathType: Prefix
+      - alertmanager.rbl.lol
   alertmanagerSpec:
     externalUrl: https://alertmanager.rbl.lol
     storage:
