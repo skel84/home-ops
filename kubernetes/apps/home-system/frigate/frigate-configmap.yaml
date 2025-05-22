@@ -181,7 +181,7 @@ data:
     #   input_pixel_format: bgr
     #   labelmap_path: /openvino-model/coco_91cl_bkgr.txt
     # version: 0.14
-    version: 0.15
+    # version: 0.15
 
     auth:
       enabled: false
