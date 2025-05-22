@@ -224,7 +224,7 @@ ingress:
   enabled: true
   className: internal
   hosts:
-    - host: "{{ .Release.Name }}.rbl.lol"
+    - host: grafana.rbl.lol
       paths:
         - path: /
           pathType: Prefix

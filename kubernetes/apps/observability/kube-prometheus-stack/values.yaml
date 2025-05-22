@@ -44,7 +44,7 @@ prometheus:
   prometheusSpec:
     image:
       registry: docker.io
-      repository: prompp/prompp
+      repository: prom/prometheus
       tag: 2.53.2-0.2.5
     securityContext:
       runAsNonRoot: true
