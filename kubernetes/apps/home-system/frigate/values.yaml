@@ -58,7 +58,7 @@ service:
 
 ingress:
   main:
-    className: "nginx-tailscale"
+    className: internal
     hosts:
       - host: "frigate.rbl.lol"
         paths:
