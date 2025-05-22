@@ -190,40 +190,11 @@ data:
         - dog
         - cat
         - bird
-      # filters:
-      #   person:
-      #     min_score: 0.5
-      #     threshold: 0.7
-      #   dog:
-      #     min_score: 0.5
-      #     threshold: 0.7
-      #   cat:
-      #     min_score: 0.5
-      #     threshold: 0.7
-      #   bird:
-      #     min_score: 0.5
-      #     threshold: 0.7
-    detectors:
-      ov:
-        type: openvino
-        device: GPU
-        model:
-          path: /config/model/ssdlite_mobilenet_v2.xml
 
-    # model:
-    #   model_type: yolonas
-    #   width: 320
-    #   height: 320
-    #   input_tensor: nchw
-    #   input_pixel_format: bgr
-    #   path: /openvino-model/yolonas/yolo_nas_m.onnx
-    #   labelmap_path: /labelmap/coco-80.txt
+    # Use the default Frigate model configuration
+    model:
+      width: 640
+      height: 640
 
-    # model:
-    #   width: 300
-    #   height: 300
-    #   input_tensor: nhwc
-    #   input_pixel_format: bgr
-    #   labelmap_path: /openvino-model/coco_91cl_bkgr.txt
     # version: 0.14
     version: 0.15.1
