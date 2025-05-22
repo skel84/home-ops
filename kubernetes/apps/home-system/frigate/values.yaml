@@ -87,7 +87,7 @@ persistence:
     globalMounts:
       - path: /config/config.yml
         subPath: config.yml
-        readOnly: true
+        readOnly: false
   media:
     type: nfs
     server: 192.168.0.217
