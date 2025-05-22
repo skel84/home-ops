@@ -63,11 +63,11 @@ data:
             - path: rtsp://127.0.0.1:8554/soggiorno_sub
               roles:
                 - detect
-        onvif:
-          host: 192.168.0.157
-          port: 8000
-          user: admin
-          password: {FRIGATE_RTSP_PASSWORD}
+        # onvif:
+        #   host: 192.168.0.157
+        #   port: 8000
+        #   user: admin
+        #   password: {FRIGATE_RTSP_PASSWORD}
 
       ufficio:
         enabled: true
@@ -79,11 +79,11 @@ data:
             - path: rtsp://127.0.0.1:8554/ufficio_sub
               roles:
                 - detect
-        onvif:
-          host: 192.168.0.145
-          port: 8000
-          user: admin
-          password: {FRIGATE_RTSP_PASSWORD}
+        # onvif:
+        #   host: 192.168.0.145
+        #   port: 8000
+        #   user: admin
+        #   password: {FRIGATE_RTSP_PASSWORD}
 
       camera_pippi:
         enabled: true
@@ -95,11 +95,11 @@ data:
             - path: rtsp://127.0.0.1:8554/camera_pippi_sub
               roles:
                 - detect
-        onvif:
-          host: 192.168.0.125
-          port: 8000
-          user: admin
-          password: {FRIGATE_RTSP_PASSWORD}
+        # onvif:
+        #   host: 192.168.0.125
+        #   port: 8000
+        #   user: admin
+        #   password: {FRIGATE_RTSP_PASSWORD}
 
       camera_letto:
         enabled: true
@@ -130,11 +130,11 @@ data:
             - path: rtsp://127.0.0.1:8554/terrazzo_ovest_sub
               roles:
                 - detect
-        onvif:
-          host: 192.168.0.176
-          port: 8000
-          user: admin
-          password: {FRIGATE_RTSP_PASSWORD}
+        # onvif:
+        #   host: 192.168.0.176
+        #   port: 8000
+        #   user: admin
+        #   password: {FRIGATE_RTSP_PASSWORD}
 
       balcone_est:
         enabled: true
@@ -149,11 +149,11 @@ data:
             - path: rtsp://127.0.0.1:8554/balcone_est_sub
               roles:
                 - detect
-        onvif:
-          host: 192.168.0.141
-          port: 8000
-          user: admin
-          password: {FRIGATE_RTSP_PASSWORD}
+        # onvif:
+        #   host: 192.168.0.141
+        #   port: 8000
+        #   user: admin
+        #   password: {FRIGATE_RTSP_PASSWORD}
 
     detect:
       enabled: true
