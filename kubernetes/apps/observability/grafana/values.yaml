@@ -223,6 +223,7 @@ serviceMonitor:
 ingress:
   enabled: true
   className: internal
+  annotations: {}
   hosts:
     - host: grafana.rbl.lol
       paths:
