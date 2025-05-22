@@ -45,12 +45,12 @@ service:
   app:
     controller: unpoller
     ports:
-      http:
+      http-metrics:
         port: *port
 serviceMonitor:
   app:
     serviceName: unpoller
     endpoints:
-      - port: http
+      - port: http-metrics
         interval: 2m # Unifi API only polls at 2m intervals
         scrapeTimeout: 10s
