@@ -17,7 +17,7 @@ spec:
       chart: app-template
       targetRevision: 4.0.1
       helm:
-        releaseName: home-assistant
+        releaseName: mosquitto
         valueFiles:
           - $repo/kubernetes/apps/home-system/mosquitto/values.yaml
   destination:
