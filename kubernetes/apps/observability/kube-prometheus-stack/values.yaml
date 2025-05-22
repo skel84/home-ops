@@ -33,11 +33,9 @@ prometheus:
     enabled: true
     className: internal
     hosts:
-      - host: prometheus.rbl.lol
-        paths:
-          - path: /
-            pathType: Prefix
-    # prometheusSpec:
+      - prometheus.rbl.lol
+
+    prometheusSpec:
     #   image:
     #     registry: docker.io
     #     repository: prom/prometheus
