@@ -1,23 +1,23 @@
-hostname: rancher.rbl.lol
-bootstrapPassword: ENC[AES256_GCM,data:pbJTUKE=,iv:MYScRRn4GbbNYbBh3o8e0Jj0pHFujFjasPA87+HcrPg=,tag:9yligi/0m38TverJ+U8Y9A==,type:str]
-sops:
-  kms: []
-  gcp_kms: []
-  azure_kv: []
-  hc_vault: []
-  age:
-    - recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v
-      enc: |
-        -----BEGIN AGE ENCRYPTED FILE-----
-        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBCTmdSVjhXbnVqeCtNMXJL
-        K01SZjF6aVlFMGNYcHpFejd6c0l3MVg1N1FBCmx1c1ZMcVhVUGl5SVE5YVBITkNH
-        UkhadTFTUWRiUC9xZ0dXS3dRMG5CWDAKLS0tIEZVV21zb3JibFppd3gvTVlpQXlV
-        U2JydC85VFVCTmMvenFPUWNOUFNCa2cKJ/MWySnNmFMz2IOpne9TcsTgpLk0qVjn
-        yfZ84k5Ku1/xnD09u4QHTrkMJocuq0v808io4SHXkYl1a2HQPxlvgg==
-        -----END AGE ENCRYPTED FILE-----
-  lastmodified: "2025-06-19T15:06:07Z"
-  mac: ENC[AES256_GCM,data:Vk5b2e9RAH+eiQPWqXJfq/MEaEF6cECae0FLMQOPOzMPhak5abj/3fcmEaJefZxhyzpwFTWDsZqnlWVzp6ymMmxromTQSo+LRxMRiTE+OkOCPxRbe+C4Ta5rOXQjr/9exi1aqtFx8X3C0c999q5o2J7ZrX8W+bC5rPYrBNQvTHc=,iv:Zn9zqni+f5sc9jgIBHJohgilRbexTiwrlxy8rLte9NA=,tag:LHSw3K0mwtOHe6AxfvoWqQ==,type:str]
-  pgp: []
-  encrypted_regex: ^(data|stringData|githubSecret|bootstrapPassword)$
-  mac_only_encrypted: true
-  version: 3.9.4
+# hostname: rancher.rbl.lol
+# bootstrapPassword: ENC[AES256_GCM,data:pbJTUKE=,iv:MYScRRn4GbbNYbBh3o8e0Jj0pHFujFjasPA87+HcrPg=,tag:9yligi/0m38TverJ+U8Y9A==,type:str]
+# sops:
+#   kms: []
+#   gcp_kms: []
+#   azure_kv: []
+#   hc_vault: []
+#   age:
+#     - recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v
+#       enc: |
+#         -----BEGIN AGE ENCRYPTED FILE-----
+#         YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBCTmdSVjhXbnVqeCtNMXJL
+#         K01SZjF6aVlFMGNYcHpFejd6c0l3MVg1N1FBCmx1c1ZMcVhVUGl5SVE5YVBITkNH
+#         UkhadTFTUWRiUC9xZ0dXS3dRMG5CWDAKLS0tIEZVV21zb3JibFppd3gvTVlpQXlV
+#         U2JydC85VFVCTmMvenFPUWNOUFNCa2cKJ/MWySnNmFMz2IOpne9TcsTgpLk0qVjn
+#         yfZ84k5Ku1/xnD09u4QHTrkMJocuq0v808io4SHXkYl1a2HQPxlvgg==
+#         -----END AGE ENCRYPTED FILE-----
+#   lastmodified: "2025-06-19T15:06:07Z"
+#   mac: ENC[AES256_GCM,data:Vk5b2e9RAH+eiQPWqXJfq/MEaEF6cECae0FLMQOPOzMPhak5abj/3fcmEaJefZxhyzpwFTWDsZqnlWVzp6ymMmxromTQSo+LRxMRiTE+OkOCPxRbe+C4Ta5rOXQjr/9exi1aqtFx8X3C0c999q5o2J7ZrX8W+bC5rPYrBNQvTHc=,iv:Zn9zqni+f5sc9jgIBHJohgilRbexTiwrlxy8rLte9NA=,tag:LHSw3K0mwtOHe6AxfvoWqQ==,type:str]
+#   pgp: []
+#   encrypted_regex: ^(data|stringData|githubSecret|bootstrapPassword)$
+#   mac_only_encrypted: true
+#   version: 3.9.4
