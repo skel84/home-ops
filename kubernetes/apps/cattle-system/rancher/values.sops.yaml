@@ -4,6 +4,7 @@ ingress:
   tls:
     source: letsEncrypt
 letsEncrypt:
+  email: skel84@gmail.com
   issuer: "letsencrypt-production"
   ingress:
     class: nginx
