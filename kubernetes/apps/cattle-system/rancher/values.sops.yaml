@@ -1,4 +1,12 @@
 hostname: rancher.rbl.lol
+privateCA: true
+ingress:
+  tls:
+    source: letsEncrypt
+letsEncrypt:
+  issuer: "letsencrypt-production"
+  ingress:
+    class: nginx
 bootstrapPassword: ENC[AES256_GCM,data:pbJTUKE=,iv:MYScRRn4GbbNYbBh3o8e0Jj0pHFujFjasPA87+HcrPg=,tag:9yligi/0m38TverJ+U8Y9A==,type:str]
 sops:
   kms: []

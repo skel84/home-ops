@@ -19,9 +19,6 @@ spec:
       helm:
         valueFiles:
           - $repo/kubernetes/apps/cattle-system/rancher/values.sops.yaml
-        values: |
-          preUpgradeChecker:
-            jobEnabled: false
   destination:
     name: in-cluster
     namespace: cattle-system
