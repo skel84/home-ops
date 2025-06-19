@@ -13,7 +13,7 @@ spec:
       ref: repo
     - chart: rancher
       repoURL: https://releases.rancher.com/server-charts/latest
-      targetRevision: v2.10.1 # Replace with the Longhorn version you'd like to install or upgrade to
+      # targetRevision: v2.10.1 # Replace with the Longhorn version you'd like to install or upgrade to
       helm:
         valueFiles:
           - $repo/kubernetes/apps/cattle-system/rancher/values.sops.yaml
