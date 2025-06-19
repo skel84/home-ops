@@ -16,7 +16,7 @@ spec:
       targetRevision: v2.10.1 # Replace with the Longhorn version you'd like to install or upgrade to
       helm:
         valueFiles:
-          - $repo/kubernetes/apps/cattle-system/rancher/values.yaml
+          - $repo/kubernetes/apps/cattle-system/rancher/values.sops.yaml
         values: |
           preUpgradeChecker:
             jobEnabled: false
