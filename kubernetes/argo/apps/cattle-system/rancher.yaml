@@ -1,36 +1,36 @@
----
-kind: Application
-apiVersion: argoproj.io/v1alpha1
-metadata:
-  name: rancher
-  namespace: argo-system
-  annotations:
-    redeploy: "true"
-spec:
-  project: kubernetes
-  sources:
-    - repoURL: "https://github.com/skel84/home-ops.git"
-      path: kubernetes/apps/cattle-system/rancher/
-      targetRevision: main
-      ref: repo
-    - chart: rancher
-      repoURL: https://releases.rancher.com/server-charts/latest
-      targetRevision: v2.12.0-rc1
-      helm:
-        valueFiles:
-          - $repo/kubernetes/apps/cattle-system/rancher/values.sops.yaml
-        values: |
-          preUpgradeChecker:
-            jobEnabled: false
-  destination:
-    name: in-cluster
-    namespace: cattle-system
-  syncPolicy:
-    automated:
-      allowEmpty: true
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
-      - RespectIgnoreDifferences=true
+# ---
+# kind: Application
+# apiVersion: argoproj.io/v1alpha1
+# metadata:
+#   name: rancher
+#   namespace: argo-system
+#   annotations:
+#     redeploy: "true"
+# spec:
+#   project: kubernetes
+#   sources:
+#     - repoURL: "https://github.com/skel84/home-ops.git"
+#       path: kubernetes/apps/cattle-system/rancher/
+#       targetRevision: main
+#       ref: repo
+#     - chart: rancher
+#       repoURL: https://releases.rancher.com/server-charts/latest
+#       targetRevision: v2.12.0-rc1
+#       helm:
+#         valueFiles:
+#           - $repo/kubernetes/apps/cattle-system/rancher/values.sops.yaml
+#         values: |
+#           preUpgradeChecker:
+#             jobEnabled: false
+#   destination:
+#     name: in-cluster
+#     namespace: cattle-system
+#   syncPolicy:
+#     automated:
+#       allowEmpty: true
+#       prune: true
+#       selfHeal: true
+#     syncOptions:
+#       - CreateNamespace=true
+#       - ServerSideApply=true
+#       - RespectIgnoreDifferences=true
