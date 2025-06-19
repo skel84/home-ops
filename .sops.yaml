@@ -4,7 +4,7 @@ creation_rules:
     mac_only_encrypted: true
     age: "age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v"
   - path_regex: (bootstrap|kubernetes)/.*\.sops\.ya?ml
-    encrypted_regex: "^(data|stringData|githubSecret)$"
+    encrypted_regex: "^(data|stringData|githubSecret|bootstrapPassword)$"
     mac_only_encrypted: true
     age: "age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v"
 stores:

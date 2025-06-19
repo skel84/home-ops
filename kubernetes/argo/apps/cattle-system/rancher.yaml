@@ -1,0 +1,34 @@
+---
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: rancher
+  namespace: argo-system
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/cattle-system/rancher/
+      targetRevision: main
+      ref: repo
+    - chart: rancher
+      repoURL: https://releases.rancher.com/server-charts/latest
+      targetRevision: v2.10.1 # Replace with the Longhorn version you'd like to install or upgrade to
+      helm:
+        valueFiles:
+          - $repo/kubernetes/apps/cattle-system/rancher/values.yaml
+        values: |
+          preUpgradeChecker:
+            jobEnabled: false
+  destination:
+    name: in-cluster
+    namespace: cattle-system
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
