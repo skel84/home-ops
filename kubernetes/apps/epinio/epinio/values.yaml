@@ -1,5 +1,5 @@
 global:
   domain: "rbl.lol"
 
-minio:
-  enabled: true
+server:
+  ingressClassName: "external"
