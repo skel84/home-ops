@@ -1,31 +1,31 @@
-# ---
-# kind: Application
-# apiVersion: argoproj.io/v1alpha1
-# metadata:
-#   name: epinio
-#   namespace: argo-system
-# spec:
-#   project: kubernetes
-#   sources:
-#     - repoURL: "https://github.com/skel84/home-ops.git"
-#       path: kubernetes/apps/epinio/epinio/
-#       targetRevision: main
-#       ref: repo
-#     - chart: epinio
-#       repoURL: https://epinio.github.io/helm-charts
-#       targetRevision: v1.11.1
-#       helm:
-#         valueFiles:
-#           - $repo/kubernetes/apps/epinio/epinio/values.yaml
-#   destination:
-#     name: in-cluster
-#     namespace: epinio
-#   syncPolicy:
-#     automated:
-#       allowEmpty: true
-#       prune: true
-#       selfHeal: true
-#     syncOptions:
-#       - CreateNamespace=true
-#       - ServerSideApply=true
-#       - RespectIgnoreDifferences=true
+---
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: epinio
+  namespace: argo-system
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/epinio/epinio/
+      targetRevision: main
+      ref: repo
+    - chart: epinio
+      repoURL: https://epinio.github.io/helm-charts
+      targetRevision: v1.11.1
+      helm:
+        valueFiles:
+          - $repo/kubernetes/apps/epinio/epinio/values.yaml
+  destination:
+    name: in-cluster
+    namespace: epinio
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
