@@ -21,3 +21,4 @@ talosconfig
 .examples/
 Thumbs.db
 1password-credentials.json
+/tests

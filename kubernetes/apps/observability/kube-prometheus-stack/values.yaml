@@ -57,7 +57,7 @@ prometheus:
     probeSelector: {}
     # Enable discovery of ScrapeConfigs with any labels
     scrapeConfigSelector: {}
-    retention: 14d
+    retention: 7d
     retentionSize: 50GB
     resources:
       requests:
@@ -70,7 +70,7 @@ prometheus:
           storageClassName: longhorn
           resources:
             requests:
-              storage: 50Gi
+              storage: 60Gi
 prometheus-node-exporter:
   fullnameOverride: node-exporter
   prometheus:
