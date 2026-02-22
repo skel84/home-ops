@@ -6,4 +6,4 @@ metadata:
 spec:
   selector:
     matchLabels:
-      kubevirt-manager.io/version: v1.5.3
+      kubevirt-manager.io/version: v1.5.4
