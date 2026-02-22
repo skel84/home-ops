@@ -75,6 +75,7 @@ spec:
   - `kubectl -n kubevirt get vmi ubuntu-example -o jsonpath='{.status.interfaces[0].ipAddress}'`
   - `VM_IP=$(kubectl -n kubevirt get vmi ubuntu-example -o jsonpath='{.status.interfaces[0].ipAddress}')`
   - `ssh -i <private_key_path> -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${VM_IP} 'hostname; sudo -n true'`
+  - `kubectl -n kubevirt get vms` (no resources means no VMs are currently managed)
 
 ## Commit & Pull Request Guidelines
 - Prefer Conventional Commits (`chore:`, `feat:`, `fix:`, `refactor:`; optional scopes like `chore(mise):`).
