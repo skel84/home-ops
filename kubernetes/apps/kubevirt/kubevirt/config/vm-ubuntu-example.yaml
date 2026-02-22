@@ -1,0 +1,66 @@
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: ubuntu-example
+  namespace: kubevirt
+  labels:
+    app.kubernetes.io/name: ubuntu-example
+spec:
+  running: false
+  dataVolumeTemplates:
+    - metadata:
+        name: ubuntu-example-rootdisk
+      spec:
+        source:
+          http:
+            url: https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
+          storageClassName: longhorn
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: ubuntu-example
+    spec:
+      terminationGracePeriodSeconds: 0
+      domain:
+        cpu:
+          cores: 2
+        resources:
+          requests:
+            memory: 2Gi
+        devices:
+          disks:
+            - name: rootdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rootdisk
+          dataVolume:
+            name: ubuntu-example-rootdisk
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              users:
+                - name: ubuntu
+                  sudo: ALL=(ALL) NOPASSWD:ALL
+                  shell: /bin/bash
+                  ssh_authorized_keys:
+                    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCkVZUxcz+Wsh3eAdPxKtiRwf0If0ocCRnVCBn0GrQ/pFXMJkHylSexmJtaQwBKhkesYVaHJpFi9o/D0bCKmhDJ0Q8uWPhsCAgSCqllRi9mV6mpDL3oqvbriRuQ60EslTyVcWUL20sKWDJESCGayBGEvjtwosVN4+N0U6zZkxbNtQArTltCsh2PW8vnBzfZz/Q2ryCs+U+wJJQ4xheTjYMz/Q9lPQmImsP460VrgKlpT1OMrNpy7cgH5ltUQHyHGjOmxVajEEgGj2GV4gSr8CSGI7bz9nx/bdwfSsJZmASAplKWqQhGXzg8vkuC3Fqk+bIZKCpLbLx2w/pElTGtU9Nd0TNkIIBc+T4aRF3fUVGwhIrtjBC9q7qQxlyW+NkpG0kpuoystlI6bey6fZxoxYecdnD7lAlu4WNyapIXR6WLYhi9eQxnWDFJ1yqD4oSGCNQsds64ku+FYRAdBuQCUeYortQktjX7GG3qZM5dhx2iKvXZreqPaKsJGwjl3TAoiEPyKWfffyNuJ69//AuahNYidw4SFnl3sRkhItUVkdYEzosthtr6N9XFORbCloI06lGOnWp3/wbXc7vrmJfFxFOgv2ZUU7Sa30bB/49dmQoiUxzrd7x1eRzcH6YnQbP6ncQQfzSCAzpyuHEmYChcYtIoV+jVxlvMgPvTmw7q05+PRw== francesco.cislaghi@bewatec.com
+              chpasswd:
+                expire: false
