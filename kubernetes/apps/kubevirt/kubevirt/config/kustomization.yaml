@@ -3,5 +3,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   # VM examples can be managed separately after platform bootstrap
-  # - ./vm-ubuntu-example.yaml
-  # - ./vm-sync-wave-patch.yaml
+  - ./vm-ubuntu-example.yaml
+
+patchesStrategicMerge:
+  - ./vm-sync-wave-patch.yaml
