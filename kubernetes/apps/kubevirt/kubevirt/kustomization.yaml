@@ -7,3 +7,4 @@ resources:
   - ./config
 patchesStrategicMerge:
   - ./kubevirt-featuregates-patch.yaml
+  - ./kubevirt-cr-patch.yaml

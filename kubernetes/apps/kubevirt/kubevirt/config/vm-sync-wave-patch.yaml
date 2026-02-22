@@ -1,0 +1,7 @@
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: ubuntu-example
+  namespace: kubevirt
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
