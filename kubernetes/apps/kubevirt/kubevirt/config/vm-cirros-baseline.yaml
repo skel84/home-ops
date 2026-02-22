@@ -1,0 +1,67 @@
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: cirros-baseline
+  namespace: kubevirt
+  labels:
+    app.kubernetes.io/name: cirros-baseline
+spec:
+  runStrategy: Always
+  dataVolumeTemplates:
+    - metadata:
+        name: cirros-baseline-rootdisk
+      spec:
+        source:
+          http:
+            url: https://download.cirros-cloud.net/0.6.2/cirros-0.6.2-x86_64-disk.img
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
+          storageClassName: longhorn
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: cirros-baseline
+    spec:
+      terminationGracePeriodSeconds: 0
+      domain:
+        cpu:
+          cores: 1
+        resources:
+          requests:
+            memory: 512Mi
+        devices:
+          disks:
+            - name: rootdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+              ports:
+                - name: ssh
+                  port: 22
+                  protocol: TCP
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rootdisk
+          dataVolume:
+            name: cirros-baseline-rootdisk
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              ssh_pwauth: true
+              chpasswd:
+                list: |
+                  cirros:gocubsgo
+                expire: false
