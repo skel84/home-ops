@@ -1,0 +1,9 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubevirt-manager
+  namespace: kubevirt-manager
+spec:
+  selector:
+    matchLabels:
+      kubevirt-manager.io/version: v1.5.3
