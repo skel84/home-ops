@@ -8,7 +8,8 @@ metadata:
     app.kubernetes.io/name: ubuntu-example
     app.kubernetes.io/component: ssh
 spec:
-  type: NodePort
+  type: LoadBalancer
+  allocateLoadBalancerNodePorts: true
   selector:
     kubevirt.io/domain: ubuntu-example
   ports:
@@ -16,4 +17,3 @@ spec:
       protocol: TCP
       port: 22
       targetPort: 22
-      nodePort: 30022
