@@ -1,5 +1,0 @@
-global:
-  domain: "rbl.lol"
-
-server:
-  ingressClassName: "external"
