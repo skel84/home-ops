@@ -76,6 +76,20 @@ spec:
   - `VM_IP=$(kubectl -n kubevirt get vmi ubuntu-example -o jsonpath='{.status.interfaces[0].ipAddress}')`
   - `ssh -i <private_key_path> -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@${VM_IP} 'hostname; sudo -n true'`
   - `kubectl -n kubevirt get vms` (no resources means no VMs are currently managed)
+- FreeBSD VM bootstrap workaround (KubeVirt):
+  - `FreeBSD-14.3-RELEASE-amd64-BASIC-CLOUDINIT-ufs` currently hits a `nuageinit` YAML parse error on first boot in this environment.
+  - Use serial console bootstrap to enable SSH access:
+  - `pod=$(kubectl -n kubevirt get pods -l kubevirt.io=virt-launcher -o name | rg freebsd-example | head -n1 | cut -d/ -f2)`
+  - `sock=$(kubectl -n kubevirt exec "$pod" -- sh -lc 'ls -d /var/run/kubevirt-private/* | head -n1')/virt-serial0`
+  - `kubectl -n kubevirt exec -it "$pod" -- nc -U "$sock"` and log in as `root` on `ttyu0`.
+  - In-guest commands:
+  - `mkdir -p /root/.ssh && chmod 700 /root/.ssh`
+  - `echo '<public_key>' > /root/.ssh/authorized_keys`
+  - `chmod 600 /root/.ssh/authorized_keys && chown -R root:wheel /root/.ssh`
+  - `sed -i "" "s/^#PermitRootLogin no/PermitRootLogin yes/" /etc/ssh/sshd_config`
+  - `service sshd restart`
+  - Verify SSH:
+  - `ssh -i <private_key_path> -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@<loadbalancer-ip> 'id && hostname'`
 
 ## Commit & Pull Request Guidelines
 - Prefer Conventional Commits (`chore:`, `feat:`, `fix:`, `refactor:`; optional scopes like `chore(mise):`).

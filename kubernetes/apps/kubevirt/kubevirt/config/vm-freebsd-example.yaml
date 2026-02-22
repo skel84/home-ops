@@ -1,0 +1,68 @@
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: freebsd-example
+  namespace: kubevirt
+  labels:
+    app.kubernetes.io/name: freebsd-example
+spec:
+  runStrategy: Always
+  dataVolumeTemplates:
+    - metadata:
+        name: freebsd-example-rootdisk
+      spec:
+        source:
+          http:
+            url: https://download.freebsd.org/ftp/releases/VM-IMAGES/14.3-RELEASE/amd64/Latest/FreeBSD-14.3-RELEASE-amd64-BASIC-CLOUDINIT-ufs.qcow2.xz
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 20Gi
+          storageClassName: longhorn
+  template:
+    metadata:
+      labels:
+        kubevirt.io/domain: freebsd-example
+    spec:
+      terminationGracePeriodSeconds: 0
+      domain:
+        cpu:
+          cores: 2
+        resources:
+          requests:
+            memory: 2Gi
+        devices:
+          disks:
+            - name: rootdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+            - name: default
+              masquerade: {}
+              ports:
+                - name: ssh
+                  port: 22
+                  protocol: TCP
+      networks:
+        - name: default
+          pod: {}
+      volumes:
+        - name: rootdisk
+          dataVolume:
+            name: freebsd-example-rootdisk
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            userData: |
+              #!cloud-config
+              users:
+                - name: root
+                  ssh_authorized_keys:
+                    - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBGHATlUZwSv8rnmJjQN7OwAhm0y8k4Q+hKF6kfRfjFs
+              ssh_authorized_keys:
+                - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBGHATlUZwSv8rnmJjQN7OwAhm0y8k4Q+hKF6kfRfjFs
