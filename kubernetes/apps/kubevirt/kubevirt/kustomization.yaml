@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
   - https://github.com/kubevirt/kubevirt/releases/download/v1.7.0/kubevirt-operator.yaml
   - https://github.com/kubevirt/kubevirt/releases/download/v1.7.0/kubevirt-cr.yaml
-  - ./config
 patchesStrategicMerge:
   - ./kubevirt-featuregates-patch.yaml
   - ./kubevirt-cr-patch.yaml
