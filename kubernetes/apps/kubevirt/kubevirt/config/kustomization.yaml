@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   # VM examples can be managed separately after platform bootstrap
   - ./vm-ubuntu-example.yaml
+  - ./vm-ubuntu-example-ssh-service.yaml
 
 patchesStrategicMerge:
   - ./vm-sync-wave-patch.yaml

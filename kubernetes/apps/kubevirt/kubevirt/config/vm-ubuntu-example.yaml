@@ -45,6 +45,10 @@ spec:
           interfaces:
             - name: default
               masquerade: {}
+              ports:
+                - name: ssh
+                  port: 22
+                  protocol: TCP
       networks:
         - name: default
           pod: {}
@@ -64,3 +68,6 @@ spec:
                     - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCkVZUxcz+Wsh3eAdPxKtiRwf0If0ocCRnVCBn0GrQ/pFXMJkHylSexmJtaQwBKhkesYVaHJpFi9o/D0bCKmhDJ0Q8uWPhsCAgSCqllRi9mV6mpDL3oqvbriRuQ60EslTyVcWUL20sKWDJESCGayBGEvjtwosVN4+N0U6zZkxbNtQArTltCsh2PW8vnBzfZz/Q2ryCs+U+wJJQ4xheTjYMz/Q9lPQmImsP460VrgKlpT1OMrNpy7cgH5ltUQHyHGjOmxVajEEgGj2GV4gSr8CSGI7bz9nx/bdwfSsJZmASAplKWqQhGXzg8vkuC3Fqk+bIZKCpLbLx2w/pElTGtU9Nd0TNkIIBc+T4aRF3fUVGwhIrtjBC9q7qQxlyW+NkpG0kpuoystlI6bey6fZxoxYecdnD7lAlu4WNyapIXR6WLYhi9eQxnWDFJ1yqD4oSGCNQsds64ku+FYRAdBuQCUeYortQktjX7GG3qZM5dhx2iKvXZreqPaKsJGwjl3TAoiEPyKWfffyNuJ69//AuahNYidw4SFnl3sRkhItUVkdYEzosthtr6N9XFORbCloI06lGOnWp3/wbXc7vrmJfFxFOgv2ZUU7Sa30bB/49dmQoiUxzrd7x1eRzcH6YnQbP6ncQQfzSCAzpyuHEmYChcYtIoV+jVxlvMgPvTmw7q05+PRw== francesco.cislaghi@bewatec.com
               chpasswd:
                 expire: false
+              runcmd:
+                - [systemctl, enable, ssh]
+                - [systemctl, start, ssh]
