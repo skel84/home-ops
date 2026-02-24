@@ -32,3 +32,4 @@ Operational notes:
 - Generated secrets/chuboconfig are written under `/tmp/chubo-kubevirt-bootstrap/`.
 - Keep those generated artifacts local and treat them as sensitive.
 - The smoke job uses `/usr/local/lib/containers/chubo-agent/usr/bin/chubo-agent`, which is present in Chubo images and does not require an extra runtime.
+- If CDI import fails with Longhorn `insufficient storage`, prune stale `chubo-nocloud-*` DataVolumes/PVCs before rerunning.
