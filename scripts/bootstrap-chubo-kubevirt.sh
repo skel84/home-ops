@@ -9,10 +9,12 @@ source "${ROOT_DIR}/scripts/lib/common.sh"
 
 KUBECONFIG_PATH="${KUBECONFIG_PATH:-${ROOT_DIR}/kubeconfig}"
 K8S_NAMESPACE="${K8S_NAMESPACE:-kubevirt}"
-RELEASE_TAG="${RELEASE_TAG:-v0.1.2}"
+RELEASE_TAG="${RELEASE_TAG:-v0.1.10}"
 CHUBOCTL="${CHUBOCTL:-/Users/francesco/repos/cislacorp/chubo-os/chubo/_out/chuboctl-darwin-arm64}"
 WORKDIR="${WORKDIR:-/tmp/chubo-kubevirt-bootstrap}"
 BASE_DV_NAME="${BASE_DV_NAME:-}"
+STORAGE_CLASS_NAME="${STORAGE_CLASS_NAME:-longhorn-static}"
+CHUBO_NETWORK_INTERFACE="${CHUBO_NETWORK_INTERFACE:-eth0}"
 
 CP1_NAME="${CP1_NAME:-chubo-cp-1}"
 CP2_NAME="${CP2_NAME:-chubo-cp-2}"
@@ -24,6 +26,10 @@ PROXY_POD_NAME="${PROXY_POD_NAME:-chubo-cp2-proxy}"
 OPENWONTON_WAIT_SECONDS="${OPENWONTON_WAIT_SECONDS:-600}"
 NOMAD_RAFT_WAIT_SECONDS="${NOMAD_RAFT_WAIT_SECONDS:-300}"
 NOMAD_HELPERS_WAIT_SECONDS="${NOMAD_HELPERS_WAIT_SECONDS:-180}"
+NOMAD_SMOKE_WAIT_SECONDS="${NOMAD_SMOKE_WAIT_SECONDS:-300}"
+SMOKE_JOB_NAME="${SMOKE_JOB_NAME:-rawexec-system-smoke}"
+SMOKE_EXPECTED_ALLOCATIONS="${SMOKE_EXPECTED_ALLOCATIONS:-3}"
+SMOKE_PURGE_ON_SUCCESS="${SMOKE_PURGE_ON_SUCCESS:-0}"
 
 CHUBO_API_ENDPOINT="127.0.0.1:${LOCAL_CHUBO_API_PORT}"
 CHUBO_API_NODE="127.0.0.1"
@@ -143,6 +149,111 @@ function wait_for_nomad_raft_peers() {
         if ((SECONDS >= deadline)); then
             log error "Timed out waiting for Nomad raft peers" \
                 "expected=${expected_count}"
+        fi
+
+        sleep 5
+    done
+}
+
+function wait_for_nomad_schedulable_clients() {
+    local expected_count="$1"
+    local timeout_seconds="$2"
+    local deadline=$((SECONDS + timeout_seconds))
+
+    while true; do
+        local nodes_json
+        if nodes_json="$(nomad node status -json 2>/dev/null)"; then
+            local eligible_count
+            eligible_count="$(jq -r '[.[] | select((.Status // "") == "ready" and (.SchedulingEligibility // "") == "eligible" and ((.Drain // false) | not))] | length' <<<"${nodes_json}")"
+            log info "Nomad client readiness" "expected>=${expected_count}" "eligible=${eligible_count}"
+
+            if ((eligible_count >= expected_count)); then
+                return 0
+            fi
+        else
+            log warn "Nomad node status unavailable yet"
+        fi
+
+        if ((SECONDS >= deadline)); then
+            log error "Timed out waiting for schedulable Nomad clients" "expected>=${expected_count}"
+        fi
+
+        sleep 5
+    done
+}
+
+function render_rawexec_smoke_job() {
+    local job_path="$1"
+
+    cat >"${job_path}" <<EOF
+job "${SMOKE_JOB_NAME}" {
+  datacenters = ["dc1"]
+  type        = "service"
+
+  group "smoke" {
+    count = ${SMOKE_EXPECTED_ALLOCATIONS}
+
+    constraint {
+      operator = "distinct_hosts"
+      value    = "true"
+    }
+
+    task "probe" {
+      driver = "raw_exec"
+
+      config {
+        command = "/usr/local/lib/containers/chubo-agent/usr/bin/chubo-agent"
+      }
+
+      logs {
+        disabled = true
+      }
+
+      resources {
+        cpu    = 50
+        memory = 64
+      }
+    }
+  }
+}
+EOF
+}
+
+function wait_for_rawexec_smoke_allocations() {
+    local job_name="$1"
+    local expected_count="$2"
+    local timeout_seconds="$3"
+    local deadline=$((SECONDS + timeout_seconds))
+
+    while true; do
+        local allocs_json
+        if allocs_json="$(nomad job allocs -json "${job_name}" 2>/dev/null)"; then
+            local total running distinct_hosts failed_or_lost
+            total="$(jq -r 'length' <<<"${allocs_json}")"
+            running="$(jq -r '[.[] | select((.ClientStatus // "") == "running")] | length' <<<"${allocs_json}")"
+            distinct_hosts="$(jq -r '[.[] | select((.ClientStatus // "") == "running") | .NodeName] | unique | length' <<<"${allocs_json}")"
+            failed_or_lost="$(jq -r '[.[] | select((.ClientStatus // "") == "failed" or (.ClientStatus // "") == "lost")] | length' <<<"${allocs_json}")"
+
+            log info "Nomad raw_exec smoke readiness" \
+                "job=${job_name}" \
+                "total=${total}" \
+                "running=${running}" \
+                "distinct_hosts=${distinct_hosts}" \
+                "failed_or_lost=${failed_or_lost}"
+
+            if ((failed_or_lost == 0 && running >= expected_count && distinct_hosts >= expected_count)); then
+                NOMAD_SMOKE_ALLOCS_JSON="${allocs_json}"
+                return 0
+            fi
+        else
+            log warn "Nomad smoke allocations unavailable yet" "job=${job_name}"
+        fi
+
+        if ((SECONDS >= deadline)); then
+            log error "Timed out waiting for Nomad raw_exec smoke allocations" \
+                "job=${job_name}" \
+                "expected_running=${expected_count}" \
+                "expected_distinct_hosts=${expected_count}"
         fi
 
         sleep 5
@@ -387,10 +498,11 @@ spec:
               storage:
                   accessModes:
                       - ReadWriteOnce
+                  volumeMode: Filesystem
                   resources:
                       requests:
                           storage: 20Gi
-                  storageClassName: longhorn
+                  storageClassName: ${STORAGE_CLASS_NAME}
     template:
         metadata:
             labels:
@@ -431,6 +543,30 @@ EOF
     sed 's/^/                          /' "${machineconfig_path}" >>"${manifest_path}"
 }
 
+function apply_base_datavolume() {
+    log info "Creating base DataVolume" "name=${BASE_DV_NAME}" "storage_class=${STORAGE_CLASS_NAME}"
+
+    cat <<EOF | kube apply -f -
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+    name: ${BASE_DV_NAME}
+    namespace: ${K8S_NAMESPACE}
+spec:
+    source:
+        http:
+            url: ${BASE_IMAGE_URL}
+    storage:
+        accessModes:
+            - ReadWriteOnce
+        volumeMode: Filesystem
+        resources:
+            requests:
+                storage: 20Gi
+        storageClassName: ${STORAGE_CLASS_NAME}
+EOF
+}
+
 check_cli kubectl jq nomad nc
 
 if [[ ! -x "${CHUBOCTL}" ]]; then
@@ -447,12 +583,15 @@ CP3_CFG="${WORKDIR}/${CP3_NAME}.yaml"
 MANIFEST_FILE="${WORKDIR}/chubo-kubevirt-cluster.yaml"
 NOMAD_HELPERS_DIR="${WORKDIR}/nomadconfig"
 PORT_FORWARD_LOG="${WORKDIR}/port-forward.log"
+SMOKE_JOB_FILE="${WORKDIR}/${SMOKE_JOB_NAME}.nomad"
 
 BASE_IMAGE_URL="https://github.com/chubo-dev/chubo/releases/download/${RELEASE_TAG}/nocloud-amd64.raw.zst"
 
 log info "Using release artifact" "tag=${RELEASE_TAG}" "url=${BASE_IMAGE_URL}"
 log info "Using kubeconfig" "path=${KUBECONFIG_PATH}"
 log info "Using chuboctl" "path=${CHUBOCTL}"
+log info "Using storage class" "name=${STORAGE_CLASS_NAME}"
+log info "Using chubo network interface" "name=${CHUBO_NETWORK_INTERFACE}"
 
 if [[ -z "${BASE_DV_NAME}" ]]; then
     BASE_DV_NAME="$(kube -n "${K8S_NAMESPACE}" get dv -o json \
@@ -466,29 +605,18 @@ fi
 
 log info "Base DataVolume selection" "name=${BASE_DV_NAME}"
 
-if ! kube -n "${K8S_NAMESPACE}" get dv "${BASE_DV_NAME}" >/dev/null 2>&1; then
-    log info "Creating base DataVolume" "name=${BASE_DV_NAME}"
-
-    cat <<EOF | kube apply -f -
-apiVersion: cdi.kubevirt.io/v1beta1
-kind: DataVolume
-metadata:
-    name: ${BASE_DV_NAME}
-    namespace: ${K8S_NAMESPACE}
-spec:
-    source:
-        http:
-            url: ${BASE_IMAGE_URL}
-    storage:
-        accessModes:
-            - ReadWriteOnce
-        resources:
-            requests:
-                storage: 20Gi
-        storageClassName: longhorn
-EOF
+if kube -n "${K8S_NAMESPACE}" get dv "${BASE_DV_NAME}" >/dev/null 2>&1; then
+    BASE_DV_PHASE="$(kube -n "${K8S_NAMESPACE}" get dv "${BASE_DV_NAME}" -o jsonpath='{.status.phase}' 2>/dev/null || true)"
+    if [[ "${BASE_DV_PHASE}" == "Succeeded" ]]; then
+        log info "Reusing existing base DataVolume" "name=${BASE_DV_NAME}" "phase=${BASE_DV_PHASE}"
+    else
+        log warn "Existing base DataVolume is not usable, recreating" "name=${BASE_DV_NAME}" "phase=${BASE_DV_PHASE:-missing}"
+        kube -n "${K8S_NAMESPACE}" delete "dv/${BASE_DV_NAME}" --ignore-not-found=true --wait=true
+        kube -n "${K8S_NAMESPACE}" delete "pvc/${BASE_DV_NAME}" --ignore-not-found=true --wait=true
+        apply_base_datavolume
+    fi
 else
-    log info "Reusing existing base DataVolume" "name=${BASE_DV_NAME}"
+    apply_base_datavolume
 fi
 
 wait_for_dv_succeeded "${BASE_DV_NAME}" 1800
@@ -502,6 +630,7 @@ log info "Generating control-plane machine configs"
     --with-secrets "${SECRETS_FILE}" \
     --with-chubo \
     --chubo-role server-client \
+    --chubo-network-interface "${CHUBO_NETWORK_INTERFACE}" \
     --chubo-bootstrap-expect 3 \
     --chubo-join "${CP2_NAME}-peer.${K8S_NAMESPACE}.svc.cluster.local,${CP3_NAME}-peer.${K8S_NAMESPACE}.svc.cluster.local" \
     --id "${CP1_NAME}" \
@@ -514,6 +643,7 @@ log info "Generating control-plane machine configs"
     --with-secrets "${SECRETS_FILE}" \
     --with-chubo \
     --chubo-role server-client \
+    --chubo-network-interface "${CHUBO_NETWORK_INTERFACE}" \
     --chubo-bootstrap-expect 3 \
     --chubo-join "${CP1_NAME}-peer.${K8S_NAMESPACE}.svc.cluster.local,${CP3_NAME}-peer.${K8S_NAMESPACE}.svc.cluster.local" \
     --id "${CP2_NAME}" \
@@ -526,6 +656,7 @@ log info "Generating control-plane machine configs"
     --with-secrets "${SECRETS_FILE}" \
     --with-chubo \
     --chubo-role server-client \
+    --chubo-network-interface "${CHUBO_NETWORK_INTERFACE}" \
     --chubo-bootstrap-expect 3 \
     --chubo-join "${CP1_NAME}-peer.${K8S_NAMESPACE}.svc.cluster.local,${CP2_NAME}-peer.${K8S_NAMESPACE}.svc.cluster.local" \
     --id "${CP3_NAME}" \
@@ -613,8 +744,38 @@ wait_for_nomad_raft_peers 3 "${NOMAD_RAFT_WAIT_SECONDS}"
 echo "${NOMAD_RAFT_OUTPUT}"
 PEER_COUNT="${NOMAD_RAFT_PEER_COUNT}"
 
+wait_for_nomad_schedulable_clients "${SMOKE_EXPECTED_ALLOCATIONS}" "${NOMAD_SMOKE_WAIT_SECONDS}"
+
+log info "Preparing Nomad raw_exec smoke job" "job=${SMOKE_JOB_NAME}" "file=${SMOKE_JOB_FILE}"
+render_rawexec_smoke_job "${SMOKE_JOB_FILE}"
+
+log info "Purging previous smoke job (if present)" "job=${SMOKE_JOB_NAME}"
+nomad job stop -detach -purge -yes "${SMOKE_JOB_NAME}" >/dev/null 2>&1 || true
+
+log info "Submitting Nomad raw_exec smoke job" "job=${SMOKE_JOB_NAME}"
+nomad job run -detach "${SMOKE_JOB_FILE}" >/dev/null
+
+wait_for_rawexec_smoke_allocations "${SMOKE_JOB_NAME}" "${SMOKE_EXPECTED_ALLOCATIONS}" "${NOMAD_SMOKE_WAIT_SECONDS}"
+
+SMOKE_RUNNING_COUNT="$(jq -r '[.[] | select((.ClientStatus // "") == "running")] | length' <<<"${NOMAD_SMOKE_ALLOCS_JSON}")"
+SMOKE_DISTINCT_HOSTS="$(jq -r '[.[] | select((.ClientStatus // "") == "running") | .NodeName] | unique | length' <<<"${NOMAD_SMOKE_ALLOCS_JSON}")"
+
+log info "Nomad raw_exec smoke job is healthy" \
+    "running=${SMOKE_RUNNING_COUNT}" \
+    "distinct_hosts=${SMOKE_DISTINCT_HOSTS}" \
+    "job=${SMOKE_JOB_NAME}"
+
+echo "${NOMAD_SMOKE_ALLOCS_JSON}" | jq -r '.[] | [.Name, .NodeName, .ClientStatus] | @tsv'
+
+if [[ "${SMOKE_PURGE_ON_SUCCESS}" == "1" ]]; then
+    log info "Purging smoke job after successful validation" "job=${SMOKE_JOB_NAME}"
+    nomad job stop -detach -purge -yes "${SMOKE_JOB_NAME}" >/dev/null 2>&1 || true
+fi
+
 log info "Chubo/OpenWonton control plane is healthy on KubeVirt" \
     "peer_count=${PEER_COUNT}" \
+    "smoke_running=${SMOKE_RUNNING_COUNT}" \
+    "smoke_distinct_hosts=${SMOKE_DISTINCT_HOSTS}" \
     "status=green"
 
 cat <<EOF
@@ -624,9 +785,11 @@ Artifacts:
   Cluster manifest: ${MANIFEST_FILE}
   Chuboconfig: ${CHUBOCONFIG_FILE}
   Nomad helpers: ${NOMAD_HELPERS_DIR}
+  Smoke job spec: ${SMOKE_JOB_FILE}
 
 Quick checks:
   kubectl --kubeconfig "${KUBECONFIG_PATH}" -n "${K8S_NAMESPACE}" get vm,vmi -o wide | rg 'chubo-cp'
   kubectl --kubeconfig "${KUBECONFIG_PATH}" -n "${K8S_NAMESPACE}" get svc | rg 'chubo-cp'
+  NOMAD_ADDR=https://127.0.0.1:${LOCAL_NOMAD_API_PORT} NOMAD_TOKEN=... nomad status ${SMOKE_JOB_NAME}
 
 EOF
