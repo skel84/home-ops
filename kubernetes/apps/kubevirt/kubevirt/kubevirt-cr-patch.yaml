@@ -5,3 +5,7 @@ metadata:
   namespace: kubevirt
   annotations:
     argocd.argoproj.io/sync-wave: "1"
+spec:
+  monitorAccount: kube-prometheus-stack-prometheus
+  monitorNamespace: observability
+  serviceMonitorNamespace: observability
