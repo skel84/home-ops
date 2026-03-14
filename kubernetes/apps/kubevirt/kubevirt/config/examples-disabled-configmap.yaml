@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubevirt-example-vms-disabled
+  namespace: kubevirt
+  labels:
+    app.kubernetes.io/name: kubevirt-example-vms-disabled
+data:
+  status: disabled
+  note: "VM example manifests stay on disk but are not managed by Argo by default."

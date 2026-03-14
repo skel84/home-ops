@@ -2,13 +2,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  # VM examples can be managed separately after platform bootstrap
-  - ./vm-ubuntu-example.yaml
-  - ./vm-ubuntu-example-ssh-service.yaml
-  - ./vm-cirros-baseline.yaml
-  - ./vm-cirros-baseline-ssh-service.yaml
-  - ./vm-freebsd-example.yaml
-  - ./vm-freebsd-example-ssh-service.yaml
-
-patchesStrategicMerge:
-  - ./vm-sync-wave-patch.yaml
+  - ./examples-disabled-configmap.yaml
+  # VM examples stay on disk here, but are intentionally not managed by Argo by default.
+  # Uncomment one example pair locally when you actually want to boot it.
+  # - ./vm-ubuntu-example.yaml
+  # - ./vm-ubuntu-example-ssh-service.yaml
+  # - ./vm-cirros-baseline.yaml
+  # - ./vm-cirros-baseline-ssh-service.yaml
+  # - ./vm-freebsd-example.yaml
+  # - ./vm-freebsd-example-ssh-service.yaml
