@@ -32,6 +32,7 @@ HELPER_POD_NAME="${HELPER_POD_NAME:-allocdb-bootstrap-helper}"
 HELPER_IMAGE="${HELPER_IMAGE:-nicolaka/netshoot:latest}"
 HELPER_STAGE_DIR="${HELPER_STAGE_DIR:-/tmp/allocdb-stage}"
 KEEP_HELPER_POD="${KEEP_HELPER_POD:-0}"
+CLUSTER_NAME="${CLUSTER_NAME:-${CONTROL_VM_NAME%-control}}"
 
 CONTROL_LISTENER_PORT="${CONTROL_LISTENER_PORT:-17000}"
 CLIENT_LISTENER_PORT="${CLIENT_LISTENER_PORT:-18000}"
@@ -259,7 +260,11 @@ EOF
 function append_vm_manifest() {
     local manifest_path="$1"
     local vm_name="$2"
+    local role="replica"
     local user_data
+    if [[ "${vm_name}" == "${CONTROL_VM_NAME}" ]]; then
+        role="control"
+    fi
     user_data="$(render_guest_user_data)"
 
     cat >>"${manifest_path}" <<EOF
@@ -271,6 +276,9 @@ metadata:
     namespace: ${K8S_NAMESPACE}
     labels:
         app.kubernetes.io/name: ${vm_name}
+        app.kubernetes.io/part-of: ${CLUSTER_NAME}
+        allocdb.sketch/cluster: ${CLUSTER_NAME}
+        allocdb.sketch/role: ${role}
 spec:
     runStrategy: Always
     dataVolumeTemplates:
@@ -293,7 +301,26 @@ spec:
         metadata:
             labels:
                 kubevirt.io/domain: ${vm_name}
+                app.kubernetes.io/name: ${vm_name}
+                app.kubernetes.io/part-of: ${CLUSTER_NAME}
+                allocdb.sketch/cluster: ${CLUSTER_NAME}
+                allocdb.sketch/role: ${role}
         spec:
+            topologySpreadConstraints:
+                - maxSkew: 1
+                  topologyKey: kubernetes.io/hostname
+                  whenUnsatisfiable: DoNotSchedule
+                  labelSelector:
+                      matchLabels:
+                          allocdb.sketch/cluster: ${CLUSTER_NAME}
+            affinity:
+                podAntiAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                        - labelSelector:
+                              matchLabels:
+                                  allocdb.sketch/cluster: ${CLUSTER_NAME}
+                                  allocdb.sketch/role: replica
+                          topologyKey: kubernetes.io/hostname
             terminationGracePeriodSeconds: 0
             domain:
                 cpu:
