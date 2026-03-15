@@ -261,9 +261,22 @@ function append_vm_manifest() {
     local manifest_path="$1"
     local vm_name="$2"
     local role="replica"
+    local affinity_block=""
     local user_data
     if [[ "${vm_name}" == "${CONTROL_VM_NAME}" ]]; then
         role="control"
+    else
+        affinity_block="$(cat <<EOF
+            affinity:
+                podAntiAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                        - labelSelector:
+                              matchLabels:
+                                  allocdb.sketch/cluster: ${CLUSTER_NAME}
+                                  allocdb.sketch/role: replica
+                          topologyKey: kubernetes.io/hostname
+EOF
+)"
     fi
     user_data="$(render_guest_user_data)"
 
@@ -306,14 +319,7 @@ spec:
                 allocdb.sketch/cluster: ${CLUSTER_NAME}
                 allocdb.sketch/role: ${role}
         spec:
-            affinity:
-                podAntiAffinity:
-                    requiredDuringSchedulingIgnoredDuringExecution:
-                        - labelSelector:
-                              matchLabels:
-                                  allocdb.sketch/cluster: ${CLUSTER_NAME}
-                                  allocdb.sketch/role: replica
-                          topologyKey: kubernetes.io/hostname
+${affinity_block}
             terminationGracePeriodSeconds: 0
             domain:
                 cpu:
