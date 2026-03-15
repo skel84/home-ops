@@ -10,7 +10,7 @@ source "${ROOT_DIR}/scripts/lib/common.sh"
 KUBECONFIG_PATH="${KUBECONFIG_PATH:-${ROOT_DIR}/kubeconfig}"
 K8S_NAMESPACE="${K8S_NAMESPACE:-kubevirt}"
 WORKDIR="${WORKDIR:-/tmp/allocdb-kubevirt-bootstrap}"
-STORAGE_CLASS_NAME="${STORAGE_CLASS_NAME:-longhorn-strict-local}"
+STORAGE_CLASS_NAME="${STORAGE_CLASS_NAME:-longhorn-strict-local-wffc}"
 BASE_IMAGE_URL="${BASE_IMAGE_URL:-https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img}"
 BASE_DV_NAME="${BASE_DV_NAME:-}"
 ROOTDISK_SIZE="${ROOTDISK_SIZE:-10Gi}"
@@ -66,7 +66,7 @@ environment:
   ALLOCDB_LOCAL_CLUSTER_BIN   required for bootstrap; path to one x86_64 Linux guest binary
   KUBECONFIG_PATH             kubeconfig path (default: ${ROOT_DIR}/kubeconfig)
   K8S_NAMESPACE               namespace to use (default: kubevirt)
-  STORAGE_CLASS_NAME          rootdisk storage class (default: longhorn-strict-local)
+  STORAGE_CLASS_NAME          rootdisk storage class (default: longhorn-strict-local-wffc)
   BASE_IMAGE_URL              Ubuntu cloud image URL for the reusable base DataVolume
   ROOTDISK_SIZE               requested size for the reusable base disk and cloned VM rootdisks
   WORKDIR                     local bootstrap workspace (default: /tmp/allocdb-kubevirt-bootstrap)

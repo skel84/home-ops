@@ -1,2 +1,3 @@
 resources:
   - longhorn-strict-local.yaml
+  - longhorn-strict-local-wffc.yaml

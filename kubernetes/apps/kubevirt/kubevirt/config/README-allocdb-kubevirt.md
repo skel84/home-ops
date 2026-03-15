@@ -21,7 +21,7 @@ Defaults:
 - Uses `home-ops/kubeconfig` (override with `KUBECONFIG_PATH=...`).
 - Uses namespace `kubevirt` (override with `K8S_NAMESPACE=...`).
 - Uses Ubuntu Noble amd64 cloud image as the base disk (override with `BASE_IMAGE_URL=...`).
-- Uses KubeVirt storage class `longhorn-strict-local` by default (override with
+- Uses KubeVirt storage class `longhorn-strict-local-wffc` by default (override with
   `STORAGE_CLASS_NAME=...`).
 - Uses `10Gi` root disks for the base image and cloned guests by default (override with
   `ROOTDISK_SIZE=...`).
@@ -68,10 +68,10 @@ Operational notes:
   KubeVirt control VM uses the same remote command surface as the existing QEMU testbed.
 - The bootstrap helper pod is deleted automatically by default. Set `KEEP_HELPER_POD=1` when you
   want to leave it up for manual guest access or ad hoc validation.
-- The default storage profile is intentionally ephemeral: `longhorn-strict-local` keeps one local
+- The default storage profile is intentionally ephemeral: `longhorn-strict-local-wffc` keeps one local
   Longhorn replica on the same node as the attached workload. This reduces cross-node storage
   traffic for Jepsen lanes, but it is not a high-availability storage profile.
-- `longhorn-strict-local` uses `WaitForFirstConsumer`, so the VM is scheduled before the local
+- `longhorn-strict-local-wffc` uses `WaitForFirstConsumer`, so the VM is scheduled before the local
   Longhorn volume is pinned to a node. This avoids early storage placement forcing the VM onto a
   memory-constrained host.
 - The rendered VMs also apply per-cluster spread rules: the three replicas are forced onto
