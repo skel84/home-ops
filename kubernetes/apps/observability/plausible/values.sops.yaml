@@ -1,13 +1,12 @@
 baseURL: https://plausible.rbl.lol
 # Must be exactly 32 bytes
-totpVaultKey: ENC[AES256_GCM,data:WV5fr9qNtzlMKG/mY5ciX7SohLwHvzb0bgi4nW/pPm4=,iv:THnPNQjPNopb0JTTVi3HI5QGxnAKBhWsCRTQy8MbyN8=,tag:KA76kBX3yLgDJHO8ZYRu4A==,type:str]
+totpVaultKey: ENC[AES256_GCM,data:RelOWhQcXp51DH4i/RU0U1w5dyNcuRg26ewFvhAbqa6OsSCBVTgwK+Ff5gA=,iv:Rt+/KcjCsU/pOxvTFKY5vqRs9HtKmtKFlLmI8CnCSWM=,tag:S2N1ziu/Bwp+t7y5pRrUSA==,type:str]
 disableRegistration: false
 logFailedLoginAttempts: true
-databaseURL: ENC[AES256_GCM,data:4Ts/gTMVixwTVk+qvUWZ/2u9orX69U9Cd3oAogDn0Zn3pU+SN/lYS1tO1UrkpAj3mM7KGcUz13Kr6LCHKgLIiZxR9w==,iv:ZBDNgQE8psjW1BsOumgCzfQ0H9Wdg4xWfmVJb4PsQdU=,tag:FRsmDcS5zCu+MlCKLoy97g==,type:str]
-clickhouseDatabaseURL: ENC[AES256_GCM,data:ScxayDHvSFACsH3FxpC4ZOi3im4hSZyiNEtGlRVIkzILZOxolPAaSNUrQPfvYlBmFJgZ4E0VjX9PG0UkX3ABzr+hvkznk/qa,iv:48CoWAFlneVPEygHJqzsCFfgDATkb5lz0e7cXYX6tBg=,tag:WKDxLPF4xHOt0NK7pvevGg==,type:str]
+databaseURL: ENC[AES256_GCM,data:A65fS+NuodTln1It53dgdHX5XzNq8U0n7TnB8BqnKTHCZ5iPmXBKPmmX2GzVuDHkORRmWwH9ACgFhw1xv2xFWOVFvw==,iv:6061yB/JQlN+rI6eWUdLLArPV2priXlSvHsfyYjkslQ=,tag:mebjG/HTTBzBn5Nj1j9ZfQ==,type:str]
+clickhouseDatabaseURL: ENC[AES256_GCM,data:qtZ9f0ZSb6VAQu7AG2SlWF2r84bSrhAYdT8t9QlXZ7lTyPQ8wyH79VbONuMA/+8H7sFeJGWm/wp6v6fseIdEix5SnkYYqHdt,iv:zjbHD+4EzFactDn592jNzlUfZJSPzqQqe4P9eOOpcG8=,tag:bxWtnB7bLOK+7WFyI4WqHA==,type:str]
 secret:
-  create: false
-  existingSecret: plausible-plausible-analytics
+  create: true
 ingress:
   enabled: true
   className: external
@@ -34,23 +33,18 @@ clickhouse:
     storageClass: longhorn
     size: 10Gi
 sops:
-  kms: []
-  gcp_kms: []
-  azure_kv: []
-  hc_vault: []
   age:
     - recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v
       enc: |
         -----BEGIN AGE ENCRYPTED FILE-----
-        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAraGFMdHZOdnMydDlwQlEw
-        YnJUN1gyTUNJc3NhblBPWUtmNU1iMzhZNTBjCkIxVCtZRFFCV25wK25rZi9DWW80
-        MHNhcHQwMkwvazQ3TkUzTGNQdW8rZDQKLS0tIEI2SzdWM3Z5Vy9Dc2svbFRQZzB2
-        bmtMOGRKZ2VGRlRnbDJyY1c2bFdIWXcKs/3b+dBjJ7UEK3wythm15GM9CwUrjVAl
-        THQU8XMJLFmWeMZhszoV0Y0x5NDWRWilsJxD7GqJGqjDDGHdlVnYag==
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBOTXhkRk5WSTVyZFBpalU3
+        cG1OMGZ1dlcyOTFEOE52TVloRWZtUUhhS1ZvCnVMRlM3ckZ2ZlR5S1ExQkZ1bEUx
+        WDc4VGV1QzZMai9JWm9wNzZrQ09mNHcKLS0tIDFWaGhOYlhhbnNha1BjUlVDMlJF
+        d2huMlNybCtNc2FvbjB5cGEvTGEyTFkKFjYQF2r2cQxiUbhxkPxojUuuNj6qb/AS
+        kwNJuGyuzeox5o99EP+Y8o+5rLki4LUXI63ngAs9nxTWhWoPddPH1A==
         -----END AGE ENCRYPTED FILE-----
-  lastmodified: "2026-03-15T21:21:27Z"
-  mac: ENC[AES256_GCM,data:4X7atp07C/JDshQ0R2ChUxs196f7UIh1PvmIviQxaN+tkpJ1Hmzn4nTOqcP5gE0qcGdEpZl1XpF2AyzQDar3EiEfAR1vOYzsYOx/NIXVD8QvpUvfk7zd3GoI4aEaS7CKFVSftJUWa93abvVFpFct6HXs93mPLFU4m2JBl77wVL0=,iv:JE/zoMcDa4ygsova+HN7ihT9crei599r4Otmx5Yr46I=,tag:KZ6e+jv91UKmgczkAiDNBw==,type:str]
-  pgp: []
+  lastmodified: "2026-03-15T21:41:12Z"
+  mac: ENC[AES256_GCM,data:hpPynIz6iS2pRmWV7BJ3I0y9aKh68ZzrdAdHcrkiLrLUBjv2wkARBVGPM8fLTktmlJIdwXvTEHFqKSP1r2yP6IzxW8sRaFsrISuZWN17w0vbTuIJ9/rkMBvYoR27hWExbJbvcqtlEaMfHHEDOjbdf9u0+haUZBXrAtYGhVgIsoo=,iv:8yM3iXvml9os3Qr2vWt3a6UTleSj2HS45ZX6QDXPtV0=,tag:sYSsPZR78c/FpOOXzrYGDg==,type:str]
   encrypted_regex: ^(totpVaultKey|databaseURL|clickhouseDatabaseURL)$
   mac_only_encrypted: true
-  version: 3.9.4
+  version: 3.12.1
