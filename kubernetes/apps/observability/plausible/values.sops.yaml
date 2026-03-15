@@ -6,7 +6,8 @@ logFailedLoginAttempts: true
 databaseURL: ENC[AES256_GCM,data:4Ts/gTMVixwTVk+qvUWZ/2u9orX69U9Cd3oAogDn0Zn3pU+SN/lYS1tO1UrkpAj3mM7KGcUz13Kr6LCHKgLIiZxR9w==,iv:ZBDNgQE8psjW1BsOumgCzfQ0H9Wdg4xWfmVJb4PsQdU=,tag:FRsmDcS5zCu+MlCKLoy97g==,type:str]
 clickhouseDatabaseURL: ENC[AES256_GCM,data:ScxayDHvSFACsH3FxpC4ZOi3im4hSZyiNEtGlRVIkzILZOxolPAaSNUrQPfvYlBmFJgZ4E0VjX9PG0UkX3ABzr+hvkznk/qa,iv:48CoWAFlneVPEygHJqzsCFfgDATkb5lz0e7cXYX6tBg=,tag:WKDxLPF4xHOt0NK7pvevGg==,type:str]
 secret:
-  create: true
+  create: false
+  existingSecret: plausible-plausible-analytics
 ingress:
   enabled: true
   className: external
@@ -14,10 +15,7 @@ ingress:
     external-dns.alpha.kubernetes.io/target: external.rbl.lol
     cert-manager.io/cluster-issuer: letsencrypt-production
   hosts:
-    - host: plausible.rbl.lol
-      paths:
-        - path: /
-          pathType: Prefix
+    - plausible.rbl.lol
   tls:
     - secretName: plausible-tls
       hosts:
