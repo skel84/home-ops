@@ -10,9 +10,10 @@ source "${ROOT_DIR}/scripts/lib/common.sh"
 KUBECONFIG_PATH="${KUBECONFIG_PATH:-${ROOT_DIR}/kubeconfig}"
 K8S_NAMESPACE="${K8S_NAMESPACE:-kubevirt}"
 WORKDIR="${WORKDIR:-/tmp/allocdb-kubevirt-bootstrap}"
-STORAGE_CLASS_NAME="${STORAGE_CLASS_NAME:-longhorn-static}"
+STORAGE_CLASS_NAME="${STORAGE_CLASS_NAME:-longhorn-strict-local}"
 BASE_IMAGE_URL="${BASE_IMAGE_URL:-https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img}"
 BASE_DV_NAME="${BASE_DV_NAME:-}"
+ROOTDISK_SIZE="${ROOTDISK_SIZE:-10Gi}"
 ALLOCDB_LOCAL_CLUSTER_BIN="${ALLOCDB_LOCAL_CLUSTER_BIN:-}"
 ACTION="${1:-bootstrap}"
 
@@ -64,8 +65,9 @@ environment:
   ALLOCDB_LOCAL_CLUSTER_BIN   required for bootstrap; path to one x86_64 Linux guest binary
   KUBECONFIG_PATH             kubeconfig path (default: ${ROOT_DIR}/kubeconfig)
   K8S_NAMESPACE               namespace to use (default: kubevirt)
-  STORAGE_CLASS_NAME          rootdisk storage class (default: longhorn-static)
+  STORAGE_CLASS_NAME          rootdisk storage class (default: longhorn-strict-local)
   BASE_IMAGE_URL              Ubuntu cloud image URL for the reusable base DataVolume
+  ROOTDISK_SIZE               requested size for the reusable base disk and cloned VM rootdisks
   WORKDIR                     local bootstrap workspace (default: /tmp/allocdb-kubevirt-bootstrap)
 EOF
 }
@@ -112,7 +114,7 @@ function select_base_dv_name() {
 }
 
 function apply_base_datavolume() {
-    log info "Creating base DataVolume" "name=${BASE_DV_NAME}" "storage_class=${STORAGE_CLASS_NAME}"
+    log info "Creating base DataVolume" "name=${BASE_DV_NAME}" "storage_class=${STORAGE_CLASS_NAME}" "size=${ROOTDISK_SIZE}"
 
     cat <<EOF | kube apply -f -
 apiVersion: cdi.kubevirt.io/v1beta1
@@ -130,7 +132,7 @@ spec:
         volumeMode: Filesystem
         resources:
             requests:
-                storage: 20Gi
+                storage: ${ROOTDISK_SIZE}
         storageClassName: ${STORAGE_CLASS_NAME}
 EOF
 }
@@ -158,17 +160,19 @@ function ensure_base_datavolume_ready() {
     select_base_dv_name
     local discovered_name
     discovered_name="$(kube -n "${K8S_NAMESPACE}" get dv -o json \
-        | jq -r --arg url "${BASE_IMAGE_URL}" '.items[] | select(.status.phase == "Succeeded" and .spec.source.http.url == $url) | .metadata.name' \
+        | jq -r --arg url "${BASE_IMAGE_URL}" --arg size "${ROOTDISK_SIZE}" '.items[] | select(.status.phase == "Succeeded" and .spec.source.http.url == $url and .spec.storage.resources.requests.storage == $size) | .metadata.name' \
         | head -n 1)"
     if [[ -n "${discovered_name}" ]]; then
         BASE_DV_NAME="${discovered_name}"
     fi
-    log info "Base DataVolume selection" "name=${BASE_DV_NAME}" "url=${BASE_IMAGE_URL}"
+    log info "Base DataVolume selection" "name=${BASE_DV_NAME}" "url=${BASE_IMAGE_URL}" "size=${ROOTDISK_SIZE}"
     if kube -n "${K8S_NAMESPACE}" get dv "${BASE_DV_NAME}" >/dev/null 2>&1; then
         local phase
+        local requested_size
         phase="$(kube -n "${K8S_NAMESPACE}" get dv "${BASE_DV_NAME}" -o jsonpath='{.status.phase}' 2>/dev/null || true)"
-        if [[ "${phase}" != "Succeeded" ]]; then
-            log warn "Existing base DataVolume is not usable, recreating" "name=${BASE_DV_NAME}" "phase=${phase:-missing}"
+        requested_size="$(kube -n "${K8S_NAMESPACE}" get dv "${BASE_DV_NAME}" -o jsonpath='{.spec.storage.resources.requests.storage}' 2>/dev/null || true)"
+        if [[ "${phase}" != "Succeeded" || "${requested_size}" != "${ROOTDISK_SIZE}" ]]; then
+            log warn "Existing base DataVolume is not usable, recreating" "name=${BASE_DV_NAME}" "phase=${phase:-missing}" "requested_size=${requested_size:-missing}" "expected_size=${ROOTDISK_SIZE}"
             kube -n "${K8S_NAMESPACE}" delete "dv/${BASE_DV_NAME}" --ignore-not-found=true --wait=true
             kube -n "${K8S_NAMESPACE}" delete "pvc/${BASE_DV_NAME}" --ignore-not-found=true --wait=true
             apply_base_datavolume
@@ -283,7 +287,7 @@ spec:
                   volumeMode: Filesystem
                   resources:
                       requests:
-                          storage: 20Gi
+                          storage: ${ROOTDISK_SIZE}
                   storageClassName: ${STORAGE_CLASS_NAME}
     template:
         metadata:

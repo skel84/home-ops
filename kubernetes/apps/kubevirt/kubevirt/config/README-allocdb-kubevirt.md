@@ -21,8 +21,10 @@ Defaults:
 - Uses `home-ops/kubeconfig` (override with `KUBECONFIG_PATH=...`).
 - Uses namespace `kubevirt` (override with `K8S_NAMESPACE=...`).
 - Uses Ubuntu Noble amd64 cloud image as the base disk (override with `BASE_IMAGE_URL=...`).
-- Uses KubeVirt storage class `longhorn-static` by default (override with
+- Uses KubeVirt storage class `longhorn-strict-local` by default (override with
   `STORAGE_CLASS_NAME=...`).
+- Uses `10Gi` root disks for the base image and cloned guests by default (override with
+  `ROOTDISK_SIZE=...`).
 - Uses one fresh workspace under `/tmp/allocdb-kubevirt-bootstrap` (override with `WORKDIR=...`).
 - Creates `allocdb-control` plus `allocdb-replica-{1,2,3}`.
 - Uses KubeVirt `bridge` pod networking so every guest gets one unique routable pod IP.
@@ -39,6 +41,7 @@ Host prerequisites:
 What the script does:
 
 1. Ensures one reusable base `DataVolume` exists for the Ubuntu cloud image.
+   If the cached base image size does not match `ROOTDISK_SIZE`, the script recreates it.
 2. Renders one cluster manifest for the control VM, the three replica VMs, and one Service per VM.
 3. Deletes and recreates the AllocDB VMs and their root disks for one fresh bootstrap.
 4. Waits for the VMIs to become ready, discovers their live pod IPs, and renders the exact
@@ -65,6 +68,9 @@ Operational notes:
   KubeVirt control VM uses the same remote command surface as the existing QEMU testbed.
 - The bootstrap helper pod is deleted automatically by default. Set `KEEP_HELPER_POD=1` when you
   want to leave it up for manual guest access or ad hoc validation.
+- The default storage profile is intentionally ephemeral: `longhorn-strict-local` keeps one local
+  Longhorn replica on the same node as the attached workload. This reduces cross-node storage
+  traffic for Jepsen lanes, but it is not a high-availability storage profile.
 - The generated SSH keypair and rendered bootstrap artifacts under `WORKDIR` are sensitive local
   artifacts. Keep them local.
 - This bootstrap path stages `allocdb-local-cluster` only. It does not yet install a full KubeVirt
