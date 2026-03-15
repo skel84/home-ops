@@ -74,9 +74,9 @@ Operational notes:
 - `longhorn-strict-local-wffc` uses `WaitForFirstConsumer`, so the VM is scheduled before the local
   Longhorn volume is pinned to a node. This avoids early storage placement forcing the VM onto a
   memory-constrained host.
-- The rendered VMs also apply per-cluster spread rules: the three replicas are forced onto
-  different hosts and the control VM is spread with the same lane, so a 4-VM lane tends to land as
-  `2-1-1` across the three mini PCs.
+- The rendered VMs force the three replicas onto different hosts. The control VM stays flexible,
+  so a 4-VM lane can still land as `2-1-1` across the three mini PCs without overconstraining the
+  scheduler.
 - The generated SSH keypair and rendered bootstrap artifacts under `WORKDIR` are sensitive local
   artifacts. Keep them local.
 - This bootstrap path stages `allocdb-local-cluster` only. It does not yet install a full KubeVirt

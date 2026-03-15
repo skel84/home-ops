@@ -306,13 +306,6 @@ spec:
                 allocdb.sketch/cluster: ${CLUSTER_NAME}
                 allocdb.sketch/role: ${role}
         spec:
-            topologySpreadConstraints:
-                - maxSkew: 1
-                  topologyKey: kubernetes.io/hostname
-                  whenUnsatisfiable: DoNotSchedule
-                  labelSelector:
-                      matchLabels:
-                          allocdb.sketch/cluster: ${CLUSTER_NAME}
             affinity:
                 podAntiAffinity:
                     requiredDuringSchedulingIgnoredDuringExecution:
