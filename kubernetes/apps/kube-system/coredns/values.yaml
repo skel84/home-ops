@@ -30,7 +30,8 @@ servers:
           pods insecure
           fallthrough in-addr.arpa ip6.arpa
       - name: forward
-        parameters: . /etc/resolv.conf
+        # Avoid depending on the node resolver, which is currently unstable in this cluster.
+        parameters: . 1.1.1.1 1.0.0.1
       - name: cache
         parameters: 30
       - name: loop
