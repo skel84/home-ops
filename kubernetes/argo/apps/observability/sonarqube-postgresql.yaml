@@ -1,0 +1,34 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sonarqube-postgresql
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/observability/sonarqube-postgresql
+      targetRevision: main
+      ref: repo
+    - repoURL: https://charts.bitnami.com/bitnami
+      chart: postgresql
+      targetRevision: 16.6.5
+      helm:
+        releaseName: sonarqube-postgresql
+        valueFiles:
+          - $repo/kubernetes/apps/observability/sonarqube-postgresql/values.yaml
+  destination:
+    name: in-cluster
+    namespace: observability
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true

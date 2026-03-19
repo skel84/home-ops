@@ -1,0 +1,45 @@
+community:
+  enabled: true
+monitoringPasscodeSecretName: sonarqube-monitoring-passcode-secret
+monitoringPasscodeSecretKey: monitoringPasscode
+setAdminPassword:
+  passwordSecretName: sonarqube-admin-secret
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+jdbcOverwrite:
+  enabled: true
+  jdbcUrl: jdbc:postgresql://sonarqube-postgresql.observability.svc.cluster.local:5432/sonarqube
+  jdbcUsername: sonar
+  jdbcSecretName: sonarqube-postgresql-secret
+  jdbcSecretPasswordKey: password
+persistence:
+  enabled: true
+  storageClass: longhorn
+  size: 10Gi
+resources:
+  requests:
+    cpu: 400m
+    memory: 2048M
+  limits:
+    cpu: 800m
+    memory: 6144M
+nodeSelector:
+  kubernetes.io/hostname: rbl-02
+ingress:
+  enabled: true
+  ingressClassName: external
+  annotations:
+    external-dns.alpha.kubernetes.io/target: external.rbl.lol
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+    - name: sonarqube.rbl.lol
+      path: /
+  tls:
+    - secretName: sonarqube-tls
+      hosts:
+        - sonarqube.rbl.lol
