@@ -12,5 +12,6 @@ Managed here:
 - `ValidatingAdmissionPolicy/protect-support-rbac`
 - `ValidatingAdmissionPolicyBinding/protect-support-rbac`
 
-The reserved vendor access role and binding are delivered from the hub side by
-the OCM `ManifestWork` in the other repository.
+The reserved vendor access role and binding are controlled locally through the
+support switch path. The hub only delivers the OCM access plumbing and support
+identity.
