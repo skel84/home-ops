@@ -1,0 +1,48 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: protect-support-rbac
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - rbac.authorization.k8s.io
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+          - DELETE
+        resources:
+          - clusterroles
+          - clusterrolebindings
+          - roles
+          - rolebindings
+  validations:
+    - expression: >-
+        !['vendor-support-readonly',
+          'vendor-support-readonly-binding',
+          'vendor-support-admin',
+          'vendor-support-admin-binding'
+        ].exists(
+          name,
+          name == (request.operation == 'DELETE'
+            ? oldObject.metadata.name
+            : object.metadata.name)
+        )
+        || request.userInfo.username == 'system:serviceaccount:support-access-system:support-switch-sa'
+        || request.userInfo.groups.exists(group, group == 'system:masters')
+      message: >-
+        Protected support RBAC may only be changed by support-switch-sa or a
+        system:masters emergency admin path.
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: protect-support-rbac
+spec:
+  policyName: protect-support-rbac
+  validationActions:
+    - Deny

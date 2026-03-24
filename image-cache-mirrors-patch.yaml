@@ -1,0 +1,12 @@
+apiVersion: v1alpha1
+kind: RegistryMirrorConfig
+name: docker.io
+endpoints:
+    - url: http://192.168.0.240:3172
+
+---
+apiVersion: v1alpha1
+kind: RegistryMirrorConfig
+name: quay.io
+endpoints:
+    - url: http://192.168.0.240:3173
