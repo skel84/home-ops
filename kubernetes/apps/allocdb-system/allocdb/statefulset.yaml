@@ -9,6 +9,10 @@ spec:
   serviceName: allocdb-internal
   replicas: 3
   podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      partition: 0
   selector:
     matchLabels:
       app.kubernetes.io/name: allocdb
@@ -27,18 +31,23 @@ spec:
           ports:
             - name: control
               containerPort: 17000
+              protocol: TCP
             - name: client
               containerPort: 18000
+              protocol: TCP
             - name: protocol
               containerPort: 19000
+              protocol: TCP
           env:
             - name: ALLOCDB_POD_IP
               valueFrom:
                 fieldRef:
+                  apiVersion: v1
                   fieldPath: status.podIP
             - name: ALLOCDB_NAMESPACE
               valueFrom:
                 fieldRef:
+                  apiVersion: v1
                   fieldPath: metadata.namespace
             - name: ALLOCDB_STATEFULSET_NAME
               value: allocdb
@@ -56,6 +65,7 @@ spec:
                 - /bin/sh
                 - -ec
                 - exec /usr/local/bin/allocdb-local-cluster control-status --addr "${ALLOCDB_POD_IP}:17000"
+            successThreshold: 1
             periodSeconds: 5
             timeoutSeconds: 2
             failureThreshold: 6
@@ -75,6 +85,7 @@ spec:
                 - /bin/sh
                 - -ec
                 - exec /usr/local/bin/allocdb-local-cluster control-status --addr "${ALLOCDB_POD_IP}:17000"
+            successThreshold: 1
             periodSeconds: 2
             timeoutSeconds: 2
             failureThreshold: 30
@@ -96,6 +107,8 @@ spec:
               mountPath: /var/lib/allocdb
             - name: run
               mountPath: /run/allocdb
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
       volumes:
         - name: run
           emptyDir: {}
@@ -106,6 +119,7 @@ spec:
         accessModes:
           - ReadWriteOnce
         storageClassName: longhorn-strict-local-wffc
+        volumeMode: Filesystem
         resources:
           requests:
             storage: 10Gi
