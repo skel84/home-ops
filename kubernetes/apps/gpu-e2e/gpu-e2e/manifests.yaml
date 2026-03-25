@@ -30,10 +30,16 @@ spec:
   namespaceSelector: {}
   resourceGroups:
     - coveredResources:
+        - cpu
+        - memory
         - example.com/gpu
       flavors:
         - name: test-flavor
           resources:
+            - name: cpu
+              nominalQuota: "4"
+            - name: memory
+              nominalQuota: 8Gi
             - name: example.com/gpu
               nominalQuota: 4
 ---
@@ -73,9 +79,12 @@ spec:
                 - sh
                 - -c
                 - echo started; sleep 2; echo done
-              # Keep the smoke aligned with the current staging queue contract.
               resources:
                 requests:
+                  cpu: 100m
+                  memory: 64Mi
                   example.com/gpu: "1"
                 limits:
+                  cpu: 100m
+                  memory: 64Mi
                   example.com/gpu: "1"
