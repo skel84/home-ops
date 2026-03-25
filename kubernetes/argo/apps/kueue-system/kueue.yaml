@@ -13,13 +13,6 @@ spec:
       path: kubernetes/apps/kueue-system/kueue
       targetRevision: main
       ref: repo
-    - repoURL: oci://registry.k8s.io/kueue/charts
-      chart: kueue
-      targetRevision: 0.16.4
-      helm:
-        releaseName: kueue
-        valueFiles:
-          - $repo/kubernetes/apps/kueue-system/kueue/values.yaml
   destination:
     name: in-cluster
     namespace: kueue-system
