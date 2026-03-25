@@ -51,6 +51,6 @@ data:
       - "leaderworkerset.x-k8s.io/leaderworkerset"
     resources:
       deviceClassMappings:
-      - resourceName: example.com/gpu
+      - name: example.com/gpu
         deviceClassNames:
         - gpucp-class-example-com-gpu-test-flavor
