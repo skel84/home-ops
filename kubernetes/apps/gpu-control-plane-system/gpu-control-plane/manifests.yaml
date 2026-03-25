@@ -215,6 +215,20 @@ spec:
     app.kubernetes.io/name: gpu-control-plane
     control-plane: controller-manager
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gpu-control-plane-webhook-service
+  namespace: gpu-control-plane-system
+spec:
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 9443
+  selector:
+    app.kubernetes.io/name: gpu-control-plane
+    control-plane: controller-manager
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -247,7 +261,7 @@ spec:
         - --allocdb-pool=example.com/gpu/test-flavor=11,12,13,14
         command:
         - /manager
-        image: docker.io/skel84/gpu-control-plane:staging-51e8ef5
+        image: docker.io/skel84/gpu-control-plane:staging-a24d36c
         livenessProbe:
           httpGet:
             path: /healthz
@@ -255,7 +269,10 @@ spec:
           initialDelaySeconds: 15
           periodSeconds: 20
         name: manager
-        ports: []
+        ports:
+        - containerPort: 9443
+          name: webhook-server
+          protocol: TCP
         readinessProbe:
           httpGet:
             path: /readyz
@@ -275,11 +292,68 @@ spec:
             drop:
             - ALL
           readOnlyRootFilesystem: true
-        volumeMounts: []
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: webhook-cert
+          readOnly: true
       securityContext:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: gpu-control-plane-controller-manager
       terminationGracePeriodSeconds: 10
-      volumes: []
+      volumes:
+      - name: webhook-cert
+        secret:
+          secretName: gpu-control-plane-webhook-server-cert
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: gpu-control-plane-serving-cert
+  namespace: gpu-control-plane-system
+spec:
+  dnsNames:
+  - gpu-control-plane-webhook-service.gpu-control-plane-system.svc
+  - gpu-control-plane-webhook-service.gpu-control-plane-system.svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: gpu-control-plane-selfsigned-webhook
+  secretName: gpu-control-plane-webhook-server-cert
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: gpu-control-plane-selfsigned-webhook
+  namespace: gpu-control-plane-system
+spec:
+  selfSigned: {}
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  annotations:
+    cert-manager.io/inject-ca-from: gpu-control-plane-system/gpu-control-plane-serving-cert
+  name: gpu-control-plane-pod-claim-injector
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: gpu-control-plane-webhook-service
+      namespace: gpu-control-plane-system
+      path: /mutate-v1-pod-claim-injection
+  failurePolicy: Ignore
+  matchPolicy: Equivalent
+  name: podclaiminjector.gpu-control-plane.controlplane.skel84.dev
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    resources:
+    - pods
+  sideEffects: None
+  timeoutSeconds: 2
