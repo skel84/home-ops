@@ -72,6 +72,16 @@ rules:
   - list
   - watch
 - apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
   - kueue.x-k8s.io
   resources:
   - admissionchecks
@@ -247,7 +257,7 @@ spec:
         - --allocdb-pool=example.com/gpu/test-flavor=11,12,13,14
         command:
         - /manager
-        image: docker.io/skel84/gpu-control-plane:staging-51e8ef5
+        image: docker.io/skel84/gpu-control-plane:staging-c91b734
         livenessProbe:
           httpGet:
             path: /healthz
