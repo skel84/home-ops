@@ -261,7 +261,7 @@ spec:
         - --allocdb-pool=example.com/gpu/test-flavor=11,12,13,14
         command:
         - /manager
-        image: docker.io/skel84/gpu-control-plane:staging-a24d36c
+        image: docker.io/skel84/gpu-control-plane:staging-5e89d6d
         livenessProbe:
           httpGet:
             path: /healthz
