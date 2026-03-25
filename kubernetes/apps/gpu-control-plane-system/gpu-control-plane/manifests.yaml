@@ -95,6 +95,7 @@ rules:
   - resourceclaims
   verbs:
   - create
+  - delete
   - get
   - list
   - patch
