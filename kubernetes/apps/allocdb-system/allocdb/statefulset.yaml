@@ -32,6 +32,10 @@ spec:
             - name: protocol
               containerPort: 19000
           env:
+            - name: ALLOCDB_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
             - name: ALLOCDB_NAMESPACE
               valueFrom:
                 fieldRef:
@@ -49,20 +53,18 @@ spec:
           readinessProbe:
             exec:
               command:
-                - /usr/local/bin/allocdb-local-cluster
-                - control-status
-                - --addr
-                - 127.0.0.1:17000
+                - /bin/sh
+                - -ec
+                - exec /usr/local/bin/allocdb-local-cluster control-status --addr "${ALLOCDB_POD_IP}:17000"
             periodSeconds: 5
             timeoutSeconds: 2
             failureThreshold: 6
           livenessProbe:
             exec:
               command:
-                - /usr/local/bin/allocdb-local-cluster
-                - control-status
-                - --addr
-                - 127.0.0.1:17000
+                - /bin/sh
+                - -ec
+                - exec /usr/local/bin/allocdb-local-cluster control-status --addr "${ALLOCDB_POD_IP}:17000"
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 2
@@ -70,10 +72,9 @@ spec:
           startupProbe:
             exec:
               command:
-                - /usr/local/bin/allocdb-local-cluster
-                - control-status
-                - --addr
-                - 127.0.0.1:17000
+                - /bin/sh
+                - -ec
+                - exec /usr/local/bin/allocdb-local-cluster control-status --addr "${ALLOCDB_POD_IP}:17000"
             periodSeconds: 2
             timeoutSeconds: 2
             failureThreshold: 30
