@@ -29,6 +29,8 @@ data:
     clientConnection:
       qps: 50
       burst: 100
+    featureGates:
+      DynamicResourceAllocation: true
     integrations:
       frameworks:
       - "batch/job"
