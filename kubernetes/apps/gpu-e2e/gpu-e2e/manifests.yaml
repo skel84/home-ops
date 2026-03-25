@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gpu-e2e
+---
+apiVersion: resource.k8s.io/v1beta1
+kind: DeviceClass
+metadata:
+  name: gpucp-class-example-com-gpu-test-flavor
+spec:
+  selectors:
+    - cel:
+        expression: device.driver == "gpu.example.com"
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: test-flavor
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: gpu-e2e
+spec:
+  admissionChecksStrategy:
+    admissionChecks:
+      - name: gpu-check
+        onFlavors:
+          - test-flavor
+  namespaceSelector: {}
+  resourceGroups:
+    - coveredResources:
+        - example.com/gpu
+      flavors:
+        - name: test-flavor
+          resources:
+            - name: example.com/gpu
+              nominalQuota: 4
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: gpu-e2e
+  namespace: gpu-e2e
+spec:
+  clusterQueue: gpu-e2e
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: gpu-e2e-direct-smoke
+  namespace: gpu-e2e
+spec:
+  schedule: "17 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    metadata:
+      labels:
+        kueue.x-k8s.io/queue-name: gpu-e2e
+    spec:
+      backoffLimit: 0
+      ttlSecondsAfterFinished: 600
+      suspend: true
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: main
+              image: busybox:1.36
+              command:
+                - sh
+                - -c
+                - echo started; sleep 2; echo done
+              # Keep the smoke aligned with the current staging queue contract.
+              resources:
+                requests:
+                  example.com/gpu: "1"
+                limits:
+                  example.com/gpu: "1"
