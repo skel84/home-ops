@@ -3,3 +3,6 @@ kind: Kustomization
 
 resources:
   - https://github.com/kubernetes-sigs/kueue/releases/download/v0.16.4/manifests.yaml
+
+patches:
+  - path: manager-config-patch.yaml
