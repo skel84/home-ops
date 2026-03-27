@@ -28,17 +28,17 @@ postgresql:
       size: 10Gi
 clickhouse:
   enabled: true
+  resources:
+    requests:
+      cpu: 2
+      memory: 1024Mi
+    limits:
+      cpu: 3
+      memory: 2048Mi
   persistence:
     enabled: true
     storageClass: longhorn
     size: 10Gi
-    resources:
-      requests:
-        cpu: 2
-        memory: 1024Mi
-      limits:
-        cpu: 3
-        memory: 2048Mi
 sops:
   age:
     - recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v

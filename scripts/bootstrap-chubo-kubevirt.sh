@@ -585,7 +585,8 @@ NOMAD_HELPERS_DIR="${WORKDIR}/nomadconfig"
 PORT_FORWARD_LOG="${WORKDIR}/port-forward.log"
 SMOKE_JOB_FILE="${WORKDIR}/${SMOKE_JOB_NAME}.nomad"
 
-BASE_IMAGE_URL="https://github.com/chubo-dev/chubo/releases/download/${RELEASE_TAG}/nocloud-amd64.raw.zst"
+DEFAULT_BASE_IMAGE_URL="https://github.com/chubo-dev/chubo/releases/download/${RELEASE_TAG}/nocloud-amd64.raw.zst"
+BASE_IMAGE_URL="${BASE_IMAGE_URL:-${DEFAULT_BASE_IMAGE_URL}}"
 
 log info "Using release artifact" "tag=${RELEASE_TAG}" "url=${BASE_IMAGE_URL}"
 log info "Using kubeconfig" "path=${KUBECONFIG_PATH}"
