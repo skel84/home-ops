@@ -52,7 +52,7 @@ service:
 
 ingress:
   enabled: true
-  className: nginx
+  className: internal
   host: oie.rbl.lol
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
