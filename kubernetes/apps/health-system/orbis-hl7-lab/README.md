@@ -1,6 +1,14 @@
 # ORBIS-like HL7 Lab
 
-This path is documentation-only in phase 0. It does not add Kubernetes manifests, an Argo CD application, or any deployable resources to `home-ops` yet.
+This path started as documentation-only planning for an ORBIS-like HL7 lab.
+
+That is no longer strictly true:
+
+- the first live integration-engine slice now exists under [oie](/Users/francesco/repos/homelab/home-ops/kubernetes/apps/health-system/oie)
+- the matching database app now exists under [oie-postgresql](/Users/francesco/repos/homelab/home-ops/kubernetes/apps/health-system/oie-postgresql)
+- the matching Argo CD apps now exist under [health-system](/Users/francesco/repos/homelab/home-ops/kubernetes/argo/apps/health-system)
+
+This document remains useful as the broader lab rationale, but it should be read alongside the OIE deployment manifests rather than as a statement that nothing is deployed.
 
 ## Goal
 
@@ -8,11 +16,15 @@ Build an integration lab that behaves like an ORBIS-style HL7 environment for in
 
 ## Current Decision
 
-Use this pipeline:
+Original planning pipeline:
 
 `HL7 simulator -> MLLP -> gateway-hl7-listener -> NATS JetStream (raw HL7) -> custom Java converter-publisher -> NATS JetStream (FHIR) -> downstream apps`
 
-Do not collapse the listener and converter into one custom ingress service for the first release.
+Current deployed direction is different for the first open-source lab slice:
+
+`Synthea or synthetic HTTP/FHIR input -> OIE -> HL7 v2 -> Medplum`
+
+The LinuxForHealth plus NATS path is still a valid alternative lab design, but it is not the only tracked direction anymore.
 
 ## Phase Boundaries
 

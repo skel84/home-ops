@@ -1,0 +1,19 @@
+auth:
+  password: ENC[AES256_GCM,data:3YZmlOFhzOEvOY/f+nqiiJ7rQ2sA06pBKX2Rx2gfHv0=,iv:bf1guFbdrcENZX0EcvxqyEtqR3jLk8BMwEuWzJ+FZ48=,tag:xn3x49wCk003TX9tS6FXOQ==,type:str]
+  postgresPassword: ENC[AES256_GCM,data:SDbwRU7gos8Y/KLH07gCXX55Gc59z1yVRnFp15QQvRg=,iv:NIHyvdQ/S2uWkX8hrx0LFeYz9glz6ff5glCTZTELjFo=,tag:BWAdcHVHhGyu2OoffQRtOQ==,type:str]
+sops:
+  age:
+    - recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBWVXQ4WDhRZ1J6LzFMZW9j
+        aUF5L1AvQkNKQmVPUm8zcmk1bHRqZ0Z4bFVRClV6ZnF2LzkvRHZyblFMMHdPeVhM
+        QTFnTC9sL3dsSmpqUjJCVzlzbGQ3QW8KLS0tIFlMZzltWTlMT2RDbUlFL1FORUh3
+        WGJES0xlSWwxQmx4M3FnSDBpNWp5S3MK6bqmIz6w7Xvc/FRYswmx+9RqgWAwX7HE
+        qj3e3kNdkoAiaqdzD5geNGVVmXwrAhpearPnFvw8nHEQn0FdB2dnVw==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-28T20:10:42Z"
+  mac: ENC[AES256_GCM,data:vsZuFHtsBYSGZF6NRhHZXZYus+zVhoYrgyBUICuumY9NQ/lTgp7r8g3ys2g5TQwugrSrvHZwDnxSbZNIxrvvEDU74EvTSw44xRPKNt5jJEbM/lHZbiaH813xwASO4wrSRIctehOdfzHgbAt41QcbIqpBjemb2righE5xAaTs0gY=,iv:n7rz2sRGqzekzNGJoHO6QRww2eINpF+sf/zVTGxSWEM=,tag:Ci6LAaX92HYTv+eudwJkEA==,type:str]
+  encrypted_regex: ^(auth|stringData|data|githubSecret|bootstrapPassword)$
+  mac_only_encrypted: true
+  version: 3.12.1
