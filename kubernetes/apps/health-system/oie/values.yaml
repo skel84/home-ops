@@ -9,6 +9,8 @@ deployment:
   replicaCount: 1
   strategy:
     type: Recreate
+  envFromSecrets:
+    - oie-medplum-client
   initImage:
     repository: busybox
     tag: "1.36.1"

@@ -60,10 +60,37 @@ spec:
                 secretKeyRef:
                   name: {{ include "oie.fullname" . }}-config
                   key: keystoreKeypass
+            - name: MEDPLUM_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "oie.fullname" . }}-config
+                  key: medplumBaseUrl
+            - name: MEDPLUM_BOT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "oie.fullname" . }}-config
+                  key: medplumBotId
+            - name: MEDPLUM_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "oie.fullname" . }}-config
+                  key: medplumClientId
+            - name: MEDPLUM_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "oie.fullname" . }}-config
+                  key: medplumClientSecret
             - name: VMOPTIONS
               value: {{ .Values.runtime.vmOptions | quote }}
             - name: _MP_HTTPS_SERVER_PROTOCOLS
               value: {{ .Values.runtime.httpsServerProtocols | quote }}
+          {{- with .Values.deployment.envFromSecrets }}
+          envFrom:
+            {{- range . }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+          {{- end }}
           ports:
             - name: https
               containerPort: 8443
