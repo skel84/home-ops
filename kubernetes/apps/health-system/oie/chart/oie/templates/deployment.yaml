@@ -23,6 +23,17 @@ spec:
         {{ $key }}: {{ $value | quote }}
         {{- end }}
     spec:
+      initContainers:
+        - name: init-appdata-permissions
+          image: {{ printf "%s:%s" .Values.deployment.initImage.repository .Values.deployment.initImage.tag }}
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - chown -R 1000:1000 /opt/engine/appdata
+          volumeMounts:
+            - name: appdata
+              mountPath: /opt/engine/appdata
       containers:
         - name: oie
           image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag }}
