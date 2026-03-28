@@ -1,0 +1,20 @@
+secrets:
+  databasePassword: ENC[AES256_GCM,data:6Xbm+Mjebwh8ka6q6ejszuY1UTX0m651olQ5oMy8TwU=,iv:NVDuYS7rLxq+8YtxDb4aZzstZ1bGqAQVOHb5FGJkTeI=,tag:8jWkTsEQ5nueHqVqDa6AiA==,type:str]
+  keystoreStorepass: ENC[AES256_GCM,data:+ycTfpx4rRsDiXw/dEyPE6z+KTuF6qLprGK+FjClU90=,iv:zAzayL+H1LusqLjlLyIeDDTTd8F954ddA27hmUHxUUY=,tag:I9L7QdvQ1/48FOWR38ETUQ==,type:str]
+  keystoreKeypass: ENC[AES256_GCM,data:jx3cVsxFwwWwltKwm8EKtilMMNTNJUDyTjACgRzHfq4=,iv:D1SLzCRwHExrwny4qEUCQ2JZT8RIxKuCMOP0OFvmDLs=,tag:jYA0rlf8Bs/6Q69pA1g31Q==,type:str]
+sops:
+  age:
+    - recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBLalBUYVNPa0IwRndaOUlU
+        TkZUaGZwYWJnWU9TQkFjTHpFSWlwektPbGxRCnVicGk3U1lsYXZWRVlwVDB1aE9S
+        UXkzVndLTEZOTUNXZitGaHpwYjRqUG8KLS0tIGZWNi9rdnlVQ1dRVDY3SFN6M25t
+        TkRoQzFqMHUzSm41d2lmeUQ5VlIrK1EKyoZQyGIpO34rik9LmMmSVutQyESiKFyt
+        ZtVNoXqW5HNnFeto8JR++9LabdPDH5j42N9b17qIJQfNSoHa5N4ZMA==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-03-28T20:18:51Z"
+  mac: ENC[AES256_GCM,data:Wg2t84T0zIRGzO9woLoL5+2p2nKkwHFY6kBBwi0WlXqqwx6foPM8VPO3bewpygXk7QFUOG3ZaL0qkA9iso8jIObHQ6/CUAuNnhM9ccdM/P9DFYwKcPwNiCIOJe53b0R32qkL/CbEnRPTzSlpQxu4siKj4GVE9mZvdbFTs+14ZIE=,iv:S0CDUK+++yXdesionCakHrRCJ7PCs6Jlai3GcXxUyr0=,tag:z8/IgCiD/RuNDmJdy7rqpw==,type:str]
+  encrypted_regex: ^(secrets)$
+  mac_only_encrypted: true
+  version: 3.12.1

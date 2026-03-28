@@ -8,10 +8,19 @@ metadata:
     argocd.argoproj.io/sync-wave: "0"
 spec:
   project: kubernetes
-  source:
-    repoURL: "https://github.com/skel84/home-ops.git"
-    path: kubernetes/apps/health-system/oie
-    targetRevision: main
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/health-system/oie/chart/oie
+      targetRevision: main
+      helm:
+        releaseName: oie
+        valueFiles:
+          - $repo/kubernetes/apps/health-system/oie/values.yaml
+          - $repo/kubernetes/apps/health-system/oie/values.sops.yaml
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/health-system/oie
+      targetRevision: main
+      ref: repo
   destination:
     name: in-cluster
     namespace: health-system

@@ -1,0 +1,59 @@
+namespace: health-system
+
+image:
+  repository: openintegrationengine/engine
+  tag: 4.5.2-tp.1-ubuntu-jre
+  pullPolicy: IfNotPresent
+
+deployment:
+  replicaCount: 1
+  strategy:
+    type: Recreate
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1500m
+      memory: 2Gi
+  probes:
+    startup:
+      failureThreshold: 60
+      periodSeconds: 10
+    readiness:
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      failureThreshold: 6
+    liveness:
+      initialDelaySeconds: 90
+      periodSeconds: 20
+      failureThreshold: 6
+
+podAnnotations:
+  secret.reloader.stakater.com/reload: oie-config
+
+database:
+  host: oie-postgresql
+  port: 5432
+  name: oie
+  username: oie
+
+runtime:
+  vmOptions: -Xmx768m
+  httpsServerProtocols: TLSv1.3,TLSv1.2
+
+service:
+  type: ClusterIP
+  port: 8443
+  targetPort: 8443
+
+ingress:
+  enabled: true
+  className: nginx
+  host: oie.rbl.lol
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+
+storage:
+  size: 5Gi
+  storageClassName: longhorn

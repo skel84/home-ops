@@ -1,0 +1,6 @@
+apiVersion: v2
+name: oie
+description: Open Integration Engine for the home-ops HL7 ingestion lab
+type: application
+version: 0.1.0
+appVersion: 4.5.2-tp.1-ubuntu-jre

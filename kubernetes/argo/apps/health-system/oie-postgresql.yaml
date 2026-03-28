@@ -13,9 +13,9 @@ spec:
       path: kubernetes/apps/health-system/oie-postgresql
       targetRevision: main
       ref: repo
-    - repoURL: https://charts.bitnami.com/bitnami
-      chart: postgresql
-      targetRevision: 18.5.14
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/health-system/oie-postgresql/chart/postgresql
+      targetRevision: main
       helm:
         releaseName: oie-postgresql
         valueFiles:

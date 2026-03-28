@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "oie.fullname" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "oie.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  strategy:
+    type: {{ .Values.deployment.strategy.type }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "oie.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "oie.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        {{- range $key, $value := .Values.podAnnotations }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+    spec:
+      containers:
+        - name: oie
+          image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: DATABASE
+              value: postgres
+            - name: DATABASE_URL
+              value: {{ printf "jdbc:postgresql://%s:%v/%s" .Values.database.host .Values.database.port .Values.database.name | quote }}
+            - name: DATABASE_USERNAME
+              value: {{ .Values.database.username | quote }}
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "oie.fullname" . }}-config
+                  key: databasePassword
+            - name: KEYSTORE_STOREPASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "oie.fullname" . }}-config
+                  key: keystoreStorepass
+            - name: KEYSTORE_KEYPASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "oie.fullname" . }}-config
+                  key: keystoreKeypass
+            - name: VMOPTIONS
+              value: {{ .Values.runtime.vmOptions | quote }}
+            - name: _MP_HTTPS_SERVER_PROTOCOLS
+              value: {{ .Values.runtime.httpsServerProtocols | quote }}
+          ports:
+            - name: https
+              containerPort: 8443
+          startupProbe:
+            tcpSocket:
+              port: https
+            failureThreshold: {{ .Values.deployment.probes.startup.failureThreshold }}
+            periodSeconds: {{ .Values.deployment.probes.startup.periodSeconds }}
+          readinessProbe:
+            tcpSocket:
+              port: https
+            initialDelaySeconds: {{ .Values.deployment.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.deployment.probes.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.deployment.probes.readiness.failureThreshold }}
+          livenessProbe:
+            tcpSocket:
+              port: https
+            initialDelaySeconds: {{ .Values.deployment.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.deployment.probes.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.deployment.probes.liveness.failureThreshold }}
+          resources:
+            {{- toYaml .Values.deployment.resources | nindent 12 }}
+          volumeMounts:
+            - name: appdata
+              mountPath: /opt/engine/appdata
+      volumes:
+        - name: appdata
+          persistentVolumeClaim:
+            claimName: {{ include "oie.fullname" . }}-appdata
