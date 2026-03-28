@@ -6,7 +6,7 @@ architecture: standalone
 primary:
   persistence:
     enabled: true
-    storageClass: longhorn
+    storageClass: longhorn-r1
     size: 8Gi
   resources:
     requests:
