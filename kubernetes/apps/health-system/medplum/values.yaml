@@ -1,0 +1,59 @@
+namespace: health-system
+global:
+  cloudProvider: azure
+  configSource:
+    type: "file:/config/medplum.config.json"
+
+deployment:
+  replicaCount: 1
+  strategy:
+    type: Recreate
+  image:
+    repository: medplum/medplum-server
+    tag: 5.1.5
+  autoscaling:
+    enabled: false
+  resources:
+    requests:
+      cpu: 500m
+      memory: 1Gi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+  probes:
+    liveness:
+      initialDelaySeconds: 180
+      timeoutSeconds: 5
+    readiness:
+      timeoutSeconds: 5
+    startup:
+      failureThreshold: 180
+      periodSeconds: 10
+      timeoutSeconds: 5
+
+podAnnotations:
+  secret.reloader.stakater.com/reload: medplum-config
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8103
+
+ingress:
+  deploy: false
+
+volumes:
+  - name: medplum-config
+    secret:
+      secretName: medplum-config
+  - name: binary-storage
+    persistentVolumeClaim:
+      claimName: medplum-binary-storage
+
+volumeMounts:
+  - name: medplum-config
+    mountPath: /config/medplum.config.json
+    subPath: medplum.config.json
+    readOnly: true
+  - name: binary-storage
+    mountPath: /srv/medplum/binary

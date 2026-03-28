@@ -1,0 +1,18 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: medplum-app
+spec:
+  ingressClassName: internal
+  rules:
+    - host: medplum.rbl.lol
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: medplum-app
+                port:
+                  number: 3000

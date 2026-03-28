@@ -1,0 +1,34 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fission
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/fission/fission
+      targetRevision: main
+      ref: repo
+    - repoURL: https://fission.github.io/fission-charts/
+      chart: fission-all
+      targetRevision: 1.22.1
+      helm:
+        releaseName: fission
+        valueFiles:
+          - $repo/kubernetes/apps/fission/fission/values.yaml
+  destination:
+    name: in-cluster
+    namespace: fission
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true

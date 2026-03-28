@@ -1,0 +1,15 @@
+serviceType: ClusterIP
+routerServiceType: ClusterIP
+
+defaultNamespace: health-system
+createNamespace: false
+
+persistence:
+  enabled: true
+  storageClass: longhorn-r1
+  size: 2Gi
+
+analytics: false
+
+mqt_keda:
+  enabled: false

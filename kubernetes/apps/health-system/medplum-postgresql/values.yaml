@@ -1,0 +1,17 @@
+auth:
+  enablePostgresUser: true
+  username: medplum
+  database: medplum
+architecture: standalone
+primary:
+  persistence:
+    enabled: true
+    storageClass: longhorn
+    size: 20Gi
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi

@@ -1,0 +1,34 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: medplum
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/health-system/medplum/chart/medplum
+      targetRevision: main
+      helm:
+        releaseName: medplum
+        valueFiles:
+          - $repo/kubernetes/apps/health-system/medplum/values.yaml
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/health-system/medplum
+      targetRevision: main
+      ref: repo
+  destination:
+    name: in-cluster
+    namespace: health-system
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true

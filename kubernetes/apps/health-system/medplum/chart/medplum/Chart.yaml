@@ -1,0 +1,26 @@
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/prerelease: "true"
+apiVersion: v2
+appVersion: 5.1.5
+description: 'Helm chart for deploying Medplum Server - an open source healthcare
+  development platform. Provides FHIR server, auth, workflows, and APIs for building
+  healthcare applications. '
+home: https://www.medplum.com
+icon: https://www.medplum.com/img/logo.svg
+keywords:
+- healthcare
+- fhir
+- medical
+- ehr
+- api
+- server
+maintainers:
+- email: support@medplum.com
+  name: Medplum Team
+  url: https://www.medplum.com
+name: medplum
+sources:
+- https://github.com/medplum/medplum
+type: application
+version: 5.1.5

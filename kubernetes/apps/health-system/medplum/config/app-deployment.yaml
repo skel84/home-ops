@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medplum-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: medplum-app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: medplum-app
+    spec:
+      containers:
+        - name: app
+          image: medplum/medplum-app:5.1.5
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MEDPLUM_BASE_URL
+              value: https://medplum-api.rbl.lol/
+            - name: MEDPLUM_REGISTER_ENABLED
+              value: "false"
+            - name: MEDPLUM_AWS_TEXTRACT_ENABLED
+              value: "false"
+          ports:
+            - containerPort: 3000
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

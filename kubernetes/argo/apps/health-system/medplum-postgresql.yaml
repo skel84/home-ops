@@ -1,0 +1,35 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: medplum-postgresql
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/health-system/medplum-postgresql
+      targetRevision: main
+      ref: repo
+    - repoURL: https://charts.bitnami.com/bitnami
+      chart: postgresql
+      targetRevision: 18.5.14
+      helm:
+        releaseName: medplum-postgresql
+        valueFiles:
+          - $repo/kubernetes/apps/health-system/medplum-postgresql/values.yaml
+          - $repo/kubernetes/apps/health-system/medplum-postgresql/values.sops.yaml
+  destination:
+    name: in-cluster
+    namespace: health-system
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true

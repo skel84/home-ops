@@ -1,0 +1,35 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: medplum-redis
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/health-system/medplum-redis
+      targetRevision: main
+      ref: repo
+    - repoURL: https://charts.bitnami.com/bitnami
+      chart: redis
+      targetRevision: 25.3.9
+      helm:
+        releaseName: medplum-redis
+        valueFiles:
+          - $repo/kubernetes/apps/health-system/medplum-redis/values.yaml
+          - $repo/kubernetes/apps/health-system/medplum-redis/values.sops.yaml
+  destination:
+    name: in-cluster
+    namespace: health-system
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true

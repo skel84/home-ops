@@ -1,0 +1,17 @@
+auth:
+    password: ENC[AES256_GCM,data:dyd/19sGGw+S4k2WrTgVaHB7Fz6LUgChBM1zuVHBGDM=,iv:IyCC+CbD9tkxACYau2BpGiVaSIdSPgvUWvInUOlEvzY=,tag:gMr/BGUWRvACJxR6o4DLgw==,type:str]
+sops:
+    age:
+        - recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBXZTczRW55bEdSMWo4ZzN6
+            RFhjdWZoNTNJUCtKdEdhS1h5M1lqeWVRS0VzCklQQ2FkT2hCK2xYcWs5TWE4YlRk
+            aGp4VGRsSExYeEJRNlpER0s4bFFhWFkKLS0tIEluenZnRnlZdFZnRGVHUE5aVjZp
+            eVMrbEllZGIweG5TdzFVdFpiY3dOWk0KBzRkPlnEHivwmAv08Hs5NOVpgPhV0m3x
+            j41qkbmiS1tnKMcqIyqCTtI1ikt9/rrZebBWRfs5p2j3j+X6HdWlpQ==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2026-03-28T14:21:52Z"
+    mac: ENC[AES256_GCM,data:HXDvNaQxneExvoNCzfcf6Tiy0mcnJt8ndp7wn/JQERpioc4MEoNLUxMpwHyKybWBFIBe0Piavdlql1CHNaYOhEt+H2+bYSpIFjamGXWMRYZNIZ2tboibiS7JRvLlv5r0PSZWnOP0Y863RswKvdJ+R7dcBASY2L38foj0yVlxj84=,iv:lR337GEzO4w66eS0r3GyxAb98HcS+zX/HYFDOdn8NbY=,tag:2ZyBQt0rbUxsXCp2eSfzuA==,type:str]
+    encrypted_regex: ^(auth|stringData|data|githubSecret|bootstrapPassword)$
+    version: 3.12.1
