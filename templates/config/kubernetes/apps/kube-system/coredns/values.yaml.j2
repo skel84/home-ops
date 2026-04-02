@@ -9,21 +9,6 @@ service:
 replicaCount: 2
 servers:
   - zones:
-      - zone: lan.
-        scheme: dns://
-        use_tcp: true
-    port: 53
-    plugins:
-      - name: errors
-      - name: forward
-        # Send home LAN lookups to the router DNS.
-        parameters: . #{ node_dns_servers[0] }#
-      - name: cache
-        parameters: 30
-      - name: loop
-      - name: reload
-      - name: loadbalance
-  - zones:
       - zone: .
         scheme: dns://
         use_tcp: true
@@ -45,7 +30,8 @@ servers:
           pods insecure
           fallthrough in-addr.arpa ip6.arpa
       - name: forward
-        parameters: . 1.1.1.1 1.0.0.1
+        # Route cluster DNS through the home router so LAN names like nas.lan resolve.
+        parameters: . #{ node_dns_servers[0] }# 1.1.1.1 1.0.0.1
       - name: cache
         parameters: 30
       - name: loop
