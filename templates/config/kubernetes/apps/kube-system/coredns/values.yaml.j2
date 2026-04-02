@@ -29,9 +29,12 @@ servers:
         configBlock: |-
           pods insecure
           fallthrough in-addr.arpa ip6.arpa
+      - name: hosts
+        configBlock: |-
+          #{ node_dns_servers[0] }# nas.lan
+          fallthrough
       - name: forward
-        # Route cluster DNS through the home router so LAN names like nas.lan resolve.
-        parameters: . #{ node_dns_servers[0] }# 1.1.1.1 1.0.0.1
+        parameters: . 1.1.1.1 1.0.0.1
       - name: cache
         parameters: 30
       - name: loop
