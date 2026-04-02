@@ -31,7 +31,7 @@ servers:
           fallthrough in-addr.arpa ip6.arpa
       - name: hosts
         configBlock: |-
-          #{ node_dns_servers[0] }# nas.lan
+          192.168.0.217 nas.lan
           fallthrough
       - name: forward
         parameters: . 1.1.1.1 1.0.0.1
