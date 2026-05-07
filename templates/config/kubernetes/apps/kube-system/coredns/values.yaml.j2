@@ -9,6 +9,17 @@ service:
 replicaCount: 2
 servers:
   - zones:
+      - zone: "#{ cloudflare_domain }#"
+        scheme: dns://
+        use_tcp: true
+    port: 53
+    plugins:
+      - name: errors
+      - name: cache
+        parameters: 30
+      - name: forward
+        parameters: . 192.168.0.50
+  - zones:
       - zone: .
         scheme: dns://
         use_tcp: true
