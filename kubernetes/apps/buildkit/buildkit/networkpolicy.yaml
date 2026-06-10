@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: buildkitd
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: buildkitd
+      app.kubernetes.io/component: builder
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 1234
+  egress:
+    - {}

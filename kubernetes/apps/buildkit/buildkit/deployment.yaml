@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildkitd
+  labels:
+    app.kubernetes.io/name: buildkitd
+    app.kubernetes.io/component: builder
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: buildkitd
+      app.kubernetes.io/component: builder
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: buildkitd
+        app.kubernetes.io/component: builder
+      annotations:
+        container.apparmor.security.beta.kubernetes.io/buildkitd: unconfined
+    spec:
+      serviceAccountName: buildkitd
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: Unconfined
+      containers:
+        - name: buildkitd
+          image: moby/buildkit:v0.30.0-rootless
+          imagePullPolicy: IfNotPresent
+          args:
+            - --addr
+            - unix:///run/user/1000/buildkit/buildkitd.sock
+            - --addr
+            - tcp://0.0.0.0:1234
+            - --config
+            - /etc/buildkit/buildkitd.toml
+            - --oci-worker-no-process-sandbox
+            - --oci-worker-gc
+            - --oci-worker-gc-keepstorage=20000
+          env:
+            - name: HOME
+              value: /home/user
+            - name: USER
+              value: user
+            - name: XDG_RUNTIME_DIR
+              value: /run/user/1000
+            - name: BUILDKIT_SESSION_KEYRING
+              value: "0"
+          ports:
+            - name: buildkit
+              containerPort: 1234
+              protocol: TCP
+          readinessProbe:
+            tcpSocket:
+              port: buildkit
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: buildkit
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              memory: 4Gi
+          volumeMounts:
+            - name: config
+              mountPath: /etc/buildkit
+              readOnly: true
+            - name: state
+              mountPath: /home/user/.local/share/buildkit
+            - name: runtime
+              mountPath: /run/user/1000
+            - name: tmp
+              mountPath: /home/user/.local/tmp
+      volumes:
+        - name: config
+          configMap:
+            name: buildkitd-config
+        - name: state
+          persistentVolumeClaim:
+            claimName: buildkitd-state
+        - name: runtime
+          emptyDir:
+            medium: Memory
+        - name: tmp
+          emptyDir: {}

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: buildkitd-config
+data:
+  buildkitd.toml: |
+    debug = false
+
+    [worker.oci]
+      enabled = true
+      gc = true
+      max-parallelism = 4
+
+    [registry."192.168.0.27:30500"]
+      http = true
+      insecure = true
