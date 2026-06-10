@@ -89,8 +89,7 @@ spec:
           configMap:
             name: buildkitd-config
         - name: state
-          persistentVolumeClaim:
-            claimName: buildkitd-state
+          emptyDir: {}
         - name: runtime
           emptyDir:
             medium: Memory

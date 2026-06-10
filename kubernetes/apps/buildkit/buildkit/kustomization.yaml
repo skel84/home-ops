@@ -5,6 +5,5 @@ resources:
   - configmap.yaml
   - deployment.yaml
   - networkpolicy.yaml
-  - pvc.yaml
   - service.yaml
   - serviceaccount.yaml

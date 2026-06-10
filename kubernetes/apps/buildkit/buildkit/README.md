@@ -18,7 +18,8 @@ docker buildx build \
   -t 192.168.0.27:30500/cc-transcoder/operator:dev \
   -f operator/Dockerfile \
   --push \
-  operator
+  .
 ```
 
 The local registry at `192.168.0.27:30500` is configured as an insecure HTTP registry in `buildkitd.toml`.
+Build cache is currently ephemeral (`emptyDir`) so the builder can run without depending on Longhorn capacity.
