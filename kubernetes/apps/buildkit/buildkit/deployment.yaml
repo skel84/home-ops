@@ -24,34 +24,30 @@ spec:
     spec:
       serviceAccountName: buildkitd
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 1000
-        runAsGroup: 1000
-        fsGroup: 1000
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
         fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: Unconfined
       containers:
         - name: buildkitd
-          image: moby/buildkit:v0.30.0-rootless
+          image: moby/buildkit:v0.30.0
           imagePullPolicy: IfNotPresent
           args:
             - --addr
-            - unix:///run/user/1000/buildkit/buildkitd.sock
+            - unix:///run/buildkit/buildkitd.sock
             - --addr
             - tcp://0.0.0.0:1234
             - --config
             - /etc/buildkit/buildkitd.toml
-            - --oci-worker-no-process-sandbox
             - --oci-worker-gc
             - --oci-worker-gc-keepstorage=20000
           env:
             - name: HOME
-              value: /home/user
+              value: /root
             - name: USER
-              value: user
-            - name: XDG_RUNTIME_DIR
-              value: /run/user/1000
+              value: root
             - name: BUILDKIT_SESSION_KEYRING
               value: "0"
           ports:
@@ -74,16 +70,18 @@ spec:
               memory: 1Gi
             limits:
               memory: 4Gi
+          securityContext:
+            privileged: true
           volumeMounts:
             - name: config
               mountPath: /etc/buildkit
               readOnly: true
             - name: state
-              mountPath: /home/user/.local/share/buildkit
+              mountPath: /var/lib/buildkit
             - name: runtime
-              mountPath: /run/user/1000
+              mountPath: /run/buildkit
             - name: tmp
-              mountPath: /home/user/.local/tmp
+              mountPath: /tmp
       volumes:
         - name: config
           configMap:
