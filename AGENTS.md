@@ -49,6 +49,11 @@ spec:
 - Primary check: `task configure`. No single test runner for `tests/stackgres/`.
 
 ## Runtime Validation & Debug Commands
+- NAS access:
+  - SSH target: `admin@192.168.0.217`.
+  - Current GitOps/NFS endpoint used by the cluster: `192.168.0.217` (`nas.lan` in CoreDNS).
+  - NAS exports used by apps: `/volume1/Media` and `/volume1/Download`.
+  - To check NAS folders from the cluster, prefer a short-lived `kubectl` debug pod with an NFS volume; local macOS NFS mounts may fail with `Operation not permitted`.
 - Cluster/app sanity:
   - `kubectl config current-context`
   - `kubectl config view --minify`

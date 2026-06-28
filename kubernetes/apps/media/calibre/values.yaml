@@ -1,0 +1,82 @@
+controllers:
+  calibre:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    containers:
+      app:
+        image:
+          repository: lscr.io/linuxserver/calibre
+          tag: latest@sha256:210dc050f7473197109fdc76f3809e9295566d68d2737363e60b1fc5fe170398
+          pullPolicy: IfNotPresent
+        env:
+          PUID: 999
+          PGID: 999
+          TZ: "Europe/Rome"
+          UMASK: "002"
+        probes:
+          liveness: &probes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /
+                port: &port 8080
+              initialDelaySeconds: 30
+              periodSeconds: 10
+              timeoutSeconds: 2
+              failureThreshold: 6
+          readiness: *probes
+        resources:
+          requests:
+            cpu: 100m
+            memory: 512Mi
+          limits:
+            memory: 2Gi
+
+service:
+  app:
+    controller: calibre
+    ports:
+      http:
+        port: *port
+      https:
+        port: 8181
+      content:
+        port: 8081
+
+persistence:
+  config:
+    enabled: true
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    storageClass: longhorn
+    globalMounts:
+      - path: /config
+  tmp:
+    type: emptyDir
+  shm:
+    type: emptyDir
+    medium: Memory
+    sizeLimit: 1Gi
+    globalMounts:
+      - path: /dev/shm
+  books:
+    type: nfs
+    server: 192.168.0.217
+    path: /volume1/Media/Books
+    globalMounts:
+      - path: /books
+      - path: "/config/Calibre Library"
+
+ingress:
+  app:
+    className: internal
+    hosts:
+      - host: "{{ .Release.Name }}.rbl.lol"
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: *port

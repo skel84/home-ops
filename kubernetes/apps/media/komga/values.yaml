@@ -1,0 +1,84 @@
+controllers:
+  komga:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    pod:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        runAsNonRoot: true
+        fsGroup: 999
+        fsGroupChangePolicy: "OnRootMismatch"
+        supplementalGroups:
+          - 65542 # gladius:external-services
+
+    containers:
+      app:
+        image:
+          repository: ghcr.io/gotson/komga
+          tag: latest@sha256:dae630271561b642d47c9723803ec77900d1f0a803fbe6a42da69db5b21ebaeb
+          pullPolicy: IfNotPresent
+        env:
+          TZ: "Europe/Rome"
+        probes:
+          liveness: &probes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /
+                port: &port 25600
+              initialDelaySeconds: 30
+              periodSeconds: 10
+              timeoutSeconds: 2
+              failureThreshold: 6
+          readiness: *probes
+        resources:
+          requests:
+            cpu: 50m
+            memory: 512Mi
+          limits:
+            memory: 2Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+              - ALL
+
+service:
+  app:
+    controller: komga
+    ports:
+      http:
+        port: *port
+
+persistence:
+  config:
+    enabled: true
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    storageClass: longhorn
+    globalMounts:
+      - path: /config
+  tmp:
+    type: emptyDir
+  books:
+    type: nfs
+    server: 192.168.0.217
+    path: /volume1/Media/Books
+    globalMounts:
+      - path: /data
+
+ingress:
+  app:
+    className: internal
+    hosts:
+      - host: "{{ .Release.Name }}.rbl.lol"
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: *port
