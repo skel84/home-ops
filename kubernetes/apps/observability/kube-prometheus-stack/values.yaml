@@ -58,7 +58,7 @@ prometheus:
     # Enable discovery of ScrapeConfigs with any labels
     scrapeConfigSelector: {}
     retention: 7d
-    retentionSize: 50GB
+    retentionSize: 40GB
     resources:
       requests:
         cpu: 100m
