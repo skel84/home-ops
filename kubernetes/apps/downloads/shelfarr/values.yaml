@@ -1,0 +1,93 @@
+controllers:
+  shelfarr:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    containers:
+      app:
+        image:
+          repository: ghcr.io/pedro-revez-silva/shelfarr
+          tag: latest@sha256:f13fa21abc277b6e5cbb73117d01a8a42508b3acac8a3399ef8fd99184f6d34f
+          pullPolicy: IfNotPresent
+        env:
+          CHOWN_ON_START: auto
+          HTTP_PORT: &port 80
+          PGID: 999
+          PUID: 999
+          SOLID_QUEUE_IN_PUMA: "1"
+          TZ: "Europe/Rome"
+        probes:
+          liveness: &probes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /up
+                port: *port
+              initialDelaySeconds: 40
+              periodSeconds: 30
+              timeoutSeconds: 10
+              failureThreshold: 3
+          readiness: *probes
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits:
+            memory: 1Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+              - ALL
+
+service:
+  app:
+    controller: shelfarr
+    ports:
+      http:
+        port: *port
+
+persistence:
+  storage:
+    enabled: true
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    storageClass: longhorn
+    globalMounts:
+      - path: /rails/storage
+  tmp:
+    type: emptyDir
+    globalMounts:
+      - path: /rails/tmp
+  audiobooks:
+    type: nfs
+    server: 192.168.0.217
+    path: /volume1/Media/Audiobooks
+    globalMounts:
+      - path: /audiobooks
+  ebooks:
+    type: nfs
+    server: 192.168.0.217
+    path: /volume1/Media/Books
+    globalMounts:
+      - path: /ebooks
+  downloads:
+    type: nfs
+    server: 192.168.0.217
+    path: /volume1/Download
+    globalMounts:
+      - path: /downloads
+
+ingress:
+  app:
+    className: internal
+    hosts:
+      - host: "{{ .Release.Name }}.rbl.lol"
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: *port

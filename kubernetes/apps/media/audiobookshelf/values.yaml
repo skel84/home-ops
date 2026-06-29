@@ -1,0 +1,95 @@
+controllers:
+  audiobookshelf:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    pod:
+      securityContext:
+        runAsUser: 999
+        runAsGroup: 999
+        runAsNonRoot: true
+        fsGroup: 999
+        fsGroupChangePolicy: "OnRootMismatch"
+        supplementalGroups:
+          - 65542 # gladius:external-services
+
+    containers:
+      app:
+        image:
+          repository: ghcr.io/advplyr/audiobookshelf
+          tag: 2.29.0@sha256:dd4a3079d26bfe9f0ea63de3e3eff483dfa25fef05ef850a5a9d121dca3794b2
+          pullPolicy: IfNotPresent
+        env:
+          CONFIG_PATH: /config
+          METADATA_PATH: /metadata
+          PORT: &port 80
+          TZ: "Europe/Rome"
+        probes:
+          liveness: &probes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /
+                port: *port
+              initialDelaySeconds: 30
+              periodSeconds: 10
+              timeoutSeconds: 2
+              failureThreshold: 6
+          readiness: *probes
+        resources:
+          requests:
+            cpu: 50m
+            memory: 256Mi
+          limits:
+            memory: 1Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+              - ALL
+
+service:
+  app:
+    controller: audiobookshelf
+    ports:
+      http:
+        port: *port
+
+persistence:
+  config:
+    enabled: true
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    storageClass: longhorn
+    globalMounts:
+      - path: /config
+  metadata:
+    enabled: true
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 10Gi
+    storageClass: longhorn
+    globalMounts:
+      - path: /metadata
+  tmp:
+    type: emptyDir
+  audiobooks:
+    type: nfs
+    server: 192.168.0.217
+    path: /volume1/Media/Audiobooks
+    globalMounts:
+      - path: /audiobooks
+
+ingress:
+  app:
+    className: internal
+    hosts:
+      - host: "{{ .Release.Name }}.rbl.lol"
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: *port
