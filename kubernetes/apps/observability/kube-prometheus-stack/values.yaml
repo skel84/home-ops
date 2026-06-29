@@ -59,6 +59,7 @@ prometheus:
     scrapeConfigSelector: {}
     retention: 7d
     retentionSize: 40GB
+    maximumStartupDurationSeconds: 3600
     resources:
       requests:
         cpu: 100m
