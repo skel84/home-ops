@@ -59,12 +59,13 @@ prometheus:
     scrapeConfigSelector: {}
     retention: 7d
     retentionSize: 40GB
-    maximumStartupDurationSeconds: 3600
+    maximumStartupDurationSeconds: 7200
     resources:
       requests:
         cpu: 100m
+        memory: 4Gi
       limits:
-        memory: 2000Mi
+        memory: 4Gi
     storageSpec:
       volumeClaimTemplate:
         spec:
