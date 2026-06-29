@@ -2,13 +2,9 @@
 
 This path started as documentation-only planning for an ORBIS-like HL7 lab.
 
-That is no longer strictly true:
+The previously deployed OIE/Medplum trial slice has been retired from GitOps.
 
-- the first live integration-engine slice now exists under [oie](/Users/francesco/repos/homelab/home-ops/kubernetes/apps/health-system/oie)
-- the matching database app now exists under [oie-postgresql](/Users/francesco/repos/homelab/home-ops/kubernetes/apps/health-system/oie-postgresql)
-- the matching Argo CD apps now exist under [health-system](/Users/francesco/repos/homelab/home-ops/kubernetes/argo/apps/health-system)
-
-This document remains useful as the broader lab rationale, but it should be read alongside the OIE deployment manifests rather than as a statement that nothing is deployed.
+This document remains useful as the broader lab rationale and planning record, not as a statement of currently deployed OIE or Medplum resources.
 
 ## Goal
 
