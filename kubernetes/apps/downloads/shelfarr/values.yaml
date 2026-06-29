@@ -12,8 +12,8 @@ controllers:
         env:
           CHOWN_ON_START: auto
           HTTP_PORT: &port 80
-          PGID: 999
-          PUID: 999
+          PGID: 1000
+          PUID: 1000
           SOLID_QUEUE_IN_PUMA: "1"
           TZ: "Europe/Rome"
         probes:
