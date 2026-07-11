@@ -13,8 +13,8 @@ spec:
       path: kubernetes/apps/forgejo/forgejo
       targetRevision: main
       ref: repo
-    - repoURL: oci://codeberg.org/forgejo-contrib/forgejo
-      path: .
+    - repoURL: codeberg.org/forgejo-contrib
+      chart: forgejo
       targetRevision: 17.0.1
       helm:
         releaseName: forgejo
