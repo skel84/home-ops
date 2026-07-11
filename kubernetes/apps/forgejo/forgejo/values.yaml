@@ -1,0 +1,44 @@
+---
+persistence:
+  enabled: true
+  size: 20Gi
+  storageClass: longhorn
+
+gitea:
+  admin:
+    existingSecret: forgejo-admin-secret
+    email: forgejo@rbl.lol
+    passwordMode: initialOnlyRequireReset
+  config:
+    service:
+      DISABLE_REGISTRATION: true
+      REQUIRE_SIGNIN_VIEW: true
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: observability
+
+ingress:
+  enabled: true
+  className: external
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/target: external.rbl.lol
+  hosts:
+    - host: forgejo.rbl.lol
+      paths:
+        - path: /
+          pathType: Prefix
+          port: http
+  tls:
+    - secretName: forgejo-tls
+      hosts:
+        - forgejo.rbl.lol
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    memory: 1Gi

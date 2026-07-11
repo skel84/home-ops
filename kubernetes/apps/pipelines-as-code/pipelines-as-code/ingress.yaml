@@ -1,0 +1,27 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pipelines-as-code
+  labels:
+    pipelines-as-code/route: controller
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    external-dns.alpha.kubernetes.io/target: external.rbl.lol
+spec:
+  ingressClassName: external
+  rules:
+    - host: pac.rbl.lol
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pipelines-as-code-controller
+                port:
+                  number: 8080
+  tls:
+    - secretName: pipelines-as-code-tls
+      hosts:
+        - pac.rbl.lol

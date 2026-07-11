@@ -1,0 +1,11 @@
+---
+namespace:
+  name: tekton-pipelines
+  create: true
+  labels:
+    app.kubernetes.io/part-of: tekton-pipelines
+    pod-security.kubernetes.io/enforce: restricted
+
+featureFlags:
+  require-git-ssh-secret-known-hosts: "true"
+  running-in-environment-with-injected-sidecars: "false"
