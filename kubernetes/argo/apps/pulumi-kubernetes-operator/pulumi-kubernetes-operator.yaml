@@ -14,8 +14,8 @@ spec:
         kubernetes/apps/pulumi-kubernetes-operator/pulumi-kubernetes-operator
       targetRevision: main
       ref: repo
-    - repoURL: oci://ghcr.io/pulumi/helm-charts/pulumi-kubernetes-operator
-      path: .
+    - repoURL: ghcr.io/pulumi/helm-charts
+      chart: pulumi-kubernetes-operator
       targetRevision: 2.7.0
       helm:
         releaseName: pulumi-kubernetes-operator
