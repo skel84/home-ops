@@ -1,0 +1,6 @@
+---
+metrics:
+  service:
+    create: true
+  serviceMonitor:
+    enabled: true

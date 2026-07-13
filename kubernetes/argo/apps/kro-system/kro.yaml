@@ -1,0 +1,33 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kro
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/kro-system/kro
+      targetRevision: main
+      ref: repo
+    - repoURL: registry.k8s.io/kro/charts
+      chart: kro
+      targetRevision: 0.9.2
+      helm:
+        releaseName: kro
+        valueFiles:
+          - $repo/kubernetes/apps/kro-system/kro/values.yaml
+  destination:
+    name: in-cluster
+    namespace: kro-system
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

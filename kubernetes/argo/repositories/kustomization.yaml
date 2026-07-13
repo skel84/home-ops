@@ -4,5 +4,6 @@ kind: Kustomization
 resources:
   - forgejo-helm.yaml
   - pulumi-helm-charts.yaml
+  - kro-helm-charts.yaml
 generators:
   - ./secret-generator.yaml
