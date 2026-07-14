@@ -3,6 +3,8 @@ apiVersion: kro.run/v1alpha1
 kind: ResourceGraphDefinition
 metadata:
   name: webstack.home-ops.io
+  annotations:
+    kro.run/allow-breaking-changes: "true"
 spec:
   schema:
     apiVersion: v1alpha1
@@ -80,5 +82,5 @@ spec:
         stringData:
           DATABASE_USER: app
           DATABASE_NAME: appdb
-          DATABASE_HOST: "${postgres.status.namespace + '.' + postgres.status.readWriteService + '.svc.cluster.local'}"
+          DATABASE_HOST: "${postgres.status.readWriteService + '.' + postgres.status.namespace + '.svc.cluster.local'}"
           DATABASE_PASSWORD: ${schema.spec.password}
