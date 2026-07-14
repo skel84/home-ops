@@ -48,7 +48,6 @@ spec:
             name: ${schema.spec.cluster}
           schedule: ${schema.spec.schedule}
           method: barmanObjectStore
-          online: true
           backupOwnerReference: self
           immediate: ${schema.spec.immediate}
       readyWhen:
