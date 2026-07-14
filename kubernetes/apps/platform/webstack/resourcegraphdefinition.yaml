@@ -1,0 +1,355 @@
+---
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: webstack.home-ops.io
+spec:
+  schema:
+    apiVersion: v1alpha1
+    group: home-ops.io
+    kind: WebStack
+    types:
+      EnvVar:
+        name: string | required=true
+        value: string | required=true
+      ResourceSlice:
+        cpu: string | default="100m"
+        memory: string | default="256Mi"
+    spec:
+      image: string | required=true
+      replicas: integer | default=1 minimum=1
+      appPort: integer | default=8080 minimum=1 maximum=65535
+      resources:
+        requests: ResourceSlice
+        limits: ResourceSlice
+      env: "[]EnvVar | default=[]"
+      ingress:
+        enabled: boolean | default=false
+        host: string | default=""
+        className: string | default="nginx"
+        annotations: "map[string]string | default={}"
+      database:
+        enabled: boolean | default=true
+        name: string | default="appdb"
+        version: string | default="16"
+        storage: string | default="10Gi"
+        storageClass: string | default="longhorn"
+        instances: integer | default=1 minimum=1
+        password: string | default=""
+        pooler:
+          enabled: boolean | default=true
+          instances: integer | default=1 minimum=1
+        backup:
+          enabled: boolean | default=false
+          endpoint: string | default=""
+          bucket: string | default=""
+          accessKeyId: string | default=""
+          secretAccessKey: string | default=""
+          schedule: string | default="0 2 * * *"
+          retentionDays: integer | default=14 minimum=1
+    status:
+      namespace: ${tenantNs.metadata.name}
+      appReady: ${deployment.status.availableReplicas >= 1}
+      dbReady: ${size(dbCluster.status.instancesStatus.healthy) > 0}
+      poolerPhase: ${dbPooler.status.phase}
+
+  resources:
+    - id: tenantNs
+      template:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: ${schema.metadata.name}
+          labels:
+            app.kubernetes.io/managed-by: kro
+            home-ops.io/component: webstack
+
+    - id: quota
+      template:
+        apiVersion: v1
+        kind: ResourceQuota
+        metadata:
+          name: ${schema.metadata.name}-quota
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          hard:
+            requests.cpu: "4"
+            requests.memory: "8Gi"
+            limits.cpu: "8"
+            limits.memory: "16Gi"
+            persistentvolumeclaims: "20"
+
+    - id: defaultDeny
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: ${schema.metadata.name}-default-deny
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          podSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: NotIn
+                values:
+                  - postgresql
+          policyTypes:
+            - Ingress
+          ingress: []
+
+
+    - id: allowIngress
+      includeWhen:
+        - ${schema.spec.ingress.enabled}
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: ${schema.metadata.name}-allow-ingress
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ${schema.metadata.name}
+          policyTypes:
+            - Ingress
+          ingress:
+            - from:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: ingress
+
+    - id: allowEgress
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: ${schema.metadata.name}-allow-egress
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ${schema.metadata.name}
+          policyTypes:
+            - Egress
+          egress:
+            - to:
+                - namespaceSelector: {}
+            - to:
+                - ipBlock:
+                    cidr: 10.0.0.0/8
+            - to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+                    except:
+                      - 10.0.0.0/8
+                      - 172.16.0.0/12
+                      - 192.168.0.0/16
+
+    - id: appSecret
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: ${schema.metadata.name}-app
+          namespace: ${tenantNs.metadata.name}
+          labels:
+            cnpg.io/reload: "true"
+        type: kubernetes.io/basic-auth
+        stringData:
+          username: app
+          password: ${schema.spec.database.password}
+
+    - id: backupSecret
+      includeWhen:
+        - ${schema.spec.database.enabled}
+        - ${schema.spec.database.backup.enabled}
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: ${schema.metadata.name}-backup
+          namespace: ${tenantNs.metadata.name}
+        type: Opaque
+        stringData:
+          ACCESS_KEY_ID: ${schema.spec.database.backup.accessKeyId}
+          SECRET_ACCESS_KEY: ${schema.spec.database.backup.secretAccessKey}
+
+    - id: dbCluster
+      includeWhen:
+        - ${schema.spec.database.enabled}
+      template:
+        apiVersion: postgresql.cnpg.io/v1
+        kind: Cluster
+        metadata:
+          name: ${schema.metadata.name}-db
+          namespace: ${tenantNs.metadata.name}
+          labels:
+            app.kubernetes.io/name: ${schema.metadata.name}
+        spec:
+          instances: ${schema.spec.database.instances}
+          primaryUpdateStrategy: unsupervised
+          bootstrap:
+            initdb:
+              database: ${schema.spec.database.name}
+              owner: app
+              secret:
+                name: ${appSecret.metadata.name}
+          managed:
+            roles:
+              - name: app
+                ensure: present
+                login: true
+                passwordSecret:
+                  name: ${appSecret.metadata.name}
+          storage:
+            size: ${schema.spec.database.storage}
+            storageClass: ${schema.spec.database.storageClass}
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          postgresql:
+            parameters:
+              max_connections: "200"
+              shared_buffers: 256MB
+              work_mem: 16MB
+
+    - id: nightlyBackup
+      includeWhen:
+        - ${schema.spec.database.enabled}
+        - ${schema.spec.database.backup.enabled}
+      template:
+        apiVersion: postgresql.cnpg.io/v1
+        kind: ScheduledBackup
+        metadata:
+          name: ${schema.metadata.name}-nightly
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          cluster:
+            name: ${dbCluster.metadata.name}
+          schedule: ${schema.spec.database.backup.schedule}
+          method: barmanObjectStore
+          online: true
+          backupOwnerReference: self
+
+    - id: dbPooler
+      includeWhen:
+        - ${schema.spec.database.enabled}
+        - ${schema.spec.database.pooler.enabled}
+      template:
+        apiVersion: postgresql.cnpg.io/v1
+        kind: Pooler
+        metadata:
+          name: ${schema.metadata.name}-pooler
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          cluster:
+            name: ${dbCluster.metadata.name}
+          instances: ${schema.spec.database.pooler.instances}
+          type: rw
+          pgbouncer:
+            parameters:
+              max_client_conn: "1000"
+              default_pool_size: "20"
+
+    - id: deployment
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: ${schema.metadata.name}
+          namespace: ${tenantNs.metadata.name}
+          labels:
+            app.kubernetes.io/name: ${schema.metadata.name}
+        spec:
+          replicas: ${schema.spec.replicas}
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: ${schema.metadata.name}
+          template:
+            metadata:
+              labels:
+                app.kubernetes.io/name: ${schema.metadata.name}
+            spec:
+              automountServiceAccountToken: false
+              containers:
+                - name: app
+                  image: ${schema.spec.image}
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                    - name: http
+                      containerPort: ${schema.spec.appPort}
+                      protocol: TCP
+                  env:
+                    - name: APP_NAME
+                      value: ${schema.metadata.name}
+                    - name: APP_PORT
+                      value: ${string(schema.spec.appPort)}
+                  envFrom:
+                    - secretRef:
+                        name: ${appSecret.metadata.name}
+                  resources:
+                    requests:
+                      cpu: ${schema.spec.resources.requests.cpu}
+                      memory: ${schema.spec.resources.requests.memory}
+                    limits:
+                      cpu: ${schema.spec.resources.limits.cpu}
+                      memory: ${schema.spec.resources.limits.memory}
+                  livenessProbe:
+                    tcpSocket:
+                      port: http
+                    initialDelaySeconds: 15
+                    periodSeconds: 20
+                  readinessProbe:
+                    tcpSocket:
+                      port: http
+                    initialDelaySeconds: 5
+                    periodSeconds: 10
+
+    - id: svc
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ${schema.metadata.name}
+          namespace: ${tenantNs.metadata.name}
+          labels:
+            app.kubernetes.io/name: ${schema.metadata.name}
+        spec:
+          selector:
+            app.kubernetes.io/name: ${schema.metadata.name}
+          ports:
+            - name: http
+              port: 80
+              targetPort: http
+              protocol: TCP
+
+    - id: ingress
+      includeWhen:
+        - ${schema.spec.ingress.enabled}
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: Ingress
+        metadata:
+          name: ${schema.metadata.name}
+          namespace: ${tenantNs.metadata.name}
+          labels:
+            app.kubernetes.io/name: ${schema.metadata.name}
+          annotations: ${schema.spec.ingress.annotations}
+        spec:
+          ingressClassName: ${schema.spec.ingress.className}
+          rules:
+            - host: ${schema.spec.ingress.host}
+              http:
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                      service:
+                        name: ${svc.metadata.name}
+                        port:
+                          number: 80
