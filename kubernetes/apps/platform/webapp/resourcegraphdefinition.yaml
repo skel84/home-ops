@@ -1,0 +1,216 @@
+---
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: webapp.home-ops.io
+spec:
+  schema:
+    apiVersion: v1alpha1
+    group: home-ops.io
+    kind: WebApp
+    types:
+      ResourceSlice:
+        cpu: string | default="100m"
+        memory: string | default="256Mi"
+    spec:
+      image: string | required=true
+      replicas: integer | default=1 minimum=1
+      appPort: integer | default=8080 minimum=1 maximum=65535
+      resources:
+        requests: ResourceSlice
+        limits: ResourceSlice
+      ingress:
+        enabled: boolean | default=false
+        host: string | default=""
+        className: string | default="nginx"
+        annotations: "map[string]string | default={}"
+    status:
+      namespace: ${tenantNs.metadata.name}
+      appReady: ${deployment.status.availableReplicas >= 1}
+
+  resources:
+    - id: tenantNs
+      template:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: ${schema.metadata.name}
+          labels:
+            app.kubernetes.io/managed-by: kro
+            home-ops.io/component: webapp
+
+    - id: quota
+      template:
+        apiVersion: v1
+        kind: ResourceQuota
+        metadata:
+          name: ${schema.metadata.name}-quota
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          hard:
+            requests.cpu: "2"
+            requests.memory: "4Gi"
+            limits.cpu: "4"
+            limits.memory: "8Gi"
+            persistentvolumeclaims: "5"
+
+    - id: defaultDeny
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: ${schema.metadata.name}-default-deny
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          podSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: NotIn
+                values:
+                  - webapp
+          policyTypes:
+            - Ingress
+          ingress: []
+
+    - id: allowEgress
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: ${schema.metadata.name}-allow-egress
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ${schema.metadata.name}
+          policyTypes:
+            - Egress
+          egress:
+            - to:
+                - namespaceSelector: {}
+            - to:
+                - ipBlock:
+                    cidr: 10.0.0.0/8
+            - to:
+                - ipBlock:
+                    cidr: 0.0.0.0/0
+                    except:
+                      - 10.0.0.0/8
+                      - 172.16.0.0/12
+                      - 192.168.0.0/16
+
+    - id: allowIngress
+      includeWhen:
+        - ${schema.spec.ingress.enabled}
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: ${schema.metadata.name}-allow-ingress
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ${schema.metadata.name}
+          policyTypes:
+            - Ingress
+          ingress:
+            - from:
+                - namespaceSelector:
+                    matchLabels:
+                      kubernetes.io/metadata.name: ingress
+
+    - id: deployment
+      template:
+        apiVersion: apps/v1
+        kind: Deployment
+        metadata:
+          name: ${schema.metadata.name}
+          namespace: ${tenantNs.metadata.name}
+          labels:
+            app.kubernetes.io/name: ${schema.metadata.name}
+        spec:
+          replicas: ${schema.spec.replicas}
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: ${schema.metadata.name}
+          template:
+            metadata:
+              labels:
+                app.kubernetes.io/name: ${schema.metadata.name}
+            spec:
+              automountServiceAccountToken: false
+              containers:
+                - name: app
+                  image: ${schema.spec.image}
+                  imagePullPolicy: IfNotPresent
+                  ports:
+                    - name: http
+                      containerPort: ${schema.spec.appPort}
+                      protocol: TCP
+                  env:
+                    - name: APP_NAME
+                      value: ${schema.metadata.name}
+                    - name: APP_PORT
+                      value: ${string(schema.spec.appPort)}
+                  resources:
+                    requests:
+                      cpu: ${schema.spec.resources.requests.cpu}
+                      memory: ${schema.spec.resources.requests.memory}
+                    limits:
+                      cpu: ${schema.spec.resources.limits.cpu}
+                      memory: ${schema.spec.resources.limits.memory}
+                  livenessProbe:
+                    tcpSocket:
+                      port: http
+                    initialDelaySeconds: 15
+                    periodSeconds: 20
+                  readinessProbe:
+                    tcpSocket:
+                      port: http
+                    initialDelaySeconds: 5
+                    periodSeconds: 10
+
+    - id: svc
+      template:
+        apiVersion: v1
+        kind: Service
+        metadata:
+          name: ${schema.metadata.name}
+          namespace: ${tenantNs.metadata.name}
+          labels:
+            app.kubernetes.io/name: ${schema.metadata.name}
+        spec:
+          selector:
+            app.kubernetes.io/name: ${schema.metadata.name}
+          ports:
+            - name: http
+              port: 80
+              targetPort: http
+              protocol: TCP
+
+    - id: ingress
+      includeWhen:
+        - ${schema.spec.ingress.enabled}
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: Ingress
+        metadata:
+          name: ${schema.metadata.name}
+          namespace: ${tenantNs.metadata.name}
+          labels:
+            app.kubernetes.io/name: ${schema.metadata.name}
+          annotations: ${schema.spec.ingress.annotations}
+        spec:
+          ingressClassName: ${schema.spec.ingress.className}
+          rules:
+            - host: ${schema.spec.ingress.host}
+              http:
+                paths:
+                  - path: /
+                    pathType: Prefix
+                    backend:
+                      service:
+                        name: ${svc.metadata.name}
+                        port:
+                          number: 80

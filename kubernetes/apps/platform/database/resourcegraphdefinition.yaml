@@ -1,0 +1,143 @@
+---
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: postgres.home-ops.io
+spec:
+  schema:
+    apiVersion: v1alpha1
+    group: home-ops.io
+    kind: Postgres
+    spec:
+      version: string | default="16"
+      storage: string | default="10Gi"
+      storageClass: string | default="longhorn"
+      instances: integer | default=1 minimum=1 maximum=5
+      password: string | required=true
+      pooler:
+        enabled: boolean | default=true
+        instances: integer | default=1 minimum=1 maximum=5
+    status:
+      namespace: ${tenantNs.metadata.name}
+      readWriteService: "${dbCluster.metadata.name + '-rw'}"
+      readOnlyService: "${dbCluster.metadata.name + '-ro'}"
+      poolerService: "${dbPooler.status.phase == 'active' ? dbPooler.metadata.name : ''}"
+      ready: ${size(dbCluster.status.instancesStatus.healthy) > 0}
+
+  resources:
+    - id: tenantNs
+      template:
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: ${schema.metadata.name}
+          labels:
+            app.kubernetes.io/managed-by: kro
+            home-ops.io/component: postgres
+
+    - id: quota
+      template:
+        apiVersion: v1
+        kind: ResourceQuota
+        metadata:
+          name: ${schema.metadata.name}-quota
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          hard:
+            requests.cpu: "2"
+            requests.memory: "4Gi"
+            limits.cpu: "4"
+            limits.memory: "8Gi"
+            persistentvolumeclaims: "10"
+
+    - id: defaultDeny
+      template:
+        apiVersion: networking.k8s.io/v1
+        kind: NetworkPolicy
+        metadata:
+          name: ${schema.metadata.name}-default-deny
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          podSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: NotIn
+                values:
+                  - postgresql
+          policyTypes:
+            - Ingress
+          ingress: []
+
+    - id: appSecret
+      template:
+        apiVersion: v1
+        kind: Secret
+        metadata:
+          name: ${schema.metadata.name}-app
+          namespace: ${tenantNs.metadata.name}
+          labels:
+            cnpg.io/reload: "true"
+        type: kubernetes.io/basic-auth
+        stringData:
+          username: app
+          password: ${schema.spec.password}
+
+    - id: dbCluster
+      template:
+        apiVersion: postgresql.cnpg.io/v1
+        kind: Cluster
+        metadata:
+          name: ${schema.metadata.name}
+          namespace: ${tenantNs.metadata.name}
+          labels:
+            app.kubernetes.io/name: ${schema.metadata.name}
+        spec:
+          instances: ${schema.spec.instances}
+          primaryUpdateStrategy: unsupervised
+          bootstrap:
+            initdb:
+              database: appdb
+              owner: app
+              secret:
+                name: ${appSecret.metadata.name}
+          managed:
+            roles:
+              - name: app
+                ensure: present
+                login: true
+                passwordSecret:
+                  name: ${appSecret.metadata.name}
+          storage:
+            size: ${schema.spec.storage}
+            storageClass: ${schema.spec.storageClass}
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          postgresql:
+            parameters:
+              max_connections: "200"
+              shared_buffers: 256MB
+              work_mem: 16MB
+
+    - id: dbPooler
+      includeWhen:
+        - ${schema.spec.pooler.enabled}
+      template:
+        apiVersion: postgresql.cnpg.io/v1
+        kind: Pooler
+        metadata:
+          name: ${schema.metadata.name}-pooler
+          namespace: ${tenantNs.metadata.name}
+        spec:
+          cluster:
+            name: ${dbCluster.metadata.name}
+          instances: ${schema.spec.pooler.instances}
+          type: rw
+          pgbouncer:
+            parameters:
+              max_client_conn: "1000"
+              default_pool_size: "20"
