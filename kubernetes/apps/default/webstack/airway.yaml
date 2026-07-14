@@ -1,0 +1,145 @@
+---
+apiVersion: yoke.cd/v1alpha1
+kind: Airway
+metadata:
+  name: webstacks.yoke.home-ops.io
+spec:
+  mode: standard
+  wasmUrls:
+    flight: oci://ghcr.io/skel84/flights/webstack@sha256:8d9102542639ce05fffd398964c530d1831ed4f3e895aa5c9c7d4b4648c977d3
+  template:
+    group: yoke.home-ops.io
+    names:
+      plural: webstacks
+      singular: webstack
+      shortNames:
+        - ws
+      kind: WebStack
+      listKind: WebStackList
+    scope: Namespaced
+    versions:
+      - name: v1alpha1
+        served: true
+        storage: true
+        schema:
+          openAPIV3Schema:
+            type: object
+            required:
+              - spec
+            properties:
+              spec:
+                type: object
+                required:
+                  - image
+                  - password
+                properties:
+                  image:
+                    type: string
+                    description: Container image for the application
+                  replicas:
+                    type: integer
+                    minimum: 1
+                    default: 1
+                  appPort:
+                    type: integer
+                    minimum: 1
+                    maximum: 65535
+                    default: 8080
+                  password:
+                    type: string
+                    description: Database password (required)
+                    minLength: 1
+                  env:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        value:
+                          type: string
+                  postgres:
+                    type: object
+                    properties:
+                      instances:
+                        type: integer
+                        minimum: 1
+                        maximum: 5
+                        default: 1
+                      storage:
+                        type: string
+                        default: 10Gi
+                      pooler:
+                        type: object
+                        properties:
+                          instances:
+                            type: integer
+                            minimum: 0
+                            maximum: 5
+                            default: 1
+                  backup:
+                    type: object
+                    required:
+                      - endpoint
+                      - bucket
+                      - accessKeyId
+                      - secretAccessKey
+                    properties:
+                      schedule:
+                        type: string
+                        default: "0 2 * * *"
+                      retentionDays:
+                        type: integer
+                        minimum: 1
+                        maximum: 365
+                        default: 14
+                      endpoint:
+                        type: string
+                      bucket:
+                        type: string
+                      accessKeyId:
+                        type: string
+                      secretAccessKey:
+                        type: string
+                  ingress:
+                    type: object
+                    properties:
+                      host:
+                        type: string
+                      className:
+                        type: string
+                        default: nginx
+                      annotations:
+                        type: object
+                        additionalProperties:
+                          type: string
+                  resources:
+                    type: object
+                    properties:
+                      requests:
+                        type: object
+                        properties:
+                          cpu:
+                            type: string
+                            default: 100m
+                          memory:
+                            type: string
+                            default: 256Mi
+                      limits:
+                        type: object
+                        properties:
+                          cpu:
+                            type: string
+                            default: 100m
+                          memory:
+                            type: string
+                            default: 256Mi
+              status:
+                type: object
+                properties:
+                  appNamespace:
+                    type: string
+                  dbNamespace:
+                    type: string
+                  ready:
+                    type: string
