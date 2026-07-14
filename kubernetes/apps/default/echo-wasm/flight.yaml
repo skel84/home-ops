@@ -1,0 +1,8 @@
+---
+apiVersion: yoke.cd/v1alpha1
+kind: Flight
+metadata:
+  name: echo-wasm
+  namespace: default
+spec:
+  wasmUrl: oci://ghcr.io/skel84/flights/echo@sha256:982cef266ff966c0e66fcf055a3c059b874bfdebae422d7aba2c76924fd58c02

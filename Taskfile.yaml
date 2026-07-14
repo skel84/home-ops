@@ -27,6 +27,31 @@ tasks:
 
   default: task --list
 
+  flight:build:
+    desc: Build a WASM flight
+    vars:
+      name: '{{.name | default "echo"}}'
+    dir: '{{.ROOT_DIR}}/flights/{{.name}}'
+    cmds:
+      - GOOS=wasip1 GOARCH=wasm go build -o '{{.name}}.wasm' .
+    generates:
+      - '{{.name}}.wasm'
+    preconditions:
+      - test -d '{{.ROOT_DIR}}/flights/{{.name}}'
+
+  flight:push:
+    desc: Push a WASM flight to GHCR
+    vars:
+      name: '{{.name | default "echo"}}'
+      registry: 'ghcr.io/skel84/flights/{{.name}}'
+    dir: '{{.ROOT_DIR}}/flights/{{.name}}'
+    cmds:
+      - task: flight:build
+        vars: { name: '{{.name}}' }
+      - yoke stow '{{.name}}.wasm' 'oci://{{.registry}}'
+    preconditions:
+      - which yoke
+
   reconcile:
     desc: Force Argo to pull in changes from your Git repository
     cmd: argocd app list --project kubernetes -o name | xargs -I {} argocd app wait {} --sync --timeout 300
