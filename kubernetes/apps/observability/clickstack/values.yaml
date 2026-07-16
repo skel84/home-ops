@@ -28,6 +28,10 @@ mongodb:
   spec:
     statefulSet:
       spec:
+        template:
+          spec:
+            nodeSelector:
+              kubernetes.io/hostname: rbl-01
         volumeClaimTemplates:
           - metadata:
               name: data-volume
