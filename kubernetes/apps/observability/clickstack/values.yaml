@@ -34,7 +34,7 @@ mongodb:
             spec:
               accessModes:
                 - ReadWriteOnce
-              storageClassName: longhorn
+              storageClassName: longhorn-r1
               resources:
                 requests:
                   storage: 10Gi
@@ -43,11 +43,11 @@ clickhouse:
   keeper:
     spec:
       dataVolumeClaimSpec:
-        storageClassName: longhorn
+        storageClassName: longhorn-r1
   cluster:
     spec:
       dataVolumeClaimSpec:
-        storageClassName: longhorn
+        storageClassName: longhorn-r1
         resources:
           requests:
             storage: 50Gi
