@@ -57,6 +57,9 @@ clickhouse:
     spec:
       dataVolumeClaimSpec:
         storageClassName: longhorn-strict-local-wffc
+        resources:
+          requests:
+            storage: 2Gi
   cluster:
     spec:
       dataVolumeClaimSpec:
