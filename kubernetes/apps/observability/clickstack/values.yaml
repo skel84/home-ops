@@ -38,6 +38,15 @@ mongodb:
               resources:
                 requests:
                   storage: 10Gi
+          - metadata:
+              name: logs-volume
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: longhorn-r1
+              resources:
+                requests:
+                  storage: 2Gi
 
 clickhouse:
   keeper:
