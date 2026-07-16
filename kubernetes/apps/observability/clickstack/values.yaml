@@ -1,0 +1,61 @@
+hyperdx:
+  config:
+    FRONTEND_URL: https://hyperdx.rbl.lol
+  deployment:
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        memory: 2Gi
+  ingress:
+    enabled: true
+    spec:
+      ingressClassName: internal
+      rules:
+        - host: hyperdx.rbl.lol
+          http:
+            paths:
+              - path: /
+                pathType: Prefix
+                backend:
+                  service:
+                    name: clickstack-app
+                    port:
+                      number: 3000
+
+mongodb:
+  spec:
+    statefulSet:
+      spec:
+        volumeClaimTemplates:
+          - metadata:
+              name: data-volume
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: longhorn
+              resources:
+                requests:
+                  storage: 10Gi
+
+clickhouse:
+  keeper:
+    spec:
+      dataVolumeClaimSpec:
+        storageClassName: longhorn
+  cluster:
+    spec:
+      dataVolumeClaimSpec:
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 50Gi
+
+otel-collector:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 1Gi

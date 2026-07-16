@@ -1,0 +1,36 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: clickstack
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/observability/clickstack
+      targetRevision: main
+      ref: repo
+    - repoURL: https://clickhouse.github.io/ClickStack-helm-charts
+      chart: clickstack
+      targetRevision: 3.0.1
+      helm:
+        releaseName: clickstack
+        valueFiles:
+          - $repo/kubernetes/apps/observability/clickstack/values.yaml
+          - $repo/kubernetes/apps/observability/clickstack/values.sops.yaml
+  destination:
+    name: in-cluster
+    namespace: observability
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+      - SkipDryRunOnMissingResource=true

@@ -1,0 +1,27 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: clickstack-operators
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: kubernetes
+  source:
+    repoURL: https://clickhouse.github.io/ClickStack-helm-charts
+    chart: clickstack-operators
+    targetRevision: 1.0.0
+    helm:
+      releaseName: clickstack-operators
+  destination:
+    name: in-cluster
+    namespace: observability
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

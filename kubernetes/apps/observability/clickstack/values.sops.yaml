@@ -1,0 +1,27 @@
+hyperdx:
+  secrets:
+    HYPERDX_API_KEY: 0a0411ac-fd4d-4498-86e5-f3419bd0b823
+    CLICKHOUSE_PASSWORD: joTiimV5TiOvztwq6yDFVw4wV2YS9WxrigXspwoCDQA
+    CLICKHOUSE_APP_PASSWORD: CBSKt-MCyMyRNbWDSpxL4OVXNW59aY2muIhxJJRXh3o
+    MONGODB_PASSWORD: IbvEZinUY-dZ4iaRX1af4IU6aGntc7M-6jkVX-vZMko
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age:
+    - recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v
+      enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAza3pnTGxkZzJiQ3BJNlNx
+        YUJzY3hjL2hTYUpodnNzUW5VWlQ3VzF5ZkFzCmxTRVRPUkNjbDJ6TFlvbzcwTDYr
+        cEFpMXpYV2UvQURyakR0SDV6UklLQjQKLS0tIDB2aUY5RUovZTFUR0FTdkcwU05X
+        ZEFGU09YeWRBNGxsY2Y0eEorQ29YZVkKfVzlQdUsypERhQoz2dYxAzFLoL1l9vwo
+        k7DyBvkpJGb6B6bAwVK/+KVr6BUeO4RKmdm4Au7yAZKeExuZrUDCDQ==
+        -----END AGE ENCRYPTED FILE-----
+  lastmodified: "2026-07-16T20:29:29Z"
+  mac: ENC[AES256_GCM,data:/Qe25ZhwDgZEItffnToKCRiAroIER5sfesPn4tSyuiZIVgMBNz6ORxqHxu1tmz4FyyyfZ4odbHc0qgB1GAMJIZIoFWynsRAQYfsSYzbQb/+lyLTQeqxNonPYz8HmUOFzKgTolyfLWXldLgMhTOlJnge+dGjyLyRyESrKx3AiBU8=,iv:XLbaXS4JXgnkCdQQwtti7yyUB9ag0LAU82J6YLvXIpM=,tag:fYJjoLSweZNYfPnsKA7Ivg==,type:str]
+  pgp: []
+  encrypted_regex: ^(data|stringData|githubSecret|bootstrapPassword)$
+  mac_only_encrypted: true
+  version: 3.9.4
