@@ -37,7 +37,7 @@ mongodb:
               storageClassName: longhorn-r1
               resources:
                 requests:
-                  storage: 10Gi
+                  storage: 5Gi
           - metadata:
               name: logs-volume
             spec:
@@ -59,7 +59,7 @@ clickhouse:
         storageClassName: longhorn-r1
         resources:
           requests:
-            storage: 50Gi
+            storage: 5Gi
 
 otel-collector:
   resources:
