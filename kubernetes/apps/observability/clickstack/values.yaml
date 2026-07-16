@@ -34,7 +34,7 @@ mongodb:
             spec:
               accessModes:
                 - ReadWriteOnce
-              storageClassName: longhorn-r1
+              storageClassName: longhorn-strict-local-wffc
               resources:
                 requests:
                   storage: 2Gi
@@ -43,7 +43,7 @@ mongodb:
             spec:
               accessModes:
                 - ReadWriteOnce
-              storageClassName: longhorn-r1
+              storageClassName: longhorn-strict-local-wffc
               resources:
                 requests:
                   storage: 2Gi
@@ -52,11 +52,11 @@ clickhouse:
   keeper:
     spec:
       dataVolumeClaimSpec:
-        storageClassName: longhorn-r1
+        storageClassName: longhorn-strict-local-wffc
   cluster:
     spec:
       dataVolumeClaimSpec:
-        storageClassName: longhorn-r1
+        storageClassName: longhorn-strict-local-wffc
         resources:
           requests:
             storage: 2Gi
