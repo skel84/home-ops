@@ -62,6 +62,10 @@ clickhouse:
             storage: 2Gi
   cluster:
     spec:
+      # This deployment has one replica, so replicated database metadata is
+      # unnecessary and would make startup depend on Keeper ACL state.
+      settings:
+        enableDatabaseSync: false
       dataVolumeClaimSpec:
         storageClassName: longhorn-strict-local-wffc
         resources:
