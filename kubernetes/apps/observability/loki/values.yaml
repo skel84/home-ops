@@ -14,7 +14,7 @@ loki:
   ingester:
     chunk_encoding: snappy
   limits_config:
-    retention_period: 14d
+    retention_period: 7d
   storage:
     type: filesystem
   schemaConfig:
@@ -30,7 +30,8 @@ loki:
     ruler:
       enable_api: true
       enable_alertmanager_v2: true
-      alertmanager_url: http://alertmanager-operated.observability.svc.cluster.local:9093
+      alertmanager_url: "http://alertmanager-operated.observability.\
+        svc.cluster.local:9093"
       storage:
         type: local
         local:
@@ -41,7 +42,7 @@ singleBinary:
   persistence:
     enabled: true
     storageClass: longhorn
-    size: 50Gi
+    size: 20Gi
 gateway:
   replicas: 0
 backend:
@@ -61,6 +62,7 @@ test:
 sidecar:
   image:
     repository: ghcr.io/home-operations/k8s-sidecar
-    tag: 1.30.3@sha256:39cca7abcad8f1621b9462d95f7d0e60301b92fcb0ff4de0ad4561859011cddf
+    tag: "1.30.3@sha256:39cca7abcad8f1621b9462d95f7d0e60301b92fcb0ff4de0ad\
+      4561859011cddf"
   rules:
     searchNamespace: ALL
