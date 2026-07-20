@@ -1,0 +1,34 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubero
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      targetRevision: main
+      path: kubernetes/apps/kubero/kubero
+      ref: repo
+    - repoURL: https://github.com/kubero-dev/kubero-operator.git
+      targetRevision: ea8327a69924ce61493dedfd02595d28ae81cbce
+      path: helm-charts/kubero
+      helm:
+        releaseName: kubero
+        valueFiles:
+          - $repo/kubernetes/apps/kubero/kubero/values.yaml
+  destination:
+    name: in-cluster
+    namespace: kubero
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - SkipDryRunOnMissingResource=true
