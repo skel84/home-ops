@@ -1,0 +1,35 @@
+image:
+  tag: v3.1.1
+  pullPolicy: IfNotPresent
+
+ingress:
+  enabled: true
+  className: internal
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+    - host: kubero.rbl.lol
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: kubero-tls
+      hosts:
+        - kubero.rbl.lol
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    memory: 1Gi
+
+kubero:
+  webhook_url: https://kubero.rbl.lol/api/repo/webhooks
+  database:
+    storageClassName: longhorn
+  config:
+    clusterissuer: letsencrypt-production
+    kubero:
+      console:
+        enabled: false
