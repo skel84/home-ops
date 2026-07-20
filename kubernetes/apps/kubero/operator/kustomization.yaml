@@ -5,5 +5,5 @@ resources:
   - https://raw.githubusercontent.com/kubero-dev/kubero-operator/ea8327a69924ce61493dedfd02595d28ae81cbce/deploy/operator.yaml
 images:
   - name: gcr.io/kubebuilder/kube-rbac-proxy
-    newName: registry.k8s.io/kube-rbac-proxy/kube-rbac-proxy
+    newName: registry.k8s.io/kubebuilder/kube-rbac-proxy
     newTag: v0.11.0
