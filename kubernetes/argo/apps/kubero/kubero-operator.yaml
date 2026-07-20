@@ -9,11 +9,9 @@ metadata:
 spec:
   project: kubernetes
   source:
-    repoURL: https://github.com/kubero-dev/kubero-operator.git
-    targetRevision: ea8327a69924ce61493dedfd02595d28ae81cbce
-    path: deploy
-    directory:
-      include: operator.yaml
+    repoURL: "https://github.com/skel84/home-ops.git"
+    targetRevision: main
+    path: kubernetes/apps/kubero/operator
   destination:
     name: in-cluster
     namespace: kubero-operator-system
