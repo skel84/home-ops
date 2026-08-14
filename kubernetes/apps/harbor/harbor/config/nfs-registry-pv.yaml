@@ -1,0 +1,42 @@
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-harbor
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+provisioner: kubernetes.io/no-provisioner
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: harbor-registry-nfs-pv
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  capacity:
+    storage: 2Ti
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-harbor
+  nfs:
+    server: 192.168.0.217
+    path: /volume1/Harbor
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: harbor-registry
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Ti
+  storageClassName: nfs-harbor
+  volumeName: harbor-registry-nfs-pv

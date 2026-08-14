@@ -1,0 +1,52 @@
+expose:
+  type: ingress
+  tls:
+    enabled: true
+    certSource: secret
+    secret:
+      secretName: harbor-tls
+  ingress:
+    className: external
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-production
+      external-dns.alpha.kubernetes.io/target: external.rbl.lol
+    hosts:
+      core: harbor.rbl.lol
+
+externalURL: https://harbor.rbl.lol
+
+existingSecretAdminPassword: harbor-admin-secret
+existingSecretSecretKey: harbor-secret-key
+
+registry:
+  credentials:
+    existingSecret: harbor-registry-credentials
+
+persistence:
+  enabled: true
+  resourcePolicy: keep
+  persistentVolumeClaim:
+    registry:
+      existingClaim: harbor-registry
+    database:
+      storageClass: longhorn
+      size: 10Gi
+    redis:
+      storageClass: longhorn
+      size: 2Gi
+    trivy:
+      storageClass: longhorn
+      size: 10Gi
+  imageChartStorage:
+    type: filesystem
+    filesystem:
+      rootdirectory: /storage
+
+jobservice:
+  jobLoggers:
+    - database
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
