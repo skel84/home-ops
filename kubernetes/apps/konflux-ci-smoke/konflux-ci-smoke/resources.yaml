@@ -1,0 +1,26 @@
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Application
+metadata:
+  name: smoke
+spec:
+  displayName: Konflux smoke test
+---
+apiVersion: appstudio.redhat.com/v1alpha1
+kind: Component
+metadata:
+  name: smoke
+  annotations:
+    build.appstudio.openshift.io/request: configure-pac-no-mr
+    git-provider: forgejo
+    git-provider-url: https://forgejo.rbl.lol
+spec:
+  application: smoke
+  componentName: smoke
+  source:
+    git:
+      url: https://forgejo.rbl.lol/ci-smoke-bot/ci-smoke-test.git
+      revision: main
+      context: ./
+      dockerfileUrl: Dockerfile
+  containerImage: harbor.rbl.lol/konflux/ci-smoke-test
