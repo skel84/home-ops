@@ -8,7 +8,7 @@ spec:
   settings:
     pipelinerun_provenance: default_branch
   git_provider:
-    type: forgejo
+    type: gitea
     url: https://forgejo.rbl.lol
     secret:
       name: ci-smoke-test-forgejo
