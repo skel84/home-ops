@@ -1,0 +1,25 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: konflux-operator
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/konflux-operator/konflux-operator
+      targetRevision: main
+  destination:
+    name: in-cluster
+    namespace: konflux-operator
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

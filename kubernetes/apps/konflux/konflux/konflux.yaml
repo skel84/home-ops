@@ -1,0 +1,19 @@
+---
+apiVersion: konflux.konflux-ci.dev/v1alpha1
+kind: Konflux
+metadata:
+  name: konflux
+spec:
+  # Harbor is the external registry; disable the bundled development registry.
+  internalRegistry:
+    enabled: false
+  # The image controller provisions only Quay repositories. Harbor destinations
+  # are declared per Component instead.
+  imageController:
+    enabled: false
+  ui:
+    spec:
+      # Keep the UI private until production OIDC and ingress are configured.
+      ingress:
+        enabled: false
+        host: konflux.rbl.lol
