@@ -6,3 +6,4 @@ resources:
   - namespace.yaml
   - serviceaccount.yaml
   - default-deny.yaml
+  - runtimeclass.yaml
