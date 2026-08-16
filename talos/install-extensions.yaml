@@ -8,3 +8,4 @@ customization:
       - siderolabs/iscsi-tools
       - siderolabs/util-linux-tools
       - siderolabs/i915
+      - siderolabs/kata-containers
