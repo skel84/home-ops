@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: apk-forge-build
+  labels:
+    app.kubernetes.io/name: apk-forge-build
+    app.kubernetes.io/part-of: apk-forge
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted

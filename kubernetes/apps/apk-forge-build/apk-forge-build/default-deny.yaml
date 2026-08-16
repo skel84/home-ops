@@ -1,0 +1,12 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny
+  labels:
+    app.kubernetes.io/part-of: apk-forge
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
