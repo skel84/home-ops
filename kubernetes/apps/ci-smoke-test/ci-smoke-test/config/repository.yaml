@@ -13,6 +13,6 @@ spec:
     secret:
       name: ci-smoke-test-forgejo
       key: provider.token
-  webhook_secret:
-    name: ci-smoke-test-forgejo
-    key: webhook.secret
+    webhook_secret:
+      name: ci-smoke-test-forgejo
+      key: webhook.secret
