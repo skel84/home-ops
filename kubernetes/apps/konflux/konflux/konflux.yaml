@@ -17,3 +17,12 @@ spec:
       ingress:
         enabled: false
         host: konflux.rbl.lol
+      proxy:
+        reverseProxy:
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
