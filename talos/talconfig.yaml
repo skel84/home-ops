@@ -89,6 +89,7 @@ patches:
   - "@./patches/global/machine-sysctls.yaml"
   - "@./patches/global/machine-time.yaml"
   - "@./patches/global/longhorn-mounts.yaml"
+  - "@./patches/global/apk-forge-seccomp.yaml"
 
 # Controller patches
 controlPlane:

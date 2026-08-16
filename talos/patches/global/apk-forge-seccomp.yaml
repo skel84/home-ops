@@ -1,0 +1,7 @@
+# Temporary audit profile for deriving the minimum Bubblewrap syscall set.
+# It must be replaced with an allowlist profile before a Melange build is run.
+machine:
+  seccompProfiles:
+    - name: apk-forge-bubblewrap-audit.json
+      value:
+        defaultAction: SCMP_ACT_LOG
