@@ -11,7 +11,7 @@ kind: Component
 metadata:
   name: smoke
   annotations:
-    build.appstudio.openshift.io/request: configure-pac-no-mr
+    build.appstudio.openshift.io/request: configure-pac
     git-provider: forgejo
     git-provider-url: https://forgejo.rbl.lol
 spec:
