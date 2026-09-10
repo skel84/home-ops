@@ -13,18 +13,19 @@ Alertmanager, exporters, scrape configuration and Grafana dashboards in place.
 Loki and Grafana are unchanged; Prometheus-backed dashboards and alert evaluation
 will be unavailable while the server is off.
 
-Do not delete its PVC or Longhorn volume. A read-only check before this edit found
-StatefulSet `prometheus-kube-prometheus-stack` using `Retain` for both deletion and
-scale-down, and PVC
-`prometheus-kube-prometheus-stack-db-prometheus-kube-prometheus-stack-0` had no
-owner references. Recheck these before activation if live configuration changes.
-Retaining the volume preserves stored data, not continuous metrics collection or
-a guarantee of storage health. This change is not a shared-storage repair.
+The shutdown initially retained the PVC. The owner subsequently authorized
+deleting `prometheus-kube-prometheus-stack-db-prometheus-kube-prometheus-stack-0`
+(UID `7e0d6d44-bf46-48bd-9a0c-e16169c69b60`) on 2026-09-10. Normal CSI reclamation
+completed by 09:49:33Z: the PVC, PV, Longhorn volume and replicas are absent.
+Historical metrics on that volume were permanently removed; recovery has not
+been established. Other applications' claims were not removed. This operation
+does not establish that Prometheus caused the earlier shared-storage problems.
 
 To resume, replace `enabled: false` with the adjacent commented `enabled: true`,
 then publish/reconcile through the normal GitOps workflow. No other settings need
-to be restored. Verify the existing claim is reused and the Prometheus Pod becomes
-ready. The local edit alone does not stop the running service; activation requires
+to be restored. Verify a new claim is provisioned and the Prometheus Pod becomes
+ready; previous metrics will not return merely by re-enabling the server.
+The local edit alone does not stop the running service; activation requires
 publishing the change and Argo CD reconciliation with pruning.
 
 ## NAS Deployments
