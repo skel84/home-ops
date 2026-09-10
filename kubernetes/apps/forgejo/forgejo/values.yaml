@@ -10,6 +10,8 @@ gitea:
     email: forgejo@rbl.lol
     passwordMode: initialOnlyRequireReset
   config:
+    webhook:
+      ALLOWED_HOST_LIST: external,pac.rbl.lol
     service:
       DISABLE_REGISTRATION: true
       REQUIRE_SIGNIN_VIEW: true
