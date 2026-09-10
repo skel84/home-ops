@@ -26,6 +26,11 @@ kubeEtcd:
 kubeProxy:
   enabled: false
 prometheus:
+  # Temporarily disabled (2026-09-10) to stop Prometheus ingestion/storage I/O.
+  # Resume: replace the next line with the commented enabled: true below.
+  # Keep the configuration and existing PVC for a quick restart; see README.md.
+  enabled: false
+  # enabled: true
   ingress:
     enabled: true
     ingressClassName: internal
