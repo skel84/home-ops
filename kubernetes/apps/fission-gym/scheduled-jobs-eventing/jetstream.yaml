@@ -76,6 +76,7 @@ metadata:
 spec:
   streamName: FISSION_GYM_JOBS
   durableName: fission-gym-worker
+  deliverSubject: fission-gym.jobs.delivery
   deliverPolicy: all
   ackPolicy: explicit
   ackWait: 30s
