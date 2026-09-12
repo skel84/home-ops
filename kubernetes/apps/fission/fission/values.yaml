@@ -23,3 +23,7 @@ analytics: false
 
 mqt_keda:
   enabled: true
+  connector_images:
+    nats_jetstream:
+      image: ghcr.io/fission/keda-nats-jetstream-http-connector
+      tag: v0.12
