@@ -1,0 +1,32 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nats
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "-4"
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/fission-gym/nats
+      targetRevision: main
+      ref: repo
+    - repoURL: https://nats-io.github.io/k8s/helm/charts/
+      chart: nats
+      targetRevision: 2.14.6
+      helm:
+        releaseName: nats
+        valueFiles:
+          - $repo/kubernetes/apps/fission-gym/nats/values.yaml
+  destination:
+    name: in-cluster
+    namespace: fission-gym
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

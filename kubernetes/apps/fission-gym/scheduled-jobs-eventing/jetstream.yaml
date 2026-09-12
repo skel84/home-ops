@@ -1,0 +1,81 @@
+---
+apiVersion: jetstream.nats.io/v1beta2
+kind: Stream
+metadata:
+  name: fission-gym-jobs
+  namespace: fission-gym
+  labels:
+    app.kubernetes.io/part-of: fission-gym
+spec:
+  name: FISSION_GYM_JOBS
+  subjects:
+    - fission-gym.jobs.dispatch
+  retention: workqueue
+  maxConsumers: 1
+  maxMsgs: 10000
+  maxBytes: 1073741824
+  maxAge: 168h
+  discard: old
+  storage: file
+  replicas: 1
+  duplicateWindow: 10m
+---
+apiVersion: jetstream.nats.io/v1beta2
+kind: Stream
+metadata:
+  name: fission-gym-responses
+  namespace: fission-gym
+  labels:
+    app.kubernetes.io/part-of: fission-gym
+spec:
+  name: FISSION_GYM_RESPONSES
+  subjects:
+    - fission-gym.jobs.response
+  retention: limits
+  maxMsgs: 10000
+  maxBytes: 1073741824
+  maxAge: 168h
+  discard: old
+  storage: file
+  replicas: 1
+---
+apiVersion: jetstream.nats.io/v1beta2
+kind: Stream
+metadata:
+  name: fission-gym-errors
+  namespace: fission-gym
+  labels:
+    app.kubernetes.io/part-of: fission-gym
+spec:
+  name: FISSION_GYM_ERRORS
+  subjects:
+    - fission-gym.jobs.error
+  retention: limits
+  maxMsgs: 10000
+  maxBytes: 1073741824
+  maxAge: 168h
+  discard: old
+  storage: file
+  replicas: 1
+---
+apiVersion: jetstream.nats.io/v1beta2
+kind: Consumer
+metadata:
+  name: fission-gym-worker
+  namespace: fission-gym
+  labels:
+    app.kubernetes.io/part-of: fission-gym
+spec:
+  streamName: FISSION_GYM_JOBS
+  durableName: fission-gym-worker
+  deliverPolicy: all
+  ackPolicy: explicit
+  ackWait: 30s
+  maxDeliver: 3
+  backoff:
+    - 10s
+    - 30s
+    - 5m
+  filterSubject: fission-gym.jobs.dispatch
+  replayPolicy: instant
+  maxAckPending: 10

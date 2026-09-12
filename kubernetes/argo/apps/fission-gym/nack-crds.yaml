@@ -1,0 +1,24 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nack-crds
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+spec:
+  project: kubernetes
+  source:
+    repoURL: https://github.com/nats-io/k8s.git
+    path: helm/charts/nack/crds
+    targetRevision: a197921d466b387c906ad42cc0277068814c04e2
+  destination:
+    name: in-cluster
+    namespace: fission-gym
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

@@ -2,6 +2,9 @@ serviceType: ClusterIP
 routerServiceType: ClusterIP
 
 defaultNamespace: health-system
+additionalFissionNamespaces:
+  - fission-gym
+
 createNamespace: false
 
 persistence:
@@ -12,4 +15,4 @@ persistence:
 analytics: false
 
 mqt_keda:
-  enabled: false
+  enabled: true
