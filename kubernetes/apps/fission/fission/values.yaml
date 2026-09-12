@@ -12,6 +12,10 @@ persistence:
   storageClass: longhorn-r1
   size: 2Gi
 
+storagesvc:
+  deploymentStrategy:
+    type: Recreate
+
 analytics: false
 
 mqt_keda:
