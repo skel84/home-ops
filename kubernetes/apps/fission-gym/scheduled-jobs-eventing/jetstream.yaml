@@ -64,27 +64,3 @@ spec:
   storage: file
   replicas: 1
 ---
-apiVersion: jetstream.nats.io/v1beta2
-kind: Consumer
-metadata:
-  name: fission-gym-worker
-  namespace: fission-gym
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
-  labels:
-    app.kubernetes.io/part-of: fission-gym
-spec:
-  streamName: FISSION_GYM_JOBS
-  durableName: fission-gym-worker
-  deliverSubject: fission-gym.jobs.delivery
-  deliverPolicy: all
-  ackPolicy: explicit
-  ackWait: 30s
-  maxDeliver: 3
-  backoff:
-    - 10s
-    - 30s
-    - 5m
-  filterSubject: fission-gym.jobs.dispatch
-  replayPolicy: instant
-  maxAckPending: 10
