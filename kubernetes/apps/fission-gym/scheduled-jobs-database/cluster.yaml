@@ -1,0 +1,26 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: fission-gym
+  namespace: fission-gym
+  labels:
+    app.kubernetes.io/name: fission-gym
+    app.kubernetes.io/part-of: fission-gym
+spec:
+  instances: 1
+  enableSuperuserAccess: false
+  bootstrap:
+    initdb:
+      database: app
+      owner: app
+  storage:
+    size: 10Gi
+    storageClass: longhorn-r1
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi

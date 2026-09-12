@@ -1,0 +1,27 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: fission-gym-scheduled-jobs-database
+  namespace: argo-system
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "-5"
+spec:
+  project: kubernetes
+  source:
+    repoURL: "https://github.com/skel84/home-ops.git"
+    path: kubernetes/apps/fission-gym/scheduled-jobs-database
+    targetRevision: main
+  destination:
+    name: in-cluster
+    namespace: fission-gym
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

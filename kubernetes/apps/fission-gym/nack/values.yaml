@@ -1,0 +1,5 @@
+jetstream:
+  nats:
+    url: nats://nats.fission-gym.svc.cluster.local:4222
+
+namespaced: true

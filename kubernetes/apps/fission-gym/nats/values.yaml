@@ -1,0 +1,31 @@
+config:
+  cluster:
+    enabled: false
+  jetstream:
+    enabled: true
+    fileStore:
+      enabled: true
+      pvc:
+        enabled: true
+        storageClassName: longhorn-r1
+
+  monitor:
+    enabled: true
+    port: 8222
+
+container:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+service:
+  ports:
+    monitor:
+      enabled: true
+
+natsBox:
+  enabled: false
