@@ -4,6 +4,8 @@ kind: Stream
 metadata:
   name: fission-gym-jobs
   namespace: fission-gym
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
   labels:
     app.kubernetes.io/part-of: fission-gym
 spec:
@@ -25,6 +27,8 @@ kind: Stream
 metadata:
   name: fission-gym-responses
   namespace: fission-gym
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
   labels:
     app.kubernetes.io/part-of: fission-gym
 spec:
@@ -44,6 +48,8 @@ kind: Stream
 metadata:
   name: fission-gym-errors
   namespace: fission-gym
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
   labels:
     app.kubernetes.io/part-of: fission-gym
 spec:
@@ -63,6 +69,8 @@ kind: Consumer
 metadata:
   name: fission-gym-worker
   namespace: fission-gym
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
   labels:
     app.kubernetes.io/part-of: fission-gym
 spec:
