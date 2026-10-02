@@ -12,6 +12,11 @@ cache, one 10 GiB ClickHouse volume with one-day telemetry TTLs, and one 1 GiB
 Keeper volume. PVCs are retained if the Coroot resource is deleted. The image
 versions are pinned. ClickStack is a separate deployment.
 
+A PostSync Job enables SQLite WAL journaling for the metric cache. This setting
+persists in the database and avoids the rollback-journal write contention seen
+during initialization on replicated Longhorn storage. The job shares Coroot's
+node and its existing PVC; it creates no additional storage or credentials.
+
 The UI is available at https://coroot.rbl.lol through the internal ingress.
 Log in as `admin`; the initial password is encrypted in
 `config/secrets.sops.yaml` and provisioned as the `coroot-admin` Secret.
