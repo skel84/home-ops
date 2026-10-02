@@ -1,0 +1,84 @@
+metricsRefreshInterval: 30s
+cacheTTL: 1d
+metricsTTL: 1d
+tracesTTL: 1d
+logsTTL: 1d
+profilesTTL: 1d
+authBootstrapAdminPasswordSecret:
+  name: coroot-admin
+  key: password
+communityEdition:
+  image:
+    name: ghcr.io/coroot/coroot:1.27.0
+storage:
+  size: 10Gi
+  className: longhorn
+  reclaimPolicy: Retain
+resources:
+  requests:
+    cpu: 250m
+    memory: 512Mi
+  limits:
+    memory: 2Gi
+ingress:
+  className: internal
+  host: coroot.rbl.lol
+  path: /
+externalPrometheus:
+  url: http://prometheus-operated.observability.svc.cluster.local:9090
+nodeAgent:
+  image:
+    name: ghcr.io/coroot/coroot-node-agent:1.36.1
+  tolerations:
+  - operator: Exists
+  resources:
+    requests:
+      cpu: 100m
+      memory: 200Mi
+    limits:
+      memory: 1Gi
+  logCollector:
+    collectLogBasedMetrics: true
+    collectLogEntries: true
+  ebpfTracer:
+    enabled: true
+    sampling: '0.1'
+  ebpfProfiler:
+    enabled: true
+clusterAgent:
+  image:
+    name: ghcr.io/coroot/coroot-cluster-agent:1.11.4
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 512Mi
+prometheus: null
+clickhouse:
+  shards: 1
+  replicas: 1
+  image:
+    name: ghcr.io/coroot/clickhouse:25.11.2-ubi9-0
+  storage:
+    size: 10Gi
+    className: longhorn
+    reclaimPolicy: Retain
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      memory: 2Gi
+  keeper:
+    replicas: 1
+    storage:
+      size: 1Gi
+      className: longhorn
+      reclaimPolicy: Retain
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        memory: 512Mi

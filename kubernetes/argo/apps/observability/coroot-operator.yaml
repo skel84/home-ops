@@ -1,0 +1,34 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: coroot-operator
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+spec:
+  project: kubernetes
+  sources:
+  - repoURL: https://github.com/skel84/home-ops.git
+    path: kubernetes/apps/observability/coroot-operator
+    targetRevision: main
+    ref: repo
+  - repoURL: https://coroot.github.io/helm-charts
+    chart: coroot-operator
+    targetRevision: 0.10.5
+    helm:
+      releaseName: coroot-operator
+      valueFiles:
+      - $repo/kubernetes/apps/observability/coroot-operator/values.yaml
+  destination:
+    name: in-cluster
+    namespace: coroot
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+    - RespectIgnoreDifferences=true
+    - SkipDryRunOnMissingResource=true

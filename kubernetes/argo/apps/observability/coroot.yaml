@@ -1,0 +1,34 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: coroot
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+spec:
+  project: kubernetes
+  sources:
+  - repoURL: https://github.com/skel84/home-ops.git
+    path: kubernetes/apps/observability/coroot
+    targetRevision: main
+    ref: repo
+  - repoURL: https://coroot.github.io/helm-charts
+    chart: coroot-ce
+    targetRevision: 0.3.3
+    helm:
+      releaseName: coroot
+      valueFiles:
+      - $repo/kubernetes/apps/observability/coroot/values.yaml
+  destination:
+    name: in-cluster
+    namespace: coroot
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+    - RespectIgnoreDifferences=true
+    - SkipDryRunOnMissingResource=true

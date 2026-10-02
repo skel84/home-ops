@@ -26,11 +26,7 @@ kubeEtcd:
 kubeProxy:
   enabled: false
 prometheus:
-  # Temporarily disabled (2026-09-10) to stop Prometheus ingestion/storage I/O.
-  # Resume: replace the next line with the commented enabled: true below.
-  # Keep the configuration and existing PVC for a quick restart; see README.md.
-  enabled: false
-  # enabled: true
+  enabled: true
   ingress:
     enabled: true
     ingressClassName: internal
@@ -62,13 +58,18 @@ prometheus:
     probeSelector: {}
     # Enable discovery of ScrapeConfigs with any labels
     scrapeConfigSelector: {}
-    retention: 3d
-    retentionSize: 15GB
+    scrapeInterval: 30s
+    retention: 1d
+    retentionSize: 7GB
+    # Coroot agents send telemetry through Coroot's remote-write forwarder.
+    enableRemoteWriteReceiver: true
+    tsdb:
+      outOfOrderTimeWindow: 1h
     maximumStartupDurationSeconds: 7200
     resources:
       requests:
         cpu: 100m
-        memory: 4Gi
+        memory: 1Gi
       limits:
         memory: 4Gi
     storageSpec:
@@ -77,7 +78,7 @@ prometheus:
           storageClassName: longhorn
           resources:
             requests:
-              storage: 20Gi
+              storage: 10Gi
 prometheus-node-exporter:
   fullnameOverride: node-exporter
   prometheus:

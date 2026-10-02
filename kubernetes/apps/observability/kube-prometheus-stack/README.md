@@ -1,11 +1,25 @@
 # kube-prometheus-stack
 
+## Current configuration
+
+Prometheus is enabled with a new 10 GiB Longhorn volume, one-day retention,
+and a 7 GB block retention cap to leave space for the WAL and head. It scrapes
+ServiceMonitors and PodMonitors across namespaces, including Longhorn, and the
+NAS ScrapeConfigs. Grafana uses the `prometheus-operated` service.
+
+The remote-write receiver accepts Coroot telemetry. A one-hour out-of-order
+window allows delayed agent batches. Coroot shares this Prometheus instance;
+it does not deploy a second metrics store.
+
+Verify ingestion using `/api/v1/targets` and queries such as
+`longhorn_volume_robustness`, `kube_node_info`, and `container_cpu_usage_seconds_total`.
+
+
 ## Temporary Prometheus shutdown (2026-09-10)
 
-`values.yaml` sets `prometheus.enabled: false`, with the enabled setting commented
-beside it. All ingress, discovery, retention, resource and storage settings remain
-intact. Merely commenting out the Prometheus block would restore the chart's
-enabled default, so the explicit false value is necessary.
+Prometheus was disabled explicitly on 2026-09-10 to stop ingestion and storage
+I/O. It was re-enabled on 2026-10-02 with the smaller storage and retention
+settings above.
 
 This disables only the Prometheus server and its chart-managed endpoint resources
 when Argo CD reconciles the change. Keep the Application, operator, CRDs,
@@ -20,13 +34,6 @@ completed by 09:49:33Z: the PVC, PV, Longhorn volume and replicas are absent.
 Historical metrics on that volume were permanently removed; recovery has not
 been established. Other applications' claims were not removed. This operation
 does not establish that Prometheus caused the earlier shared-storage problems.
-
-To resume, replace `enabled: false` with the adjacent commented `enabled: true`,
-then publish/reconcile through the normal GitOps workflow. No other settings need
-to be restored. Verify a new claim is provisioned and the Prometheus Pod becomes
-ready; previous metrics will not return merely by re-enabling the server.
-The local edit alone does not stop the running service; activation requires
-publishing the change and Argo CD reconciliation with pruning.
 
 ## NAS Deployments
 
