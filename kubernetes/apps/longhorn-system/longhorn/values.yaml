@@ -1,5 +1,6 @@
 ---
 defaultSettings:
+  concurrentReplicaRebuildPerNodeLimit: 1
   defaultReplicaCount: 2
 ingress:
   enabled: true
