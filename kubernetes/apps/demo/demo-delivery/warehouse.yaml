@@ -16,3 +16,5 @@ spec:
         allowTagsRegexes:
           - ^[0-9a-f]{40}$
         discoveryLimit: 5
+        # Kargo's webhook defaults this; declared so Argo CD sees no drift.
+        strictSemvers: true
