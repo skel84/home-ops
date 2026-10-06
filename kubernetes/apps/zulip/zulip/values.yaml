@@ -1,0 +1,63 @@
+---
+zulip:
+  environment:
+    SETTING_EXTERNAL_HOST: zulip.rbl.lol
+    SETTING_ZULIP_ADMINISTRATOR: zulip@rbl.lol
+    SECRETS_secret_key:
+      valueFrom:
+        secretKeyRef:
+          name: zulip-secrets
+          key: secret-key
+  persistence:
+    enabled: true
+    size: 20Gi
+    storageClass: longhorn
+
+ingress:
+  enabled: true
+  className: internal
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+    - host: zulip.rbl.lol
+      paths:
+        - path: /
+  tls:
+    - secretName: zulip-tls
+      hosts:
+        - zulip.rbl.lol
+
+postgresql:
+  auth:
+    existingSecret: zulip-secrets
+    secretKeys:
+      adminPasswordKey: postgres-password
+      userPasswordKey: password
+  primary:
+    persistence:
+      storageClass: longhorn
+      size: 10Gi
+
+rabbitmq:
+  auth:
+    existingPasswordSecret: zulip-secrets
+    existingSecretPasswordKey: rabbitmq-password
+    existingErlangSecret: zulip-secrets
+    existingSecretErlangKey: rabbitmq-erlang-cookie
+
+memcached:
+  auth:
+    existingPasswordSecret: zulip-secrets
+    existingSecretPasswordKey: memcached-password
+
+redis:
+  auth:
+    existingSecret: zulip-secrets
+    existingSecretPasswordKey: redis-password
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 1Gi
+  limits:
+    memory: 3Gi
