@@ -1,0 +1,26 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-stages
+  namespace: argo-system
+  annotations:
+    # Before the stage apps, so the pull Secrets exist when the Rollouts start.
+    argocd.argoproj.io/sync-wave: "8"
+spec:
+  project: kubernetes
+  # Namespaces and Harbor pull Secrets for demo-dev and demo-prod; no workloads.
+  source:
+    repoURL: "https://github.com/skel84/home-ops.git"
+    path: kubernetes/apps/demo/demo-stages
+    targetRevision: main
+  destination:
+    name: in-cluster
+    namespace: demo-dev
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

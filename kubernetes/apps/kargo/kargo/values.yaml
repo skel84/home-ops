@@ -1,0 +1,55 @@
+---
+api:
+  replicas: 1
+  # Admin password hash and token signing key come from the SOPS secret in config/.
+  secret:
+    name: kargo-api
+  adminAccount:
+    enabled: true
+  argocd:
+    urls:
+      "": https://argo.rbl.lol
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      memory: 256Mi
+
+controller:
+  argocd:
+    namespace: argo-system
+  resources:
+    requests:
+      cpu: 25m
+      memory: 96Mi
+    limits:
+      memory: 384Mi
+
+managementController:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 48Mi
+    limits:
+      memory: 192Mi
+
+webhooksServer:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 10m
+      memory: 48Mi
+    limits:
+      memory: 128Mi
+
+garbageCollector:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 128Mi
+
+externalWebhooksServer:
+  enabled: false

@@ -1,0 +1,10 @@
+---
+# Kargo adopts a pre-created namespace only when it carries the project label.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: demo-delivery
+  labels:
+    kargo.akuity.io/project: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"

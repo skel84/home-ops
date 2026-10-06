@@ -1,0 +1,18 @@
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Warehouse
+metadata:
+  name: demo-hello
+  namespace: demo-delivery
+spec:
+  interval: 2m0s
+  freightCreationPolicy: Automatic
+  subscriptions:
+    # Private Harbor project: read with the cred-type=image Secret from config/.
+    - image:
+        repoURL: harbor.rbl.lol/demo/demo-hello
+        imageSelectionStrategy: NewestBuild
+        # The pipeline tags every image with its full commit SHA.
+        allowTagsRegexes:
+          - ^[0-9a-f]{40}$
+        discoveryLimit: 5

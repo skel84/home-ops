@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: delivery-demo-repo
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    argocd.argoproj.io/secret-type: repository
+type: Opaque
+stringData:
+  type: ENC[AES256_GCM,data:daEX,iv:h5Qx5BYB66OfkcRwVb3ThHEHfCqv/LZAiPXUYnnSht8=,tag:5LX2iSmANnRdjuWxSChLsQ==,type:str]
+  url: ENC[AES256_GCM,data:d+lmwJjNd3rtn2XxkTCjYJwn3x2q9B+ysCpwtjXrngvB6wNSbqJi54rWsd81JA==,iv:BHIfm4ntt5D+VqaGlBkUYl5I3SXjzKk66PMeWiDm40I=,tag:NFE3K6oWfimUh/CY7R0U3Q==,type:str]
+  username: ENC[AES256_GCM,data:yTfcE2ggrfc=,iv:ILUD05L7x/dUDBuWzlcODEYWy74JhKV9tUBbozmBGr8=,tag:B/p9qoAY/uTocbZuiMBw3w==,type:str]
+  password: ENC[AES256_GCM,data:OKuoku/8fVcT6WOFjZUvpBFiQaVq2O/7n9Gd5OxUBifWhUw1RGhLAw==,iv:klcmhAW1RfZAtDmJ7ypVMQL+vsWW+CuIefqTqkqIXfI=,tag:hj6IHK95skefMrp+EYtt9A==,type:str]
+sops:
+  age:
+    - enc: |
+        -----BEGIN AGE ENCRYPTED FILE-----
+        YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBEdlNHSGFyS1dpU0VVcUgz
+        VDd0Smw0OHdvbENrbzNzRHdIWlA4eTB1VkRRCkNvU3BqVWMxdTlaeURVdVlTZi9X
+        ZVdBWTZVZDRsUDc3Unhtak5Zdnd4dVkKLS0tIFdjMzVFVDZMNmVxTUxHRWdaTVdO
+        Z1Q2dDZRSGNHQVd2Y0dQTVR6OUhDR3cKLUU3ICs0WKrwSHOWP185ciYjSvkgew+Y
+        XWJnbezsicVgvdpZriLb7sURxge7uOjSLor36syL9etzNYNWCJsCKg==
+        -----END AGE ENCRYPTED FILE-----
+      recipient: age1cttxajn7lhmn2536rtxtdwtjr43t3y6v759xhdaj5hmdge02kp7s80004v
+  encrypted_regex: ^(data|stringData|githubSecret|bootstrapPassword)$
+  lastmodified: "2026-10-06T23:06:47Z"
+  mac: ENC[AES256_GCM,data:SgkVuud4rIOVJrj3SJwnzcQf1hhMmRRG9aEWKF4xS1ZbEtSTWV9BG+7VyE403xNpZr1Wzr+iCYP5Ln23KGRxedPzohBdo253SXu5Ds01hf4tcNA9JmEf0fWfz0NxTWrs0PFKIolIkbqmEJaaaaOYeHn+g/ZB3TuIX6w5a+5ILM8=,iv:04PBkiXYN8PkX4k9UWO/C8FUYdZuL5zBCZxHYkArSVk=,tag:c2wUtkxwu/ZoaLhUX7QG3Q==,type:str]
+  mac_only_encrypted: true
+  version: 3.13.3
