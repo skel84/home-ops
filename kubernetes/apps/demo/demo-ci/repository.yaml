@@ -1,0 +1,21 @@
+---
+# Pipelines-as-Code runs .tekton/ PipelineRuns from the demo Forgejo repo here.
+apiVersion: pipelinesascode.tekton.dev/v1alpha1
+kind: Repository
+metadata:
+  name: delivery-demo
+spec:
+  url: https://forgejo.rbl.lol/demo/delivery-demo
+  # One build at a time; the cluster is memory-constrained.
+  concurrency_limit: 1
+  settings:
+    pipelinerun_provenance: default_branch
+  git_provider:
+    type: forgejo
+    url: https://forgejo.rbl.lol
+    secret:
+      name: forgejo-webhook-config
+      key: provider.token
+  webhook_secret:
+    name: forgejo-webhook-config
+    key: webhook.secret

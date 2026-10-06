@@ -13,6 +13,10 @@ spec:
   ingress:
     - from:
         - podSelector: {}
+        # buildctl clients in the demo delivery pipeline.
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: demo-ci
       ports:
         - protocol: TCP
           port: 1234

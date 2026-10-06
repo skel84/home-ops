@@ -1,0 +1,32 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-delivery
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  project: kubernetes
+  source:
+    repoURL: "https://github.com/skel84/home-ops.git"
+    path: kubernetes/apps/demo/demo-delivery
+    targetRevision: main
+  destination:
+    name: in-cluster
+    namespace: demo-delivery
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
+      # Kargo CRDs arrive with the kargo app; retry until they exist.
+      - SkipDryRunOnMissingResource=true
+    retry:
+      limit: 10
+      backoff:
+        duration: 30s
+        factor: 2
+        maxDuration: 10m

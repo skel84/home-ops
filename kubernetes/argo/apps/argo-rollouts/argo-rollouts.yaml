@@ -1,0 +1,33 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-rollouts
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      path: kubernetes/apps/argo-rollouts/argo-rollouts
+      targetRevision: main
+      ref: repo
+    - repoURL: https://argoproj.github.io/argo-helm
+      chart: argo-rollouts
+      targetRevision: 2.43.6
+      helm:
+        releaseName: argo-rollouts
+        valueFiles:
+          - $repo/kubernetes/apps/argo-rollouts/argo-rollouts/values.yaml
+  destination:
+    name: in-cluster
+    namespace: argo-rollouts
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

@@ -1,0 +1,28 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-hello-prod
+  namespace: argo-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+    # Lets the Kargo Stage demo-prod sync this Application during promotion.
+    kargo.akuity.io/authorized-stage: demo-delivery:demo-prod
+spec:
+  project: kubernetes
+  # Kargo commits the promoted image digest under deploy/stages/demo-prod.
+  source:
+    repoURL: https://forgejo.rbl.lol/demo/delivery-demo.git
+    path: deploy/stages/demo-prod
+    targetRevision: main
+  # One cluster, one namespace: the Rollout's destination stays unambiguous.
+  destination:
+    name: in-cluster
+    namespace: demo-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      # The namespace and its Harbor pull Secret come from the demo-stages app.
+      - ServerSideApply=true

@@ -1,0 +1,17 @@
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Project
+metadata:
+  name: demo-delivery
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: ProjectConfig
+metadata:
+  name: demo-delivery
+  namespace: demo-delivery
+spec:
+  # demo-dev promotes new Freight automatically; demo-prod is promoted by hand.
+  promotionPolicies:
+    - stageSelector:
+        name: demo-dev
+      autoPromotionEnabled: true

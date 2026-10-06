@@ -1,0 +1,59 @@
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: PromotionTask
+metadata:
+  name: promote-demo-hello
+  namespace: demo-delivery
+spec:
+  vars:
+    - name: gitRepo
+      value: https://forgejo.rbl.lol/demo/delivery-demo.git
+    - name: imageRepo
+      value: harbor.rbl.lol/demo/demo-hello
+    - name: app
+  steps:
+    - uses: git-clone
+      config:
+        repoURL: ${{ vars.gitRepo }}
+        checkout:
+          - branch: main
+            path: ./repo
+    - uses: kustomize-set-image
+      as: set-image
+      config:
+        path: ./repo/deploy/stages/${{ ctx.stage }}
+        images:
+          - image: ${{ vars.imageRepo }}
+            digest: ${{ imageFrom(vars.imageRepo).Digest }}
+    # Pods carry the source commit next to the image digest.
+    - uses: yaml-update
+      as: set-commit
+      config:
+        path: ./repo/deploy/stages/${{ ctx.stage }}/rollout-patch.yaml
+        updates:
+          - key: spec.template.metadata.annotations.demo/commit-sha
+            value: ${{ imageFrom(vars.imageRepo).Tag }}
+    - uses: git-commit
+      as: commit
+      config:
+        path: ./repo
+        message: |
+          promote(${{ ctx.stage }}): demo-hello ${{ imageFrom(vars.imageRepo).Tag }}
+
+          Image: ${{ vars.imageRepo }}@${{ imageFrom(vars.imageRepo).Digest }}
+          Commit-Sha: ${{ imageFrom(vars.imageRepo).Tag }}
+          Freight: ${{ ctx.targetFreight.name }}
+          Promotion: ${{ ctx.promotion }}
+    - uses: git-push
+      as: push
+      config:
+        path: ./repo
+        targetBranch: main
+    - uses: argocd-update
+      config:
+        apps:
+          - name: ${{ vars.app }}
+            namespace: argo-system
+            sources:
+              - repoURL: ${{ vars.gitRepo }}
+                desiredRevision: ${{ task.outputs['push'].commit }}

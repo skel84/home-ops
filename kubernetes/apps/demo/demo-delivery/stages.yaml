@@ -1,0 +1,43 @@
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: demo-dev
+  namespace: demo-delivery
+spec:
+  requestedFreight:
+    - origin:
+        kind: Warehouse
+        name: demo-hello
+      sources:
+        direct: true
+  promotionTemplate:
+    spec:
+      steps:
+        - task:
+            name: promote-demo-hello
+          vars:
+            - name: app
+              value: demo-hello-dev
+---
+apiVersion: kargo.akuity.io/v1alpha1
+kind: Stage
+metadata:
+  name: demo-prod
+  namespace: demo-delivery
+spec:
+  requestedFreight:
+    - origin:
+        kind: Warehouse
+        name: demo-hello
+      sources:
+        stages:
+          - demo-dev
+  promotionTemplate:
+    spec:
+      steps:
+        - task:
+            name: promote-demo-hello
+          vars:
+            - name: app
+              value: demo-hello-prod

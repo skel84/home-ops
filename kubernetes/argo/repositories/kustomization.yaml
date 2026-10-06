@@ -6,5 +6,6 @@ resources:
   - pulumi-helm-charts.yaml
   - kro-helm-charts.yaml
   - zulip-helm-charts.yaml
+  - kargo-helm-charts.yaml
 generators:
   - ./secret-generator.yaml

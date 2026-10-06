@@ -1,0 +1,15 @@
+---
+installCRDs: true
+keepCRDs: true
+
+controller:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      memory: 256Mi
+
+dashboard:
+  enabled: false
