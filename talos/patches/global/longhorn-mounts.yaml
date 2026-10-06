@@ -10,7 +10,8 @@ machine:
           - rshared
           - rw
   sysctls:
-    vm.nr_hugepages: "1024"
+    # Hugepages are only used by the Longhorn v2 data engine, which is disabled.
+    vm.nr_hugepages: "0"
   kernel:
     modules:
       - name: nvme_tcp
