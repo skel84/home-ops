@@ -36,9 +36,9 @@ Change that password at first login.
        secret:
          name: forgejo-webhook-config
          key: provider.token
-     webhook_secret:
-       name: forgejo-webhook-config
-       key: webhook.secret
+       webhook_secret:
+         name: forgejo-webhook-config
+         key: webhook.secret
    ```
 
 4. In the Forgejo repository's **Settings → Webhooks**, add a **Forgejo** webhook
