@@ -1,6 +1,19 @@
 ---
 api:
   replicas: 1
+  host: kargo.rbl.lol
+  # Internal ingress only. ingress-nginx-internal terminates TLS with its default
+  # *.rbl.lol certificate and talks plain HTTP to the API server, as for Argo CD
+  # (server.insecure). terminatedUpstream keeps Kargo's own URLs on https.
+  tls:
+    enabled: false
+    terminatedUpstream: true
+  ingress:
+    enabled: true
+    ingressClassName: internal
+    pathType: Prefix
+    tls:
+      enabled: false
   # Admin password hash and token signing key come from the SOPS secret in config/.
   secret:
     name: kargo-api
