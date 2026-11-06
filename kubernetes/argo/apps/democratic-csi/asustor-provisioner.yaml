@@ -1,0 +1,23 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: asustor-provisioner
+  namespace: argo-system
+spec:
+  project: kubernetes
+  source:
+    repoURL: "https://github.com/skel84/home-ops.git"
+    path: kubernetes/apps/democratic-csi/asustor-provisioner
+    targetRevision: main
+  destination:
+    name: in-cluster
+    namespace: democratic-csi
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+      - ServerSideApply=true
