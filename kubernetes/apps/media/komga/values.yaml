@@ -17,7 +17,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/gotson/komga
-          tag: latest@sha256:dae630271561b642d47c9723803ec77900d1f0a803fbe6a42da69db5b21ebaeb
+          tag: latest@sha256:3ae42f88511211e0ec2637d88f3df1b709d07cfb093427e58444ae200a62608e
           pullPolicy: IfNotPresent
         env:
           TZ: "Europe/Rome"
