@@ -30,7 +30,7 @@ externalPrometheus:
   url: http://prometheus-operated.observability.svc.cluster.local:9090
 nodeAgent:
   image:
-    name: ghcr.io/coroot/coroot-node-agent:1.36.1
+    name: ghcr.io/coroot/coroot-node-agent:1.38.1
   tolerations:
   - operator: Exists
   resources:
