@@ -4,7 +4,7 @@ controllers:
       01-permissions:
         image:
           repository: busybox
-          tag: 1.36.1
+          tag: 1.38.0
         command:
           - /bin/sh
           - -c
