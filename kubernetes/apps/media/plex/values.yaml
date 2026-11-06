@@ -83,18 +83,19 @@ service:
         port: &port 32400
 persistence:
   config:
-    suffix: config
     enabled: true
     type: persistentVolumeClaim
     accessMode: ReadWriteOnce
     size: 10Gi
-    storageClass: longhorn
+    storageClass: asustor-iscsi
+    forceRename: plex-config-iscsi
     globalMounts:
       - path: /config
   # Separate PVC for cache to avoid backing up cache files
   # Uncomment these only after initial setup is complete
   plex-cache:
-    storageClass: "longhorn"
+    storageClass: asustor-iscsi
+    forceRename: plex-plex-cache-iscsi
     accessMode: ReadWriteOnce
     size: "20Gi"
     globalMounts:
