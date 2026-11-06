@@ -15,7 +15,7 @@ spec:
       ref: repo
     - repoURL: codeberg.org/forgejo-contrib
       chart: forgejo
-      targetRevision: 17.0.1
+      targetRevision: 17.3.2
       helm:
         releaseName: forgejo
         valueFiles:
