@@ -108,8 +108,8 @@ class Nas:
                 luntype=0, lun=name, volume=self.cfg["nas_volume"],
                 provisioning=1, indexed=0, size=gib * 1024,
             )
-        # Masking a target with no LUN is ignored yet reports success, and writes
-        # garbage sections into iscsi.conf. Never attempt it.
+        # Masking a target with no LUN reports success but is not applied, so
+        # never attempt it.
         target = self._target(name)
         if target is None or int(target["lun"]) != 1:
             raise RuntimeError(f"target {name} has no single LUN, needs manual cleanup: {target}")
