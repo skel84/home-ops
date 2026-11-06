@@ -31,7 +31,7 @@ controllers:
       code-server:
         image:
           repository: ghcr.io/coder/code-server
-          tag: 4.100.2@sha256:0c31654f1125c3a685a42ed1f2946573f5ebaaf016c5bc0640c72f9f571267e0
+          tag: 4.145.0@sha256:992796b850b8b7ec6f7393b8dd2295840a65cf5071981990ff41ef52dd566c43
         args:
           [
             "--auth",
