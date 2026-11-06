@@ -15,7 +15,7 @@ spec:
       ref: repo
     - repoURL: https://kedacore.github.io/charts
       chart: keda
-      targetRevision: 2.18.3
+      targetRevision: 2.21.0
       helm:
         releaseName: keda
         valueFiles:
