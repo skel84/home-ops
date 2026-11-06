@@ -10,11 +10,7 @@ controller:
     default: true
     controllerValue: k8s.io/internal
   admissionWebhooks:
-    objectSelector:
-      matchExpressions:
-        - key: ingress-class
-          operator: In
-          values: ["internal"]
+    enabled: false
   config:
     allow-snippet-annotations: true
     annotations-risk-level: Critical
