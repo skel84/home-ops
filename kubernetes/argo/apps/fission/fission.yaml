@@ -15,7 +15,7 @@ spec:
       ref: repo
     - repoURL: https://fission.github.io/fission-charts/
       chart: fission-all
-      targetRevision: 1.22.1
+      targetRevision: 1.27.0
       helm:
         releaseName: fission
         valueFiles:
