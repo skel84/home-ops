@@ -16,7 +16,7 @@ spec:
       ref: repo
     - repoURL: ghcr.io/pulumi/helm-charts
       chart: pulumi-kubernetes-operator
-      targetRevision: 2.7.0
+      targetRevision: 2.10.0
       helm:
         releaseName: pulumi-kubernetes-operator
         valueFiles:
