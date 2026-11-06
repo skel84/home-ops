@@ -63,11 +63,11 @@ ingress:
 persistence:
   config:
     enabled: true
-    suffix: config
     type: persistentVolumeClaim
-    storageClass: longhorn
+    storageClass: asustor-iscsi
+    forceRename: overseer-config-iscsi
     accessMode: ReadWriteOnce
-    size: 128Mi
+    size: 1Gi
     retain: false
     globalMounts:
       - path: /config
