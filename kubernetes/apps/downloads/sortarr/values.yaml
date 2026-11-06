@@ -11,12 +11,24 @@ controllers:
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"
 
-    containers:
-      app:
-        image:
+    initContainers:
+      # A fresh install has no recorded version, so Sortarr treats env-based
+      # config as a pre-0.8.3 upgrade and locks everything behind /setup
+      seed-startup-state:
+        image: &image
           repository: ghcr.io/jaredharper1/sortarr
           tag: v0.9.0
           pullPolicy: IfNotPresent
+        command:
+          - sh
+          - -c
+          - >-
+            grep -qs '"upgrade_setup_required": false' /data/Sortarr.startup.json ||
+            echo '{"app_version": "0.8.3"}' > /data/Sortarr.startup.json
+
+    containers:
+      app:
+        image: *image
         env:
           PORT: &port 8787
           ENV_FILE_PATH: /data/Sortarr.env
