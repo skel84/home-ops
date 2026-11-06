@@ -15,7 +15,7 @@ spec:
       ref: repo
     - repoURL: ghcr.io/zulip/helm-charts
       chart: zulip
-      targetRevision: 2.3.0
+      targetRevision: 2.4.0
       helm:
         releaseName: zulip
         valueFiles:
