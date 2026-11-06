@@ -83,7 +83,8 @@ persistence:
     type: persistentVolumeClaim
     accessMode: ReadWriteOnce
     size: 2Gi
-    storageClass: longhorn
+    storageClass: asustor-iscsi
+    forceRename: sonarr-config-iscsi
     globalMounts:
       - path: /config
   config-cache:
@@ -91,7 +92,8 @@ persistence:
     type: persistentVolumeClaim
     accessMode: ReadWriteOnce
     size: 10Gi
-    storageClass: longhorn
+    storageClass: asustor-iscsi
+    forceRename: sonarr-config-cache-iscsi
     globalMounts:
       - path: /config/MediaCover
   add-ons:
