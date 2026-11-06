@@ -2,6 +2,8 @@
 defaultSettings:
   concurrentReplicaRebuildPerNodeLimit: 1
   defaultReplicaCount: 2
+persistence:
+  defaultClassReplicaCount: 2
 ingress:
   enabled: true
   ingressClassName: internal
