@@ -41,8 +41,8 @@ singleBinary:
   replicas: 1
   persistence:
     enabled: true
-    storageClass: longhorn
-    size: 20Gi
+    storageClass: asustor-iscsi
+    size: 50Gi
 gateway:
   replicas: 0
 backend:
