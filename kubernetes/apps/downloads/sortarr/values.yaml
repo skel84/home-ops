@@ -1,0 +1,110 @@
+controllers:
+  sortarr:
+    annotations:
+      reloader.stakater.com/auto: "true"
+
+    pod:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
+
+    containers:
+      app:
+        image:
+          repository: ghcr.io/jaredharper1/sortarr
+          tag: v0.9.0
+          pullPolicy: IfNotPresent
+        env:
+          PORT: &port 8787
+          ENV_FILE_PATH: /data/Sortarr.env
+          SORTARR_CONFIG_PATH: /data/Sortarr.env
+          SORTARR_ALLOW_PLAINTEXT_SECRETS: "0"
+          SORTARR_STORE_SECRETS_AS_FILES: "1"
+          SORTARR_PROXY_MODE: single
+          SORTARR_AUTH_METHOD: basic
+          BASIC_AUTH_USER: admin
+          # Sortarr only reads *_FILE secrets by basename from /data/secrets
+          BASIC_AUTH_PASS_FILE: /data/secrets/basic_auth_pass
+          SORTARR_SECRET_KEY_FILE: /data/secrets/secret_key
+          SONARR_URL: http://sonarr.downloads.svc.cluster.local
+          SONARR_URL_EXTERNAL: https://sonarr.rbl.lol
+          SONARR_API_KEY_FILE: /data/secrets/sonarr_api_key
+          RADARR_URL: http://radarr.downloads.svc.cluster.local:7878
+          RADARR_URL_EXTERNAL: https://radarr.rbl.lol
+          RADARR_API_KEY_FILE: /data/secrets/radarr_api_key
+        probes:
+          # /health requires auth
+          liveness: &probes
+            enabled: true
+            custom: true
+            spec:
+              tcpSocket:
+                port: *port
+              initialDelaySeconds: 0
+              periodSeconds: 10
+              timeoutSeconds: 1
+              failureThreshold: 3
+          readiness: *probes
+        resources:
+          requests:
+            cpu: 20m
+            memory: 256Mi
+          limits:
+            memory: 1Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+              - ALL
+
+service:
+  app:
+    controller: sortarr
+    ports:
+      http:
+        port: *port
+
+persistence:
+  data:
+    enabled: true
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 2Gi
+    storageClass: longhorn
+    globalMounts:
+      - path: /data
+  secrets:
+    type: custom
+    volumeSpec:
+      projected:
+        sources:
+          - secret:
+              name: sortarr-secret
+          - secret:
+              name: sonarr-secret
+              items:
+                - key: api_key
+                  path: sonarr_api_key
+          - secret:
+              name: radarr-secret
+              items:
+                - key: api_key
+                  path: radarr_api_key
+    globalMounts:
+      - path: /data/secrets
+        readOnly: true
+
+ingress:
+  app:
+    className: internal
+    hosts:
+      - host: "{{ .Release.Name }}.rbl.lol"
+        paths:
+          - path: /
+            service:
+              identifier: app
+              port: *port
