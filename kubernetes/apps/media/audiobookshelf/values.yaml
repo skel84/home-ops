@@ -63,7 +63,8 @@ persistence:
     type: persistentVolumeClaim
     accessMode: ReadWriteOnce
     size: 5Gi
-    storageClass: longhorn
+    storageClass: asustor-iscsi
+    forceRename: audiobookshelf-config-iscsi
     globalMounts:
       - path: /config
   metadata:
@@ -71,7 +72,8 @@ persistence:
     type: persistentVolumeClaim
     accessMode: ReadWriteOnce
     size: 10Gi
-    storageClass: longhorn
+    storageClass: asustor-iscsi
+    forceRename: audiobookshelf-metadata-iscsi
     globalMounts:
       - path: /metadata
   tmp:
