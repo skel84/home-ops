@@ -6,7 +6,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/home-assistant/home-assistant
-          tag: 2026.4
+          tag: 2026.11
         env:
           TZ: Europe/Rome
           HASS_HTTP_TRUSTED_PROXY_1: 192.168.0.0/24
