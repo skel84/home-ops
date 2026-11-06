@@ -11,6 +11,8 @@ extraArgs:
   - --cloudflare-proxied
   - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
   - --crd-source-kind=DNSEndpoint
+  - --dry-run
+  - --enable-legacy-annotation-prefix
   - --events
   - --ignore-ingress-tls-spec
   - --ingress-class=external
