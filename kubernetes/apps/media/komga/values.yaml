@@ -60,7 +60,8 @@ persistence:
     type: persistentVolumeClaim
     accessMode: ReadWriteOnce
     size: 5Gi
-    storageClass: longhorn
+    storageClass: asustor-iscsi
+    forceRename: komga-iscsi
     globalMounts:
       - path: /config
   tmp:
