@@ -47,7 +47,8 @@ persistence:
     type: persistentVolumeClaim
     accessMode: ReadWriteOnce
     size: 2Gi
-    storageClass: longhorn
+    storageClass: asustor-iscsi
+    forceRename: calibre-web-iscsi
     globalMounts:
       - path: /config
   tmp:
