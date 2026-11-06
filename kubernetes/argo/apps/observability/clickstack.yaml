@@ -15,7 +15,7 @@ spec:
       ref: repo
     - repoURL: https://clickhouse.github.io/ClickStack-helm-charts
       chart: clickstack
-      targetRevision: 3.0.1
+      targetRevision: 3.5.0
       helm:
         releaseName: clickstack
         valueFiles:
