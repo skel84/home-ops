@@ -34,6 +34,8 @@ prometheus:
     hosts:
       - prometheus.rbl.lol
   prometheusSpec:
+    # Paused during the Longhorn repair: replaying the WAL starved rbl-02 of memory
+    replicas: 0
     #   image:
     #     registry: docker.io
     #     repository: prom/prometheus
