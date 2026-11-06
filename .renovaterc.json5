@@ -6,7 +6,6 @@
     "helpers:pinGitHubActionDigests",
     ":automergeBranch",
     ":dependencyDashboard",
-    ":disableRateLimiting",
     ":semanticCommits",
   ],
   dependencyDashboard: true,
@@ -18,21 +17,54 @@
   schedule: ["every weekend"],
   ignorePaths: ["**/*.sops.*"],
   argocd: {
-    fileMatch: ["(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$"],
+    managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"],
   },
   "helm-values": {
-    fileMatch: ["(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$"],
+    managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"],
   },
   helmfile: {
-    fileMatch: ["(^|/)helmfile\\.ya?ml(?:\\.j2)?$"],
+    managerFilePatterns: ["/(^|/)helmfile\\.ya?ml(?:\\.j2)?$/"],
   },
   kubernetes: {
-    fileMatch: ["(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$"],
+    managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"],
   },
   kustomize: {
-    fileMatch: ["(^|/)kustomization\\.ya?ml(?:\\.j2)?$"],
+    managerFilePatterns: ["/(^|/)kustomization\\.ya?ml(?:\\.j2)?$/"],
+  },
+  customDatasources: {
+    "grafana-dashboards": {
+      defaultRegistryUrlTemplate: "https://grafana.com/api/dashboards/{{packageName}}",
+      format: "json",
+      transformTemplates: ['{"releases":[{"version": $string(revision)}]}'],
+    },
   },
   packageRules: [
+    {
+      description: "Merging goes live through Argo auto-sync with no CI gate, so majors wait for approval on the dashboard",
+      matchUpdateTypes: ["major"],
+      dependencyDashboardApproval: true,
+    },
+    {
+      description: "Only supported one minor at a time, so offer each minor separately and wait for approval",
+      matchPackageNames: ["longhorn", "cilium", "ghcr.io/siderolabs/**"],
+      separateMultipleMinor: true,
+      dependencyDashboardApproval: true,
+    },
+    {
+      description: "Flights ship as committed wasm binaries, so a go.mod bump does nothing without a rebuild",
+      matchManagers: ["gomod"],
+      enabled: false,
+    },
+    {
+      description: "Intel Device Plugins Group",
+      groupName: "intel device plugins",
+      matchPackageNames: ["intel-device-plugins-*", "intel/intel-gpu-plugin"],
+    },
+    {
+      description: "Workstation tooling Group",
+      groupName: "mise tools",
+      matchManagers: ["mise"],
+    },
     {
       description: "Argo Operator Group",
       groupName: "Argo Operator",
@@ -121,15 +153,40 @@
       matchDatasources: ["github-releases"],
       addLabels: ["renovate/github-release"],
     },
+    {
+      description: "Grafana Dashboards Group",
+      groupName: "grafana dashboards",
+      matchDatasources: ["custom.grafana-dashboards"],
+      semanticCommitScope: "grafana-dashboard",
+      addLabels: ["renovate/grafana-dashboard"],
+    },
   ],
   customManagers: [
     {
+      description: "Process Grafana dashboards",
+      customType: "regex",
+      managerFilePatterns: ["/(^|/)kubernetes/apps/observability/grafana/values\\.yaml$/"],
+      matchStrings: [
+        "depName=\"(?<depName>.*)\"\\n(?<indentation>\\s+)gnetId: (?<packageName>\\d+)\\n.+revision: (?<currentValue>\\d+)",
+      ],
+      autoReplaceStringTemplate: "depName=\"{{{depName}}}\"\n{{{indentation}}}gnetId: {{{packageName}}}\n{{{indentation}}}revision: {{{newValue}}}",
+      datasourceTemplate: "custom.grafana-dashboards",
+      versioningTemplate: "regex:^(?<patch>\\d+)$",
+    },
+    {
+      description: "Process Coroot image references",
+      customType: "regex",
+      managerFilePatterns: ["/(^|/)kubernetes/apps/observability/coroot/values\\.yaml$/"],
+      matchStrings: ["name: (?<depName>ghcr\\.io/\\S+?):(?<currentValue>\\S+)"],
+      datasourceTemplate: "docker",
+    },
+    {
       description: "Process annotated dependencies",
       customType: "regex",
-      fileMatch: [
-        "(^|/).+\\.env(?:\\.j2)?$",
-        "(^|/).+\\.sh(?:\\.j2)?$",
-        "(^|/).+\\.ya?ml(?:\\.j2)?$",
+      managerFilePatterns: [
+        "/(^|/).+\\.env(?:\\.j2)?$/",
+        "/(^|/).+\\.sh(?:\\.j2)?$/",
+        "/(^|/).+\\.ya?ml(?:\\.j2)?$/",
       ],
       matchStrings: [
         // # renovate: datasource=github-releases depName=k3s-io/k3s

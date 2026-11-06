@@ -1,4 +1,5 @@
 image:
+  # renovate: datasource=docker depName=ghcr.io/kubero-dev/kubero/kubero
   tag: v3.1.1
   pullPolicy: IfNotPresent
 
