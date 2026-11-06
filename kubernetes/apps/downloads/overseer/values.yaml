@@ -40,9 +40,8 @@ service:
 ingress:
   app:
     enabled: true
-    ingressClassName: external
+    className: internal
     annotations:
-      external-dns.alpha.kubernetes.io/target: external.rbl.lol
       hajimari.io/icon: mdi:eye-circle
       hajimari.io/info: &description Media Request Management
       gethomepage.dev/enabled: "true"
