@@ -19,7 +19,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/home-operations/plex
-          tag: 1.41.6.9685
+          tag: 1.43.5.11079
         env:
           TZ: "Europe/Rome"
           PLEX_ADVERTISE_URL: http://192.168.0.52:32400,https://plex.rbl.lol:443
