@@ -68,8 +68,8 @@ ingress:
 
 persistence:
   config:
-    suffix: config
-    storageClass: longhorn
+    storageClass: asustor-iscsi
+    forceRename: prowlarr-config-iscsi
     accessMode: ReadWriteOnce
     size: "5Gi"
   tmp:
