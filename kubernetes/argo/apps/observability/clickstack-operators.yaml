@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://clickhouse.github.io/ClickStack-helm-charts
     chart: clickstack-operators
-    targetRevision: 1.0.0
+    targetRevision: 1.1.0
     helm:
       releaseName: clickstack-operators
   destination:
