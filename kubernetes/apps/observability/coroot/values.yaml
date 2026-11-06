@@ -49,7 +49,7 @@ nodeAgent:
     enabled: true
 clusterAgent:
   image:
-    name: ghcr.io/coroot/coroot-cluster-agent:1.11.4
+    name: ghcr.io/coroot/coroot-cluster-agent:1.11.9
   resources:
     requests:
       cpu: 100m
