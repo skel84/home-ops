@@ -6,7 +6,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/bjw-s-labs/scrypted
-          tag: 0.139.0@sha256:0a376e9166d51e0d0fae47b9234774338809fdbd317db614fdc95cef532f024e
+          tag: 0.141.0@sha256:c9e82faec2e27debeba03fd8d4bdb2aa53cdaf0f3f8aa77c04312a047db4c2ea
         probes:
           liveness:
             enabled: true
