@@ -32,7 +32,6 @@ provider:
       timeoutSeconds: 5
 extraArgs:
   - --ignore-ingress-tls-spec
-  - --dry-run
   - --enable-legacy-annotation-prefix
   - --ingress-class=internal
 policy: sync
