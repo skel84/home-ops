@@ -1,0 +1,75 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: asustor-provisioner
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: asustor-provisioner
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: asustor-provisioner
+    spec:
+      serviceAccountName: asustor-provisioner
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: provisioner
+          image: python:3.13-alpine@sha256:1e1f6334529d1fb26a2ef619d7cffb30a7c7d7cc1cc7338ebee283a58d1aeaca
+          command: [python, -B, /app/provisioner.py]
+          env:
+            - name: NAS_HOST
+              value: 192.168.0.217
+            - name: NAS_FINGERPRINT
+              value: 06ce337487c73d075cea493adefd74d70b7d2b7d3c2d89cb8602c19e9afb7880
+            - name: NAS_USER
+              value: k8s-csi
+            - name: IQN_PREFIX
+              value: iqn.2011-08.com.asustor:as6704t-42819c
+            - name: INITIATORS
+              value: iqn.2017-11.dev.talos:7272b294705c2674d38e233bd6766e4c,iqn.2017-11.dev.talos:2933b6dfeec39adbffec5e9dad01ff94,iqn.2017-11.dev.talos:8badc6ef7c469766af9e298a5c1f58a6
+            - name: CHAP_USER
+              value: k8s
+            - name: CHAP_SECRET
+              value: asustor-chap
+            - name: CHAP_SECRET_NAMESPACE
+              value: democratic-csi
+            - name: CAP_GIB
+              value: "1024"
+            - name: NAS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: asustor-provisioner
+                  key: nas-password
+            - name: CHAP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: asustor-chap
+                  key: node-db.node.session.auth.password
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+          volumeMounts:
+            - name: app
+              mountPath: /app
+      volumes:
+        - name: app
+          configMap:
+            name: asustor-provisioner

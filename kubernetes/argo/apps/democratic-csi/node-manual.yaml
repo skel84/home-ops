@@ -1,0 +1,30 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: node-manual
+  namespace: argo-system
+spec:
+  project: kubernetes
+  sources:
+    - repoURL: "https://github.com/skel84/home-ops.git"
+      targetRevision: main
+      ref: repo
+    - repoURL: https://democratic-csi.github.io/charts/
+      chart: democratic-csi
+      targetRevision: 0.15.1
+      helm:
+        releaseName: node-manual
+        valueFiles:
+          - $repo/kubernetes/apps/democratic-csi/node-manual/values.yaml
+  destination:
+    name: in-cluster
+    namespace: democratic-csi
+  syncPolicy:
+    automated:
+      allowEmpty: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
+      - ServerSideApply=true

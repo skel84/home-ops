@@ -1,0 +1,28 @@
+---
+csiDriver:
+  name: org.democratic-csi.node-manual
+  attachRequired: true
+  fsGroupPolicy: File
+
+driver:
+  config:
+    driver: node-manual
+
+controller:
+  externalProvisioner:
+    enabled: false
+  externalResizer:
+    enabled: false
+  externalSnapshotter:
+    enabled: false
+
+node:
+  hostPID: true
+  driver:
+    extraEnv:
+      - name: ISCSIADM_HOST_STRATEGY
+        value: nsenter
+      - name: ISCSIADM_HOST_PATH
+        value: /usr/local/sbin/iscsiadm
+    iscsiDirHostPath: /var/iscsi
+    iscsiDirHostPathType: ""
