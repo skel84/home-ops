@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fstrim
+data:
+  fstrim.sh: |
+    #!/bin/sh
+    # etcd shares this disk, so trim in small chunks with gaps between them.
+    set -eu
+    size=$(df --output=size -BG /host/var | tail -1 | tr -dc 0-9)
+    offset=0
+    while [ "$offset" -lt "$size" ]; do
+      fstrim -v -o "${offset}G" -l 16G /host/var
+      offset=$((offset + 16))
+      sleep 6
+    done
