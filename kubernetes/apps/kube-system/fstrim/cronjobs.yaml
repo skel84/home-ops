@@ -1,0 +1,135 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fstrim-rbl-01
+spec:
+  schedule: "0 3 * * 0"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        spec:
+          restartPolicy: Never
+          nodeSelector:
+            kubernetes.io/hostname: rbl-01
+          tolerations:
+            - operator: Exists
+          containers:
+            - name: fstrim
+              image: public.ecr.aws/docker/library/debian:bookworm-slim
+              command: ["/bin/sh", "/scripts/fstrim.sh"]
+              securityContext:
+                privileged: true
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  memory: 64Mi
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                - name: var
+                  mountPath: /host/var
+          volumes:
+            - name: scripts
+              configMap:
+                name: fstrim
+            - name: var
+              hostPath:
+                path: /var
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fstrim-rbl-02
+spec:
+  schedule: "30 3 * * 0"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        spec:
+          restartPolicy: Never
+          nodeSelector:
+            kubernetes.io/hostname: rbl-02
+          tolerations:
+            - operator: Exists
+          containers:
+            - name: fstrim
+              image: public.ecr.aws/docker/library/debian:bookworm-slim
+              command: ["/bin/sh", "/scripts/fstrim.sh"]
+              securityContext:
+                privileged: true
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  memory: 64Mi
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                - name: var
+                  mountPath: /host/var
+          volumes:
+            - name: scripts
+              configMap:
+                name: fstrim
+            - name: var
+              hostPath:
+                path: /var
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fstrim-rbl-03
+spec:
+  schedule: "0 4 * * 0"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 1800
+      template:
+        spec:
+          restartPolicy: Never
+          nodeSelector:
+            kubernetes.io/hostname: rbl-03
+          tolerations:
+            - operator: Exists
+          containers:
+            - name: fstrim
+              image: public.ecr.aws/docker/library/debian:bookworm-slim
+              command: ["/bin/sh", "/scripts/fstrim.sh"]
+              securityContext:
+                privileged: true
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 16Mi
+                limits:
+                  memory: 64Mi
+              volumeMounts:
+                - name: scripts
+                  mountPath: /scripts
+                - name: var
+                  mountPath: /host/var
+          volumes:
+            - name: scripts
+              configMap:
+                name: fstrim
+            - name: var
+              hostPath:
+                path: /var
