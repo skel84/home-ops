@@ -61,18 +61,30 @@ service:
       rtsp:
         enabled: true
         port: 8554
+  # The Gateway needs a ClusterIP backend: Cilium Envoy honours the
+  # externalTrafficPolicy: Local of the main Service.
+  web:
+    controller: main
+    ports:
+      http:
+        port: *port
 
-ingress:
+route:
   main:
-    className: internal
-    hosts:
-      - host: "frigate.rbl.lol"
-        paths:
-          - path: /
-            pathType: Prefix
-            service:
-              identifier: main
-              port: *port
+    hostnames:
+      - frigate.rbl.lol
+    parentRefs:
+      - name: internal
+        namespace: network
+        sectionName: https
+    rules:
+      - backendRefs:
+          - identifier: web
+            port: *port
+        matches:
+          - path:
+              type: PathPrefix
+              value: /
 
 persistence:
   config:

@@ -8,21 +8,6 @@ hyperdx:
         memory: 512Mi
       limits:
         memory: 2Gi
-  ingress:
-    enabled: true
-    spec:
-      ingressClassName: internal
-      rules:
-        - host: hyperdx.rbl.lol
-          http:
-            paths:
-              - path: /
-                pathType: Prefix
-                backend:
-                  service:
-                    name: clickstack-app
-                    port:
-                      number: 3000
 
 mongodb:
   spec:

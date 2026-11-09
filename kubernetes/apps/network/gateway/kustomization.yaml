@@ -15,3 +15,5 @@ patches:
       - op: add
         path: /metadata/annotations/argocd.argoproj.io~1sync-options
         value: Prune=false
+resources:
+  - ./livekit-route.yaml

@@ -5,11 +5,6 @@ crds:
     forceConflicts: true
 cleanPrometheusOperatorObjectNames: true
 alertmanager:
-  ingress:
-    enabled: true
-    ingressClassName: internal
-    hosts:
-      - alertmanager.rbl.lol
   alertmanagerSpec:
     externalUrl: https://alertmanager.rbl.lol
     storage:
@@ -27,13 +22,8 @@ kubeProxy:
   enabled: false
 prometheus:
   enabled: true
-  ingress:
-    enabled: true
-    ingressClassName: internal
-    annotations: {}
-    hosts:
-      - prometheus.rbl.lol
   prometheusSpec:
+    externalUrl: http://prometheus.rbl.lol/
     #   image:
     #     registry: docker.io
     #     repository: prom/prometheus

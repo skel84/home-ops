@@ -22,10 +22,6 @@ resources:
     memory: 512Mi
   limits:
     memory: 2Gi
-ingress:
-  className: internal
-  host: coroot.rbl.lol
-  path: /
 externalPrometheus:
   url: http://prometheus-operated.observability.svc.cluster.local:9090
 nodeAgent:
