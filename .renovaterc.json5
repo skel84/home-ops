@@ -9,8 +9,6 @@
     ":semanticCommits",
   ],
   dependencyDashboard: true,
-  // Paused until the Longhorn repair is finished: every update waits for dashboard approval
-  dependencyDashboardApproval: true,
   dependencyDashboardTitle: "Renovate Dashboard 🤖",
   suppressNotifications: [
     "prEditedNotification",
