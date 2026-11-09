@@ -2,10 +2,17 @@ crds:
   install: true
 global:
   domain: "argo.#{ cloudflare_domain }#"
+  # Chart 10 creates NetworkPolicies by default; the chart's redis policy blocks the
+  # redis-exporter metrics port. Keep the pre-upgrade posture until we write Cilium policies.
+  networkPolicy:
+    create: false
 configs:
   params:
     server.insecure: true
   cm:
+    # Argo CD 3 defaults to annotation tracking; keep label tracking so the upgrade
+    # does not change how existing resources are tracked. Migrate separately.
+    application.resourceTrackingMethod: label
     statusbadge.enabled: true
     kustomize.buildOptions: "--enable-alpha-plugins --enable-exec"
     helm.valuesFileSchemes: >-
@@ -13,13 +20,8 @@ configs:
       secrets+age-import, secrets+age-import-kubernetes,
       secrets, secrets+literal,
       https
-    resource.exclusions: |
-      - apiGroups:
-          - cilium.io
-        kinds:
-          - CiliumIdentity
-        clusters:
-          - "*"
+    # resource.exclusions is left to the chart default, which already excludes
+    # CiliumIdentity plus Endpoints, EndpointSlice, Lease and other high-churn kinds.
   secret:
     argocdServerAdminPassword: #{ argo_password }#
     argocdServerAdminPasswordMtime: #{ current_datetime() }#
@@ -122,8 +124,10 @@ repoServer:
     - mountPath: /helm-secrets-private-keys/
       name: helm-secrets-private-keys
   initContainers:
+    # Argo CD 3.5+ ships Helm 4, which needs the split helm-secrets plugins (>= 4.7).
+    # 1.0.1 (helm-secrets 4.6.5) fails with: unknown command "secrets" for "helm".
     - name: gitops-tools
-      image: ajaykumar4/gitops-tools:1.0.1
+      image: ajaykumar4/gitops-tools:2026.10.0
       imagePullPolicy: Always
       command: [sh, -ec]
       args:
