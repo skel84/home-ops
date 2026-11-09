@@ -54,17 +54,22 @@ service:
     ports:
       http:
         port: *port
-ingress:
-  main:
-    className: internal
-    hosts:
-      - host: prowlarr.rbl.lol
-        paths:
-          - path: /
-            pathType: Prefix
-            service:
-              identifier: app
-              port: http
+route:
+  app:
+    hostnames:
+      - prowlarr.rbl.lol
+    parentRefs:
+      - name: internal
+        namespace: network
+        sectionName: https
+    rules:
+      - backendRefs:
+          - identifier: app
+            port: *port
+        matches:
+          - path:
+              type: PathPrefix
+              value: /
 
 persistence:
   config:

@@ -67,15 +67,19 @@ serviceMonitor:
         path: /metrics
         interval: 1m
         scrapeTimeout: 10s
-ingress:
+route:
   app:
-    className: internal
-    # annotations:
-    #   external-dns.alpha.kubernetes.io/target: external.rbl.lol
-    hosts:
-      - host: "{{ .Release.Name }}.rbl.lol"
-        paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
+    hostnames:
+      - "{{ .Release.Name }}.rbl.lol"
+    parentRefs:
+      - name: internal
+        namespace: network
+        sectionName: https
+    rules:
+      - backendRefs:
+          - identifier: app
+            port: 8080
+        matches:
+          - path:
+              type: PathPrefix
+              value: /
