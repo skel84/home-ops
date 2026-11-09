@@ -42,6 +42,7 @@ service:
       external-dns.alpha.kubernetes.io/hostname: scrypted.rbl.lol
 
 defaultPodOptions:
+  automountServiceAccountToken: true
   hostNetwork: true
 
 # ingress:
@@ -65,6 +66,7 @@ persistence:
   config:
     enabled: true
     type: persistentVolumeClaim
+    forceRename: scrypted-config
     accessMode: ReadWriteOnce
     size: 2Gi
     storageClass: longhorn
@@ -88,3 +90,6 @@ persistence:
       scrypted:
         app:
           - path: /recs
+# Keep app-template v4 ServiceAccount behaviour (namespace default SA, token mounted)
+global:
+  createDefaultServiceAccount: false
