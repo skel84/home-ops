@@ -14,7 +14,7 @@ controllers:
       app:
         image: &image
           repository: harbor.rbl.lol/classbook/classbook
-          tag: 0.1.1@sha256:f1c0bb70ead4bdb7b1ff67f28181db945e6a418b031c999f69360d8bb22b3a14
+          tag: 0.1.2@sha256:45c3c92b27007cf12c56a3809dd1de7de88e5da6d9879ab794fb9a5b1ed93425
           pullPolicy: IfNotPresent
         env: &env
           APP_URL: https://classbook.rbl.lol
