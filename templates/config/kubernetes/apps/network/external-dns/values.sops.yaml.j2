@@ -15,9 +15,10 @@ extraArgs:
   - --enable-legacy-annotation-prefix
   - --events
   - --ignore-ingress-tls-spec
+  - --gateway-name=external
   - --ingress-class=external
 policy: sync
-sources: ["crd", "ingress"]
+sources: ["crd", "gateway-httproute", "ingress"]
 txtPrefix: k8s.
 txtOwnerId: default
 domainFilters: ["#{ cloudflare_domain }#"]

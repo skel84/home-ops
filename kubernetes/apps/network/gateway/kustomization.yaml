@@ -6,6 +6,7 @@ resources:
   - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
   - ./gateways.yaml
   - ./https-redirect.yaml
+  - ./test-route.yaml
 patches:
   # Deleting these CRDs would delete every route in the cluster.
   - target:

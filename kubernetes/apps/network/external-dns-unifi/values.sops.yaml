@@ -33,9 +33,10 @@ provider:
 extraArgs:
   - --ignore-ingress-tls-spec
   - --enable-legacy-annotation-prefix
+  - --gateway-name=internal
   - --ingress-class=internal
 policy: sync
-sources: ["ingress", "service"]
+sources: ["gateway-httproute", "ingress", "service"]
 txtOwnerId: default
 txtPrefix: k8s.
 domainFilters: ["rbl.lol"] # replace with your domain
