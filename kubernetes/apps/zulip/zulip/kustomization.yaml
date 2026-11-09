@@ -4,3 +4,4 @@ kind: Kustomization
 namespace: zulip
 resources:
   - ./config
+  - ./httproute.yaml

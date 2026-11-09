@@ -4,3 +4,4 @@ kind: Kustomization
 namespace: kargo
 resources:
   - config
+  - ./httproute.yaml

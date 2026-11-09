@@ -3,20 +3,11 @@ image:
   tag: v3.1.1
   pullPolicy: IfNotPresent
 
+# The UI is served by the internal Gateway (httproute.yaml). className is
+# still passed to Kubero as the class for the Ingresses it creates for apps.
 ingress:
-  enabled: true
+  enabled: false
   className: internal
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production
-  hosts:
-    - host: kubero.rbl.lol
-      paths:
-        - path: /
-          pathType: Prefix
-  tls:
-    - secretName: kubero-tls
-      hosts:
-        - kubero.rbl.lol
 
 resources:
   requests:

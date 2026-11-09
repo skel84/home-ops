@@ -10,6 +10,8 @@ env:
   GF_SECURITY_ANGULAR_SUPPORT_ENABLED: true
   GF_SERVER_ROOT_URL: https://grafana.rbl.lol
 grafana.ini:
+  server:
+    domain: grafana.rbl.lol
   analytics:
     check_for_updates: false
     check_for_plugin_updates: false
@@ -221,12 +223,6 @@ plugins:
   - vonage-status-panel
 serviceMonitor:
   enabled: true
-ingress:
-  enabled: true
-  className: internal
-  annotations: {}
-  hosts:
-    - grafana.rbl.lol
 persistence:
   enabled: false
 testFramework:
