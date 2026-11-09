@@ -1,7 +1,7 @@
 # Patches for Longhorn system extensions
 # ❯ curl -X POST --data-binary @longhorn-extensions.yaml https://factory.talos.dev/schematics
 # {"id":"056d8e12ba2b9711c613665c43f0ebf86eb451839a22f360a42110362f84faa1"}
-# talosctl upgrade --image factory.talos.dev/metal-installer/056d8e12ba2b9711c613665c43f0ebf86eb451839a22f360a42110362f84faa1:v1.10.1
+# talosctl upgrade --image factory.talos.dev/metal-installer/056d8e12ba2b9711c613665c43f0ebf86eb451839a22f360a42110362f84faa1:v1.14.5
 customization:
   systemExtensions:
     officialExtensions:
