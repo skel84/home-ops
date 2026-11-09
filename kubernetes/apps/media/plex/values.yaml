@@ -116,23 +116,3 @@ persistence:
       - path: /transcode
   tmp:
     type: emptyDir
-ingress:
-  app:
-    enabled: true
-    # ensure that external DNS (cloudflare) has an entry for this directed to the router
-    # ensure that internal DNS for this zone (coredns) has an entry for this directed to nginx LB IP
-    className: external
-    annotations:
-      external-dns.alpha.kubernetes.io/target: external.rbl.lol
-      nginx.ingress.kubernetes.io/app-root: /web
-    hosts:
-      - host: &host plex.rbl.lol
-        paths:
-          - path: /
-            pathType: Prefix
-            service:
-              identifier: app
-              port: http
-    tls:
-      - hosts:
-          - *host

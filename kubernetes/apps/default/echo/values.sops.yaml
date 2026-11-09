@@ -67,18 +67,6 @@ serviceMonitor:
         path: /metrics
         interval: 1m
         scrapeTimeout: 10s
-ingress:
-  app:
-    className: external
-    annotations:
-      external-dns.alpha.kubernetes.io/target: external.rbl.lol
-    hosts:
-      - host: '{{ .Release.Name }}.rbl.lol'
-        paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
 sops:
   kms: []
   gcp_kms: []
