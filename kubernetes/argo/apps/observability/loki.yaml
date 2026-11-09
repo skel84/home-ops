@@ -11,9 +11,9 @@ spec:
       path: kubernetes/apps/observability/loki
       targetRevision: main
       ref: repo
-    - repoURL: https://grafana.github.io/helm-charts
+    - repoURL: https://grafana-community.github.io/helm-charts
       chart: loki
-      targetRevision: 6.55.0
+      targetRevision: 21.0.0
       helm:
         releaseName: loki
         valueFiles:
