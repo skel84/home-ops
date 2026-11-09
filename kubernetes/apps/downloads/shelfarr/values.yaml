@@ -90,13 +90,19 @@ persistence:
     globalMounts:
       - path: /downloads
 
-ingress:
+route:
   app:
-    className: internal
-    hosts:
-      - host: "{{ .Release.Name }}.rbl.lol"
-        paths:
-          - path: /
-            service:
-              identifier: app
-              port: *port
+    hostnames:
+      - "{{ .Release.Name }}.rbl.lol"
+    parentRefs:
+      - name: internal
+        namespace: network
+        sectionName: https
+    rules:
+      - backendRefs:
+          - identifier: app
+            port: *port
+        matches:
+          - path:
+              type: PathPrefix
+              value: /

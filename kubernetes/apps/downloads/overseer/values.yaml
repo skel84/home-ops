@@ -37,28 +37,22 @@ service:
     ports:
       http:
         port: 5055
-ingress:
+route:
   app:
-    enabled: true
-    className: internal
-    annotations:
-      hajimari.io/icon: mdi:eye-circle
-      hajimari.io/info: &description Media Request Management
-      gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: *description
-      gethomepage.dev/group: Media
-      gethomepage.dev/icon: overseerr
-      gethomepage.dev/name: Overseerr
-      gethomepage.dev/widget.type: ${APP}
-      gethomepage.dev/widget.url: http://${APP}.media.svc.cluster.local:5055
-      # gethomepage.dev/widget.key: "{{ `{{HOMEPAGE_VAR_OVERSEERR_TOKEN}}` }}"
-    hosts:
-      - host: "{{ .Release.Name }}.rbl.lol"
-        paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
+    hostnames:
+      - "{{ .Release.Name }}.rbl.lol"
+    parentRefs:
+      - name: internal
+        namespace: network
+        sectionName: https
+    rules:
+      - backendRefs:
+          - identifier: app
+            port: 5055
+        matches:
+          - path:
+              type: PathPrefix
+              value: /
 
 persistence:
   config:
