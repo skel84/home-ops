@@ -306,3 +306,23 @@ spec:
     - path:
         type: PathPrefix
         value: /
+---
+# demo's NetworkPolicy (from flights/webstack) only admits ingress-nginx pods;
+# Gateway traffic arrives from Cilium's reserved ingress identity.
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: demo-allow-gateway
+  namespace: default
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/managed-by: yokecd
+      app.kubernetes.io/name: demo
+  ingress:
+    - fromEntities:
+        - ingress
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
