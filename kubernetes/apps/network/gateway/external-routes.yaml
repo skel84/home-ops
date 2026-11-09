@@ -8,14 +8,69 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app.kubernetes.io/controller: home-assistant
-    app.kubernetes.io/instance: home-assistant
-    app.kubernetes.io/name: home-assistant
+    app.kubernetes.io/name: home-assistant-proxy
   ports:
   - name: http
     port: 8123
     targetPort: 8123
     protocol: TCP
+---
+# Cilium's Envoy can't reach a hostNetwork backend on its own node, so
+# hass.rbl.lol breaks whenever Home Assistant and the Gateway IP share a node.
+# This plain TCP forwarder runs on the pod network, which reaches HA from any
+# node; websockets and X-Forwarded-For pass through untouched.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: home-assistant-proxy
+  namespace: home-system
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: home-assistant-proxy
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: home-assistant-proxy
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/name: home-assistant-proxy
+      containers:
+      - name: socat
+        image: docker.io/alpine/socat:1.8.1.1@sha256:7f9a06753033f2b7de18edc2353f2c15153413d95a039163c6db270fc7a6c3b0
+        args:
+        - TCP-LISTEN:8123,fork,reuseaddr
+        - TCP:home-assistant.home-system.svc.cluster.local:8123
+        ports:
+        - name: http
+          containerPort: 8123
+        readinessProbe:
+          tcpSocket:
+            port: 8123
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+        resources:
+          requests:
+            cpu: 5m
+            memory: 8Mi
+          limits:
+            memory: 64Mi
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute

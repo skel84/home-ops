@@ -6,7 +6,6 @@ resources:
   - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
   - ./gateways.yaml
   - ./https-redirect.yaml
-  - ./test-route.yaml
   - ./livekit-route.yaml
   - ./external-routes.yaml
 patches:
