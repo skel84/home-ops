@@ -43,6 +43,9 @@ singleBinary:
     enabled: true
     storageClass: asustor-iscsi
     size: 50Gi
+    # chart default deletes the PVC (and its NAS LUN) on scale-down or StatefulSet delete
+    whenScaled: Retain
+    whenDeleted: Retain
 gateway:
   replicas: 0
 backend:
