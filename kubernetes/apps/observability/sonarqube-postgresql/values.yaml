@@ -1,3 +1,7 @@
+# docker.io/bitnami no longer has versioned tags; the frozen copies live in
+# bitnamilegacy and get no further updates.
+image:
+  repository: bitnamilegacy/postgresql
 auth:
   enablePostgresUser: true
   username: sonar
