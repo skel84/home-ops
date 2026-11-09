@@ -1,4 +1,4 @@
-# Routes for the hosts served through the Cloudflare tunnel.
+# Routes for the public hosts, reached through the WAN port forward to this Gateway.
 ---
 apiVersion: v1
 kind: Service
@@ -20,7 +20,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: argo-cd
+  name: argo-cd-webhook
   namespace: argo-system
 spec:
   parentRefs:
@@ -38,10 +38,11 @@ spec:
       name: argo-cd-argocd-server
       port: 80
       weight: 1
+    # Only the GitHub push webhook is public; the UI is on the internal Gateway.
     matches:
     - path:
         type: PathPrefix
-        value: /
+        value: /api/webhook
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -249,32 +250,6 @@ spec:
       kind: Service
       name: plausible-plausible-analytics
       port: 80
-      weight: 1
-    matches:
-    - path:
-        type: PathPrefix
-        value: /
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: sonarqube
-  namespace: observability
-spec:
-  parentRefs:
-  - group: gateway.networking.k8s.io
-    kind: Gateway
-    name: external
-    namespace: network
-    sectionName: https
-  hostnames:
-  - sonarqube.rbl.lol
-  rules:
-  - backendRefs:
-    - group: ''
-      kind: Service
-      name: sonarqube-sonarqube
-      port: 9000
       weight: 1
     matches:
     - path:
