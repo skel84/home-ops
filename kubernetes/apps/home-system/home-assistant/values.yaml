@@ -7,14 +7,16 @@ controllers:
         image:
           repository: ghcr.io/home-assistant/home-assistant
           tag: 2026.11
+        # The image sets UV_SYSTEM_PYTHON, which makes HA install integration
+        # requirements into /usr/local (not writable as uid 1000). Unset it
+        # so HA uses the user site below; env execs /init, which stays PID 1.
+        command: ["env", "-u", "UV_SYSTEM_PYTHON", "/init"]
         env:
           TZ: Europe/Rome
           HASS_HTTP_TRUSTED_PROXY_1: 192.168.0.0/24
           HASS_HTTP_TRUSTED_PROXY_2: 10.42.0.0/16
           PYTHONPATH: "/config/deps"
-          # Custom integration requirements go to the user site on the
-          # config-cache PVC; HA runs as uid 1000 and can't write /usr/local.
-          # UV_SYSTEM_PYTHON would force installs there instead.
+          # User site for integration requirements, on the config-cache PVC.
           PYTHONUSERBASE: /config/.venv
           UV_NO_CACHE: "true"
           VENV_FOLDER: /venv
