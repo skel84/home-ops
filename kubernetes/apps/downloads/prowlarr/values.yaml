@@ -42,6 +42,7 @@ controllers:
           limits:
             memory: 500Mi
 defaultPodOptions:
+  automountServiceAccountToken: true
   securityContext:
     runAsNonRoot: true
     runAsUser: 1001
@@ -79,3 +80,6 @@ persistence:
     size: "5Gi"
   tmp:
     type: emptyDir
+# Keep app-template v4 ServiceAccount behaviour (namespace default SA, token mounted)
+global:
+  createDefaultServiceAccount: false

@@ -129,3 +129,8 @@ route:
           - path:
               type: PathPrefix
               value: /
+# Keep app-template v4 ServiceAccount behaviour (namespace default SA, token mounted)
+global:
+  createDefaultServiceAccount: false
+defaultPodOptions:
+  automountServiceAccountToken: true

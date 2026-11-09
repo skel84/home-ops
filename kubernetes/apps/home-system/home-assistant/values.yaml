@@ -54,6 +54,7 @@ controllers:
             memory: 512Mi
 
 defaultPodOptions:
+  automountServiceAccountToken: true
   hostNetwork: true
   securityContext:
     runAsNonRoot: true
@@ -121,3 +122,6 @@ persistence:
 #       - backendRefs:
 #           - identifier: app
 #             port: *port
+# Keep app-template v4 ServiceAccount behaviour (namespace default SA, token mounted)
+global:
+  createDefaultServiceAccount: false

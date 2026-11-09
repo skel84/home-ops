@@ -82,6 +82,7 @@ controllers:
         securityContext: *securityContext
         resources: *resources
 defaultPodOptions:
+  automountServiceAccountToken: true
   securityContext:
     runAsNonRoot: true
     runAsUser: 999
@@ -100,3 +101,6 @@ persistence:
     type: emptyDir
     globalMounts:
       - path: *configDir
+# Keep app-template v4 ServiceAccount behaviour (namespace default SA, token mounted)
+global:
+  createDefaultServiceAccount: false

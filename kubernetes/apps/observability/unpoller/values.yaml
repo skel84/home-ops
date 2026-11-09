@@ -37,6 +37,7 @@ controllers:
           limits:
             memory: 128Mi
 defaultPodOptions:
+  automountServiceAccountToken: true
   securityContext:
     runAsNonRoot: true
     runAsUser: 1000
@@ -54,3 +55,6 @@ serviceMonitor:
       - port: http-metrics
         interval: 2m # Unifi API only polls at 2m intervals
         scrapeTimeout: 10s
+# Keep app-template v4 ServiceAccount behaviour (namespace default SA, token mounted)
+global:
+  createDefaultServiceAccount: false

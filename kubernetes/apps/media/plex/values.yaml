@@ -60,6 +60,7 @@ controllers:
             gpu.intel.com/i915: 1
             memory: 5Gi
 defaultPodOptions:
+  automountServiceAccountToken: true
   securityContext:
     runAsNonRoot: true
     runAsUser: 1000
@@ -116,3 +117,6 @@ persistence:
       - path: /transcode
   tmp:
     type: emptyDir
+# Keep app-template v4 ServiceAccount behaviour (namespace default SA, token mounted)
+global:
+  createDefaultServiceAccount: false
