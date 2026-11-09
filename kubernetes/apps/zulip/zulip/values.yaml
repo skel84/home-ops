@@ -3,6 +3,8 @@ zulip:
   environment:
     SETTING_EXTERNAL_HOST: zulip.rbl.lol
     SETTING_ZULIP_ADMINISTRATOR: zulip@rbl.lol
+    # The internal Gateway (Cilium Envoy) connects from pod IPs.
+    LOADBALANCER_IPS: 10.42.0.0/16
     SECRETS_secret_key:
       valueFrom:
         secretKeyRef:
