@@ -4,7 +4,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/unpoller/unpoller
-          tag: v2.39.0@sha256:1cf63ad43121acc6995da1bd636063de9023b4bfc16599a4297951a6fb6b7fd2
+          tag: v5.9.4@sha256:bf2ef9706159c60f81a631030fb792e5ab809d872791ee5d0029a023212b48a7
         env:
           TZ: Europe/Rome
           UP_UNIFI_DEFAULT_ROLE: home-ops
@@ -37,6 +37,7 @@ controllers:
           limits:
             memory: 128Mi
 defaultPodOptions:
+  automountServiceAccountToken: true
   securityContext:
     runAsNonRoot: true
     runAsUser: 1000
@@ -54,3 +55,6 @@ serviceMonitor:
       - port: http-metrics
         interval: 2m # Unifi API only polls at 2m intervals
         scrapeTimeout: 10s
+# Keep app-template v4 ServiceAccount behaviour (namespace default SA, token mounted)
+global:
+  createDefaultServiceAccount: false

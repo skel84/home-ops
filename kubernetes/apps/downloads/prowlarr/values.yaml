@@ -4,7 +4,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/home-operations/prowlarr
-          tag: 1.37.0.5076@sha256:aab0bfd4e96bdca19cca280a2bbf8ac60b9251dcae13459856b724a2dd3ae020
+          tag: 2.7.0.5723@sha256:fcf7498692f97698ea8b8f7078a0f81120a16e7354e4c232b5e3810e3e783dff
         env:
           PROWLARR__APP__INSTANCENAME: Prowlarr
           PROWLARR__APP__THEME: dark
@@ -13,6 +13,8 @@ controllers:
           PROWLARR__LOG__DBENABLED: "False"
           PROWLARR__LOG__LEVEL: info
           PROWLARR__SERVER__PORT: &port 9696
+          # The internal Gateway (Cilium Envoy) connects from pod IPs.
+          PROWLARR__SERVER__TRUSTEDNETWORKS: 10.42.0.0/16
           PROWLARR__UPDATE__BRANCH: develop
           TZ: Europe/Rome
         envFrom:
@@ -42,6 +44,7 @@ controllers:
           limits:
             memory: 500Mi
 defaultPodOptions:
+  automountServiceAccountToken: true
   securityContext:
     runAsNonRoot: true
     runAsUser: 1001
@@ -79,3 +82,6 @@ persistence:
     size: "5Gi"
   tmp:
     type: emptyDir
+# Keep app-template v4 ServiceAccount behaviour (namespace default SA, token mounted)
+global:
+  createDefaultServiceAccount: false

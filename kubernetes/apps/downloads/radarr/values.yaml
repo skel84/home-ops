@@ -29,7 +29,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/home-operations/radarr
-          tag: 5.28.0.10205@sha256:80dec94f1eea0715471853011efdf2c49cf92f8fe3b17b722ad8f8a637e3fead
+          tag: 6.4.4.10685@sha256:1902ad2c08e9bac276ff9a1429af2eaa2f3c635a51f138f1b3eb734995171537
           pullPolicy: IfNotPresent
         env:
           RADARR__APP__INSTANCENAME: Radarr
@@ -132,3 +132,8 @@ route:
           - path:
               type: PathPrefix
               value: /
+# Keep app-template v4 ServiceAccount behaviour (namespace default SA, token mounted)
+global:
+  createDefaultServiceAccount: false
+defaultPodOptions:
+  automountServiceAccountToken: true

@@ -34,8 +34,12 @@ controllers:
           limits:
             memory: 64Mi
 defaultPodOptions:
+  automountServiceAccountToken: true
   securityContext:
     runAsNonRoot: true
     runAsUser: 65534
     runAsGroup: 65534
     seccompProfile: { type: RuntimeDefault }
+# Keep app-template v4 ServiceAccount behaviour (namespace default SA, token mounted)
+global:
+  createDefaultServiceAccount: false
