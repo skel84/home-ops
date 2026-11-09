@@ -21,6 +21,10 @@ endpointRoutes:
   enabled: true
 envoy:
   enabled: false
+gatewayAPI:
+  enabled: true
+  gatewayClass:
+    create: "true"
 dashboards:
   enabled: true
 hubble:
@@ -78,3 +82,9 @@ securityContext:
       - SYS_RESOURCE
 socketLB:
   hostNamespaceOnly: true
+# Restart agents one node at a time.
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 0
+    maxUnavailable: 1
