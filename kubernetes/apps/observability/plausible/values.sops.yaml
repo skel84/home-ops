@@ -7,18 +7,9 @@ databaseURL: ENC[AES256_GCM,data:A65fS+NuodTln1It53dgdHX5XzNq8U0n7TnB8BqnKTHCZ5i
 clickhouseDatabaseURL: ENC[AES256_GCM,data:qtZ9f0ZSb6VAQu7AG2SlWF2r84bSrhAYdT8t9QlXZ7lTyPQ8wyH79VbONuMA/+8H7sFeJGWm/wp6v6fseIdEix5SnkYYqHdt,iv:zjbHD+4EzFactDn592jNzlUfZJSPzqQqe4P9eOOpcG8=,tag:bxWtnB7bLOK+7WFyI4WqHA==,type:str]
 secret:
   create: true
+# Served by the external Gateway (network/gateway/external-routes.yaml).
 ingress:
-  enabled: true
-  className: external
-  annotations:
-    external-dns.alpha.kubernetes.io/target: external.rbl.lol
-    cert-manager.io/cluster-issuer: letsencrypt-production
-  hosts:
-    - plausible.rbl.lol
-  tls:
-    - secretName: plausible-tls
-      hosts:
-        - plausible.rbl.lol
+  enabled: false
 postgresql:
   enabled: true
   primary:

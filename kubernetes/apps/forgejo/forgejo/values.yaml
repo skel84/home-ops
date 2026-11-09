@@ -10,6 +10,11 @@ gitea:
     email: forgejo@rbl.lol
     passwordMode: initialOnlyRequireReset
   config:
+    # Set explicitly: the chart only derives these from an enabled Ingress.
+    server:
+      DOMAIN: forgejo.rbl.lol
+      ROOT_URL: https://forgejo.rbl.lol
+      SSH_DOMAIN: forgejo.rbl.lol
     webhook:
       ALLOWED_HOST_LIST: external,pac.rbl.lol
     service:
@@ -21,22 +26,9 @@ gitea:
       enabled: true
       namespace: observability
 
+# Served by the external Gateway (network/gateway/external-routes.yaml).
 ingress:
-  enabled: true
-  className: external
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production
-    external-dns.alpha.kubernetes.io/target: external.rbl.lol
-  hosts:
-    - host: forgejo.rbl.lol
-      paths:
-        - path: /
-          pathType: Prefix
-          port: http
-  tls:
-    - secretName: forgejo-tls
-      hosts:
-        - forgejo.rbl.lol
+  enabled: false
 
 resources:
   requests:

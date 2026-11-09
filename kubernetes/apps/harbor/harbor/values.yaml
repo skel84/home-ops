@@ -1,17 +1,18 @@
 expose:
-  type: ingress
+  # The chart renders its own HTTPRoute on the external Gateway.
+  type: route
   tls:
     enabled: true
-    certSource: secret
-    secret:
-      secretName: harbor-tls
-  ingress:
-    className: external
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-production
-      external-dns.alpha.kubernetes.io/target: external.rbl.lol
+    certSource: none
+  route:
+    parentRefs:
+      - group: gateway.networking.k8s.io
+        kind: Gateway
+        name: external
+        namespace: network
+        sectionName: https
     hosts:
-      core: harbor.rbl.lol
+      - harbor.rbl.lol
 
 externalURL: https://harbor.rbl.lol
 

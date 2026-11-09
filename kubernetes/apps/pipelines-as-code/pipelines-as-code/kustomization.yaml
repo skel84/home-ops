@@ -5,4 +5,3 @@ namespace: pipelines-as-code
 resources:
   # renovate: datasource=github-releases depName=tektoncd/pipelines-as-code
   - https://github.com/tektoncd/pipelines-as-code/releases/download/v0.52.0/release.k8s.yaml
-  - ingress.yaml

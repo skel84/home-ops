@@ -78,28 +78,6 @@ service:
       code-server:
         port: 12321
 
-ingress:
-  app:
-    className: external
-    annotations:
-      external-dns.alpha.kubernetes.io/target: external.rbl.lol
-    hosts:
-      - host: "hass.rbl.lol"
-        paths:
-          - path: /
-            service:
-              identifier: app
-              port: 8123
-  # app-lan:
-  #   className: internal
-  #   hosts:
-  #     - host: "home-assistant.rbl.lol"
-  #       paths:
-  #         - path: /
-  #           service:
-  #             identifier: app
-  #             port: 8123
-
 persistence:
   config:
     enabled: true
