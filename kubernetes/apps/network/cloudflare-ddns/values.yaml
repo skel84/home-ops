@@ -1,0 +1,41 @@
+---
+# Keeps external.rbl.lol pointed at the home public IP. Detection goes out through
+# the active WAN, so failover to the FritzBox line updates the record by itself.
+controllers:
+  cloudflare-ddns:
+    annotations:
+      secret.reloader.stakater.com/reload: external-dns-secret
+    containers:
+      app:
+        image:
+          repository: docker.io/favonia/cloudflare-ddns
+          tag: 1.18.0
+        env:
+          CLOUDFLARE_API_TOKEN:
+            valueFrom:
+              secretKeyRef:
+                name: external-dns-secret
+                key: api-token
+          DOMAINS: external.rbl.lol
+          IP6_PROVIDER: none
+          PROXIED: false
+          TTL: 60
+          UPDATE_CRON: "@every 1m"
+          RECORD_COMMENT: managed by cloudflare-ddns
+          MANAGED_RECORDS_COMMENT_REGEX: ^managed by cloudflare-ddns$
+          EMOJI: false
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities: { drop: ["ALL"] }
+        resources:
+          requests:
+            cpu: 5m
+          limits:
+            memory: 64Mi
+defaultPodOptions:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 65534
+    runAsGroup: 65534
+    seccompProfile: { type: RuntimeDefault }

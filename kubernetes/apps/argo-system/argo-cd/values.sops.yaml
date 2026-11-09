@@ -48,12 +48,9 @@ redis:
 server:
   replicas: 2
   allowAnyNamespace: true
+  # Served by the internal Gateway (httproute.yaml); only /api/webhook is public.
   ingress:
-    enabled: true
-    ingressClassName: external
-    annotations:
-      external-dns.alpha.kubernetes.io/target: external.rbl.lol
-    hostname: argo.rbl.lol
+    enabled: false
   metrics:
     enabled: true
     serviceMonitor:

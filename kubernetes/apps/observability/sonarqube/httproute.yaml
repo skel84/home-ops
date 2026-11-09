@@ -1,0 +1,26 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: sonarqube
+  namespace: observability
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: internal
+      namespace: network
+      sectionName: https
+  hostnames:
+    - sonarqube.rbl.lol
+  rules:
+    - backendRefs:
+        - group: ""
+          kind: Service
+          name: sonarqube-sonarqube
+          port: 9000
+          weight: 1
+      matches:
+        - path:
+            type: PathPrefix
+            value: /

@@ -30,16 +30,6 @@ resources:
     memory: 6144M
 nodeSelector:
   kubernetes.io/hostname: rbl-02
+# Served by the internal Gateway (httproute.yaml).
 ingress:
-  enabled: true
-  ingressClassName: external
-  annotations:
-    external-dns.alpha.kubernetes.io/target: external.rbl.lol
-    cert-manager.io/cluster-issuer: letsencrypt-production
-  hosts:
-    - name: sonarqube.rbl.lol
-      path: /
-  tls:
-    - secretName: sonarqube-tls
-      hosts:
-        - sonarqube.rbl.lol
+  enabled: false
