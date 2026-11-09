@@ -1,6 +1,7 @@
 ---
 defaultSettings:
   concurrentReplicaRebuildPerNodeLimit: 1
+  concurrentAutomaticEngineUpgradePerNodeLimit: 3
   defaultReplicaCount: 2
 persistence:
   defaultClassReplicaCount: 2
