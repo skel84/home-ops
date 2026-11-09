@@ -10,7 +10,7 @@ controllers:
       main:
         image:
           repository: ghcr.io/blakeblackshear/frigate
-          tag: 0.15.1@sha256:c4e02d2c511847eebbda8e0e370b41c78e7b51247353de79340e06c3e95f11be
+          tag: 0.18.2@sha256:fd60f99ffd4eb6c42360ed4e14953e270586f239309ab3983e55b2e97ffac09a
         env:
           TZ: Europe/Rome
           FRIGATE_DISABLE_AUTH: "true"
