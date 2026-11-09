@@ -6,12 +6,20 @@ metadata:
   namespace: network
 spec:
   parentRefs:
-    - name: internal
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: internal
       sectionName: http
-    - name: external
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: external
       sectionName: http
   rules:
-    - filters:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      filters:
         - type: RequestRedirect
           requestRedirect:
             scheme: https
