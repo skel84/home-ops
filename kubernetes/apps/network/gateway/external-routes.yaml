@@ -1,0 +1,308 @@
+# Routes for the hosts served through the Cloudflare tunnel.
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-assistant-gateway
+  namespace: home-system
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/controller: home-assistant
+    app.kubernetes.io/instance: home-assistant
+    app.kubernetes.io/name: home-assistant
+  ports:
+  - name: http
+    port: 8123
+    targetPort: 8123
+    protocol: TCP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: argo-cd
+  namespace: argo-system
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: external
+    namespace: network
+    sectionName: https
+  hostnames:
+  - argo.rbl.lol
+  rules:
+  - backendRefs:
+    - group: ''
+      kind: Service
+      name: argo-cd-argocd-server
+      port: 80
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: demo
+  namespace: default
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: external
+    namespace: network
+    sectionName: https
+  hostnames:
+  - demo.rbl.lol
+  rules:
+  - backendRefs:
+    - group: ''
+      kind: Service
+      name: demo
+      port: 80
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: echo
+  namespace: default
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: external
+    namespace: network
+    sectionName: https
+  hostnames:
+  - echo.rbl.lol
+  rules:
+  - backendRefs:
+    - group: ''
+      kind: Service
+      name: echo
+      port: 8080
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: forgejo
+  namespace: forgejo
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: external
+    namespace: network
+    sectionName: https
+  hostnames:
+  - forgejo.rbl.lol
+  rules:
+  - backendRefs:
+    - group: ''
+      kind: Service
+      name: forgejo-http
+      port: 3000
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: harbor
+  namespace: harbor
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: external
+    namespace: network
+    sectionName: https
+  hostnames:
+  - harbor.rbl.lol
+  rules:
+  - backendRefs:
+    - group: ''
+      kind: Service
+      name: harbor-core
+      port: 80
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /api
+    - path:
+        type: PathPrefix
+        value: /service
+    - path:
+        type: PathPrefix
+        value: /v2
+    - path:
+        type: PathPrefix
+        value: /c
+  - backendRefs:
+    - group: ''
+      kind: Service
+      name: harbor-portal
+      port: 80
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: home-assistant
+  namespace: home-system
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: external
+    namespace: network
+    sectionName: https
+  hostnames:
+  - hass.rbl.lol
+  rules:
+  - backendRefs:
+    - group: ''
+      kind: Service
+      name: home-assistant-gateway
+      port: 8123
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: plex
+  namespace: media
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: external
+    namespace: network
+    sectionName: https
+  hostnames:
+  - plex.rbl.lol
+  rules:
+  - filters:
+    - type: RequestRedirect
+      requestRedirect:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /web
+        statusCode: 302
+    matches:
+    - path:
+        type: Exact
+        value: /
+  - backendRefs:
+    - group: ''
+      kind: Service
+      name: plex
+      port: 32400
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: plausible
+  namespace: observability
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: external
+    namespace: network
+    sectionName: https
+  hostnames:
+  - plausible.rbl.lol
+  rules:
+  - backendRefs:
+    - group: ''
+      kind: Service
+      name: plausible-plausible-analytics
+      port: 80
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: sonarqube
+  namespace: observability
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: external
+    namespace: network
+    sectionName: https
+  hostnames:
+  - sonarqube.rbl.lol
+  rules:
+  - backendRefs:
+    - group: ''
+      kind: Service
+      name: sonarqube-sonarqube
+      port: 9000
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: pipelines-as-code
+  namespace: pipelines-as-code
+spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: external
+    namespace: network
+    sectionName: https
+  hostnames:
+  - pac.rbl.lol
+  rules:
+  - backendRefs:
+    - group: ''
+      kind: Service
+      name: pipelines-as-code-controller
+      port: 8080
+      weight: 1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /

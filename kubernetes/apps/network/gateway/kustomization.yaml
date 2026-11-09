@@ -8,6 +8,7 @@ resources:
   - ./https-redirect.yaml
   - ./test-route.yaml
   - ./livekit-route.yaml
+  - ./external-routes.yaml
 patches:
   # Deleting these CRDs would delete every route in the cluster.
   - target:
