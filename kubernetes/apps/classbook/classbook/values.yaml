@@ -1,0 +1,99 @@
+controllers:
+  classbook:
+    strategy: Recreate
+
+    pod:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        fsGroup: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
+
+    containers:
+      app:
+        image: &image
+          repository: harbor.rbl.lol/classbook/classbook
+          tag: 0.1.0@sha256:831a375c91381ce4fa7ea056f48da6cebccac0725fca22b626198217e10e65e8
+          pullPolicy: IfNotPresent
+        env: &env
+          APP_URL: https://classbook.rbl.lol
+          # Public demo with made-up families: login links are shown on screen, there is no mail server
+          SHOW_LOGIN_LINKS: "true"
+          SEED_DEMO: "true"
+        envFrom: &envFrom
+          - secretRef:
+              name: classbook-secret
+        probes:
+          liveness: &probes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /up
+                port: &port 8080
+              periodSeconds: 10
+              timeoutSeconds: 2
+              failureThreshold: 3
+          readiness: *probes
+          startup:
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /up
+                port: *port
+              periodSeconds: 5
+              failureThreshold: 60
+        resources: &resources
+          requests:
+            cpu: 20m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+        securityContext: &securityContext
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+
+      scheduler:
+        image: *image
+        command: ["php", "artisan", "schedule:work"]
+        env: *env
+        envFrom: *envFrom
+        resources: *resources
+        securityContext: *securityContext
+
+service:
+  app:
+    controller: classbook
+    ports:
+      http:
+        port: *port
+
+route:
+  app:
+    hostnames:
+      - classbook.rbl.lol
+    parentRefs:
+      - name: external
+        namespace: network
+        sectionName: https
+    rules:
+      - backendRefs:
+          - identifier: app
+            port: *port
+        matches:
+          - path:
+              type: PathPrefix
+              value: /
+
+persistence:
+  storage:
+    type: persistentVolumeClaim
+    storageClass: longhorn
+    accessMode: ReadWriteOnce
+    size: 2Gi
+    globalMounts:
+      - path: /app/storage/app
