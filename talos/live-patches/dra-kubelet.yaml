@@ -1,4 +1,0 @@
-machine:
-  kubelet:
-    extraArgs:
-      feature-gates: DynamicResourceAllocation=true

@@ -1,6 +1,9 @@
 ---
 defaultSettings:
   concurrentReplicaRebuildPerNodeLimit: 1
+  concurrentAutomaticEngineUpgradePerNodeLimit: 3
   defaultReplicaCount: 2
+  # Detached single-replica volumes (e.g. strict-local) must not block node drains.
+  nodeDrainPolicy: allow-if-replica-is-stopped
 persistence:
   defaultClassReplicaCount: 2
