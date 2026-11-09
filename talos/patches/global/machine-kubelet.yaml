@@ -1,7 +1,5 @@
 machine:
   kubelet:
-    extraArgs:
-      feature-gates: DynamicResourceAllocation=true
     extraConfig:
       serializeImagePulls: false
     nodeIP:
