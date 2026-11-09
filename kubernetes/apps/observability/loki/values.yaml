@@ -1,4 +1,4 @@
-deploymentMode: SingleBinary
+deploymentMode: Monolithic
 loki:
   auth_enabled: false
   analytics:
@@ -7,6 +7,10 @@ loki:
     log_level: info
   commonConfig:
     replication_factor: 1
+  # single replica: the memberlist Service has no ready peer while the pod
+  # starts, so a failed join must not abort startup (the 6.x default)
+  extraMemberlistConfig:
+    abort_if_cluster_join_fails: false
   compactor:
     working_directory: /var/loki/compactor/retention
     delete_request_store: filesystem
@@ -44,6 +48,8 @@ singleBinary:
     storageClass: asustor-iscsi
     size: 50Gi
     # chart default deletes the PVC (and its NAS LUN) on scale-down or StatefulSet delete
+    # the community chart only renders the retention policy when this is true
+    enableStatefulSetAutoDeletePVC: true
     whenScaled: Retain
     whenDeleted: Retain
 gateway:
@@ -64,8 +70,9 @@ test:
   enabled: false
 sidecar:
   image:
-    repository: ghcr.io/home-operations/k8s-sidecar
-    tag: "1.30.3@sha256:39cca7abcad8f1621b9462d95f7d0e60301b92fcb0ff4de0ad\
-      4561859011cddf"
+    registry: ghcr.io
+    repository: home-operations/k8s-sidecar
+    # 2.x serves the /healthz probes the chart now configures
+    tag: 2.14.3@sha256:cc81b13164b15474260b8721bb6a63da2212a704fb92b5496091aabae3038487
   rules:
     searchNamespace: ALL
