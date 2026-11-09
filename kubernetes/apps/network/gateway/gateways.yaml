@@ -41,6 +41,9 @@ spec:
   infrastructure:
     annotations:
       lbipam.cilium.io/ips: 192.168.0.58
+      # LAN record (external-dns-unifi watches Services): send LAN clients
+      # straight to this Gateway instead of hairpinning via the public IP.
+      external-dns.alpha.kubernetes.io/hostname: external.rbl.lol
   listeners:
     - name: http
       protocol: HTTP
