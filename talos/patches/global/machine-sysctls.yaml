@@ -5,3 +5,4 @@ machine:
     net.core.rmem_max: "7500000" # Cloudflared | QUIC
     net.core.wmem_max: "7500000" # Cloudflared | QUIC
     user.max_user_namespaces: "11255" # Rootless BuildKit
+    net.ipv6.conf.enp2s0.accept_ra_rt_info_max_plen: "64" # Matter | Thread routes from border routers

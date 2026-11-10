@@ -33,6 +33,27 @@ controllers:
             cpu: 10m
           limits:
             memory: 2Gi
+      # Matter controller for HA's Matter integration (ws://127.0.0.1:5580/ws).
+      # Shares the pod's host network: localhost-only WebSocket, so it is not
+      # reachable from the LAN; fabric data lives on the config PVC.
+      matter-server:
+        image:
+          repository: ghcr.io/matter-js/matterjs-server
+          tag: 1.5.5@sha256:ee149c7c67eff0e90f131e8f0d628f7b099591ec58473c8cda1209e8ae4df66e
+        args:
+          - --storage-path
+          - /config/matter
+          - --primary-interface
+          - enp2s0
+          - --listen-address
+          - 127.0.0.1
+        env:
+          TZ: Europe/Rome
+        resources:
+          requests:
+            cpu: 10m
+          limits:
+            memory: 512Mi
       code-server:
         image:
           repository: ghcr.io/coder/code-server
