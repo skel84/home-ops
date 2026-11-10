@@ -31,6 +31,8 @@ service:
       http:
         port: 11080
         primary: true
+      https:
+        port: 10443
       rebroadcast1:
         port: 37861
       rebroadcast2:
