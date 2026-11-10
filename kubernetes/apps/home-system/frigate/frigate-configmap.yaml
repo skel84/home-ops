@@ -1,5 +1,7 @@
-# Frigate Configuration
 ---
+# Seed config: copied to /config/config.yml on first start only, so zones,
+# masks and GenAI settings edited in the Frigate UI survive restarts.
+# Delete /config/config.yml on the PVC to re-seed from this file.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -7,191 +9,45 @@ metadata:
   namespace: home-system
 data:
   config.yml: |
+    version: 0.18-0
+
     mqtt:
-      host: mosquitto.rbl.lol
-      topic_prefix: frigate
-      # user: mqtt
-      # password: '{FRIGATE_MQTT_PASSWORD}'
+      host: mosquitto.home-system.svc.cluster.local
+
     go2rtc:
       streams:
-        soggiorno:
-          - ffmpeg:http://192.168.0.157/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=admin&password=admin1234#video=copy#audio=copy#audio=opus
-          # - rtsp://admin:admin1234@192.168.0.157:554/Preview_01_main
-        soggiorno_sub:
-          - ffmpeg:http://192.168.0.157/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=admin&password=admin1234
-          # - rtsp://admin:admin1234@192.168.0.157:554/Preview_01_sub
-        ufficio:
-          - ffmpeg:http://192.168.0.148/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=admin&password=admin1234#video=copy#audio=copy#audio=opus
-          # - rtsp://admin:admin1234@192.168.0.148:554/Preview_01_main
-        ufficio_sub:
-          - ffmpeg:http://192.168.0.148/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=admin&password=admin1234
-          # - rtsp://admin:admin1234@192.168.0.148:554/Preview_01_sub
-        balcone_est:
-          - ffmpeg:http://192.168.0.141/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=admin&password=admin1234#video=copy#audio=copy#audio=opus
-          # - rtsp://admin:admin1234@192.168.0.141:554/Preview_01_main
-        balcone_est_sub:
-          - ffmpeg:http://192.168.0.141/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=admin&password=admin1234
-          # - rtsp://admin:admin1234@192.168.0.141:554/Preview_01_sub
-        camera_letto:
-          - ffmpeg:http://192.168.0.9/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=admin&password=admin1234#video=copy#audio=copy#audio=opus
-          # - rtsp://admin:admin1234@192.168.0.9:554/Preview_01_main
-        camera_letto_sub:
-          - ffmpeg:http://192.168.0.9/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=admin&password=admin1234
-          # - rtsp://admin:admin1234@192.168.0.9:554/Preview_01_sub
-        camera_pippi:
-          - ffmpeg:http://192.168.0.125/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=admin&password=admin1234#video=copy#audio=copy#audio=opus
-          # - rtsp://admin:admin1234@192.168.0.125:554/Preview_01_main
-        camera_pippi_sub:
-          - ffmpeg:http://192.168.0.125/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=admin&password=admin1234
-          # - rtsp://admin:admin1234@192.168.0.125:554/Preview_01_sub
         terrazzo_ovest:
-          - ffmpeg:http://192.168.0.176/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=admin&password=admin1234#video=copy#audio=copy#audio=opus
-          # - rtsp://admin:admin1234@192.168.0.176:554/Preview_01_main
+          - "ffmpeg:http://192.168.0.92/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=admin&password={FRIGATE_RTSP_PASSWORD}#video=copy#audio=copy#audio=opus"
         terrazzo_ovest_sub:
-          - ffmpeg:http://192.168.0.176/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=admin&password=admin1234
-          # - rtsp://admin:admin1234@192.168.0.176:554/Preview_01_sub
+          - "ffmpeg:http://192.168.0.92/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=admin&password={FRIGATE_RTSP_PASSWORD}"
+        balcone_est:
+          - "ffmpeg:http://192.168.0.141/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=admin&password={FRIGATE_RTSP_PASSWORD}#video=copy#audio=copy#audio=opus"
+        balcone_est_sub:
+          - "ffmpeg:http://192.168.0.141/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=admin&password={FRIGATE_RTSP_PASSWORD}"
 
     cameras:
-      soggiorno:
-        enabled: true
-        ffmpeg:
-          inputs:
-            - path: rtsp://127.0.0.1:8554/soggiorno
-              roles:
-                - record
-            - path: rtsp://127.0.0.1:8554/soggiorno_sub
-              roles:
-                - detect
-        onvif:
-          host: 192.168.0.157
-          port: 8000
-          user: admin
-          password: admin1234
-
-      ufficio:
-        enabled: true
-        ffmpeg:
-          inputs:
-            - path: rtsp://127.0.0.1:8554/ufficio
-              roles:
-                - record
-            - path: rtsp://127.0.0.1:8554/ufficio_sub
-              roles:
-                - detect
-        onvif:
-          host: 192.168.0.148
-          port: 8000
-          user: admin
-          password: admin1234
-
-      camera_pippi:
-        enabled: true
-        ffmpeg:
-          inputs:
-            - path: rtsp://127.0.0.1:8554/camera_pippi
-              roles:
-                - record
-            - path: rtsp://127.0.0.1:8554/camera_pippi_sub
-              roles:
-                - detect
-        onvif:
-          host: 192.168.0.125
-          port: 8000
-          user: admin
-          password: admin1234
-
-      camera_letto:
-        enabled: false  # Disabled until connectivity is fixed
-        ffmpeg:
-          inputs:
-            - path: rtsp://127.0.0.1:8554/camera_letto
-              roles:
-                - record
-            - path: rtsp://127.0.0.1:8554/camera_letto_sub
-              roles:
-                - detect
-        onvif:
-          host: 192.168.0.148
-          port: 8000
-          user: admin
-          password: admin1234
-
       terrazzo_ovest:
-        enabled: true
         ffmpeg:
-          input_args:
-            - -rtsp_transport
-            - tcp
           inputs:
             - path: rtsp://127.0.0.1:8554/terrazzo_ovest
-              roles:
-                - record
+              input_args: preset-rtsp-restream
+              roles: [record]
             - path: rtsp://127.0.0.1:8554/terrazzo_ovest_sub
-              roles:
-                - detect
-        onvif:
-          host: 192.168.0.176
-          port: 8000
-          user: admin
-          password: admin1234
-
+              input_args: preset-rtsp-restream
+              roles: [detect]
       balcone_est:
-        enabled: true
         ffmpeg:
-          input_args:
-            - -rtsp_transport
-            - tcp
           inputs:
             - path: rtsp://127.0.0.1:8554/balcone_est
-              roles:
-                - record
+              input_args: preset-rtsp-restream
+              roles: [record]
             - path: rtsp://127.0.0.1:8554/balcone_est_sub
-              roles:
-                - detect
-        onvif:
-          host: 192.168.0.141
-          port: 8000
-          user: admin
-          password: admin1234
-
-    detect:
-      enabled: true
+              input_args: preset-rtsp-restream
+              roles: [detect]
 
     ffmpeg:
-      hwaccel_args:
-        - -hwaccel
-        - vaapi
-        - -hwaccel_device
-        - /dev/dri/renderD128
-      input_args:
-        - -avoid_negative_ts
-        - make_zero
-        - -fflags
-        - +genpts+discardcorrupt
-        - -rtsp_transport
-        - tcp
+      hwaccel_args: preset-vaapi
 
-    # record:
-    #   enabled: True
-    #   retain:
-    #     days: 0
-    #     mode: motion
-    #   events:
-    #     retain:
-    #       default: 14
-    #       mode: active_objects
-    #       objects:
-    #         cat: 7
-    #         bird: 7
-
-    objects:
-      track:
-        - person
-        - dog
-        - cat
-        - bird
-
-    # Configure OpenVINO detector with GPU acceleration
     detectors:
       ov:
         type: openvino
@@ -203,6 +59,42 @@ data:
       input_tensor: nhwc
       input_pixel_format: bgr
       path: /openvino-model/ssdlite_mobilenet_v2.xml
+      labelmap_path: /openvino-model/coco_91cl_bkgr.txt
 
-    # version: 0.14
-    version: 0.15.1
+    objects:
+      track: [bird, person, cat, dog]
+      filters:
+        bird:
+          # Small, distant birds score low; raise if leaves and shadows trigger it.
+          min_score: 0.4
+          threshold: 0.6
+
+    review:
+      alerts:
+        labels: [bird, person]
+
+    record:
+      enabled: true
+      continuous:
+        days: 0
+      alerts:
+        pre_capture: 5
+        post_capture: 10
+        retain:
+          days: 30
+          mode: all
+      detections:
+        pre_capture: 5
+        post_capture: 10
+        retain:
+          days: 14
+          mode: motion
+
+    snapshots:
+      enabled: true
+      retain:
+        default: 30
+
+    classification:
+      bird:
+        enabled: true
