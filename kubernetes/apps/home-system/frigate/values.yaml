@@ -6,6 +6,12 @@ controllers:
     pod:
       nodeSelector:
         intel.feature.node.kubernetes.io/gpu: "true"
+    initContainers:
+      seed-config:
+        image:
+          repository: ghcr.io/blakeblackshear/frigate
+          tag: 0.18.2@sha256:fd60f99ffd4eb6c42360ed4e14953e270586f239309ab3983e55b2e97ffac09a
+        command: [sh, -c, "[ -f /config/config.yml ] || cp /seed/config.yml /config/config.yml"]
     containers:
       main:
         image:
@@ -14,9 +20,9 @@ controllers:
         env:
           TZ: Europe/Rome
           FRIGATE_DISABLE_AUTH: "true"
-        # envFrom:
-        #   - secretRef:
-        #       name: frigate-secret
+        envFrom:
+          - secretRef:
+              name: frigate-secret
         securityContext:
           privileged: true
         # probes:
@@ -98,8 +104,7 @@ persistence:
     type: configMap
     name: frigate-configmap
     globalMounts:
-      - path: /config/config.yml
-        subPath: config.yml
+      - path: /seed
         readOnly: true
   media:
     type: nfs
