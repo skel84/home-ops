@@ -1,0 +1,28 @@
+---
+# Dune HD IP control listens on 11080 on Android models, but HA's dunehd
+# integration only accepts a bare host (port 80). Map port 80 to it here and
+# configure the integration with home-assistant-dunehd.home-system.svc.cluster.local.
+apiVersion: v1
+kind: Service
+metadata:
+  name: home-assistant-dunehd
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 11080
+---
+apiVersion: discovery.k8s.io/v1
+kind: EndpointSlice
+metadata:
+  name: home-assistant-dunehd
+  labels:
+    kubernetes.io/service-name: home-assistant-dunehd
+    endpointslice.kubernetes.io/managed-by: home-ops
+addressType: IPv4
+ports:
+  - name: http
+    port: 11080
+endpoints:
+  - addresses:
+      - 192.168.0.115
