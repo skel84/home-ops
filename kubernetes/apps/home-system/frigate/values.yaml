@@ -61,9 +61,6 @@ service:
       http:
         port: &port 5000
         primary: true
-      go2rtc:
-        enabled: true
-        port: &apiPort 1984
       rtsp:
         enabled: true
         port: 8554
