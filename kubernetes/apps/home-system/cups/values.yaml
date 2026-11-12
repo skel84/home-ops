@@ -19,6 +19,9 @@ controllers:
             set -e
             mkdir -p /run/dbus
             dbus-daemon --system
+            # A fixed mDNS name, so AirPrint shows "Canon MG6100 @ cups"
+            # instead of the node name, which changes when the pod moves.
+            sed -i 's/^#host-name=.*/host-name=cups/' /etc/avahi/avahi-daemon.conf
             avahi-daemon --daemonize --no-chroot
             cupsd -f &
             cupsd_pid=$!
