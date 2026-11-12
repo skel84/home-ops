@@ -1,0 +1,53 @@
+controllers:
+  cups:
+    containers:
+      app:
+        image:
+          repository: docker.io/anujdatar/cups
+          tag: 26.11.01
+        env:
+          TZ: Europe/Rome
+        # The Canon MG6100 only speaks LPD and BJNP, so CUPS drives it with
+        # Gutenprint and re-shares it over AirPrint for phones and Macs.
+        # Stateless: the queue is recreated on every start, so no PVC. The
+        # image's entrypoint is skipped on purpose: it creates an admin user
+        # with a default password; without one, remote admin stays locked.
+        command:
+          - sh
+          - -c
+          - |
+            set -e
+            mkdir -p /run/dbus
+            dbus-daemon --system
+            avahi-daemon --daemonize --no-chroot
+            cupsd -f &
+            cupsd_pid=$!
+            trap 'kill $cupsd_pid' TERM INT
+            until lpstat -r >/dev/null 2>&1; do sleep 1; done
+            lpadmin -p Canon_MG6100 -D "Canon MG6100" -E \
+              -v lpd://192.168.0.89/lp \
+              -m gutenprint.5.3://bjc-MG6100-series/expert \
+              -o printer-is-shared=true -o PageSize=A4
+            lpadmin -d Canon_MG6100
+            cupsctl --share-printers
+            wait $cupsd_pid
+        resources:
+          requests:
+            cpu: 10m
+          limits:
+            memory: 256Mi
+
+defaultPodOptions:
+  # AirPrint discovery is mDNS, so Avahi needs the LAN, like Home Assistant.
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+
+service:
+  app:
+    controller: cups
+    ports:
+      http:
+        port: 631
+
+global:
+  createDefaultServiceAccount: false
