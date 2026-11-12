@@ -45,6 +45,10 @@ data:
               input_args: preset-rtsp-restream
               roles: [detect]
 
+    # Frigate 0.18 leaves detection off unless it is enabled explicitly.
+    detect:
+      enabled: true
+
     ffmpeg:
       hwaccel_args: preset-vaapi
 
