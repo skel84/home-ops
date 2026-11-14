@@ -1,0 +1,213 @@
+# DroppedNeedle music requests, with slskd (Soulseek) and SABnzbd (Usenet) as its download clients.
+# All three mount the NAS Media share once at /data: DroppedNeedle imports by rename, so the
+# download folders and the library (/data/Music) must sit on the same mount.
+controllers:
+  droppedneedle:
+    annotations:
+      reloader.stakater.com/auto: "true"
+    containers:
+      app:
+        image:
+          repository: ghcr.io/droppedneedle/droppedneedle
+          tag: v2.15.0
+        env:
+          TZ: Europe/Rome
+          PORT: &dnPort 8688
+          UMASK: "002"
+          SLSKD_DOWNLOADS_PATH: /data/.music-downloads/slskd/complete
+        probes:
+          liveness: &dnProbes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /health
+                port: *dnPort
+              periodSeconds: 30
+              timeoutSeconds: 10
+          readiness: *dnProbes
+          startup:
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /health
+                port: *dnPort
+              periodSeconds: 10
+              failureThreshold: 60
+        resources:
+          requests:
+            cpu: 20m
+            memory: 256Mi
+          limits:
+            memory: 1Gi
+        securityContext: &securityContext
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+              - ALL
+
+  slskd:
+    annotations:
+      reloader.stakater.com/auto: "true"
+    containers:
+      app:
+        image:
+          repository: slskd/slskd
+          tag: 0.25.1
+        env:
+          TZ: Europe/Rome
+          SLSKD_HTTP_PORT: &slskdPort 5030
+          SLSKD_NO_HTTPS: "true"
+          SLSKD_UMASK: "0002"
+          SLSKD_DOWNLOADS_DIR: /data/.music-downloads/slskd/complete
+          SLSKD_INCOMPLETE_DIR: /data/.music-downloads/slskd/incomplete
+          SLSKD_SHARED_DIR: /data/Music
+        envFrom: &secret
+          - secretRef:
+              name: droppedneedle-secret
+        probes:
+          liveness: &slskdProbes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /health
+                port: *slskdPort
+              periodSeconds: 30
+          readiness: *slskdProbes
+        resources:
+          requests:
+            cpu: 20m
+            memory: 192Mi
+          limits:
+            memory: 1Gi
+        securityContext: *securityContext
+
+  sabnzbd:
+    annotations:
+      reloader.stakater.com/auto: "true"
+    containers:
+      app:
+        image:
+          repository: ghcr.io/home-operations/sabnzbd
+          tag: 5.1.3
+        env:
+          TZ: Europe/Rome
+          SABNZBD__PORT: &sabPort 8080
+          SABNZBD__HOST_WHITELIST_ENTRIES: droppedneedle-sabnzbd, droppedneedle-sabnzbd.downloads, droppedneedle-sabnzbd.downloads.svc.cluster.local, sabnzbd.rbl.lol
+        envFrom: *secret
+        probes:
+          liveness: &sabProbes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /api?mode=version
+                port: *sabPort
+              periodSeconds: 30
+          readiness: *sabProbes
+        resources:
+          requests:
+            cpu: 20m
+            memory: 128Mi
+          limits:
+            memory: 1Gi
+        securityContext: *securityContext
+
+defaultPodOptions:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 999
+    runAsGroup: 999
+    fsGroup: 999
+    fsGroupChangePolicy: OnRootMismatch
+    seccompProfile:
+      type: RuntimeDefault
+
+service:
+  app:
+    controller: droppedneedle
+    ports:
+      http:
+        port: *dnPort
+  slskd:
+    controller: slskd
+    ports:
+      http:
+        port: *slskdPort
+  sabnzbd:
+    controller: sabnzbd
+    ports:
+      http:
+        port: *sabPort
+
+route:
+  app:
+    hostnames:
+      - droppedneedle.rbl.lol
+    parentRefs: &parentRefs
+      - name: internal
+        namespace: network
+        sectionName: https
+    rules:
+      - backendRefs:
+          - identifier: app
+            port: *dnPort
+  slskd:
+    hostnames:
+      - slskd.rbl.lol
+    parentRefs: *parentRefs
+    rules:
+      - backendRefs:
+          - identifier: slskd
+            port: *slskdPort
+  sabnzbd:
+    hostnames:
+      - sabnzbd.rbl.lol
+    parentRefs: *parentRefs
+    rules:
+      - backendRefs:
+          - identifier: sabnzbd
+            port: *sabPort
+
+persistence:
+  config:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 5Gi
+    storageClass: longhorn
+    advancedMounts:
+      droppedneedle:
+        app:
+          - path: /app/config
+            subPath: config
+          - path: /app/cache
+            subPath: cache
+          - path: /app/plugins
+            subPath: plugins
+  slskd:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    storageClass: longhorn
+    advancedMounts:
+      slskd:
+        app:
+          - path: /app
+  sabnzbd:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 1Gi
+    storageClass: longhorn
+    advancedMounts:
+      sabnzbd:
+        app:
+          - path: /config
+  media:
+    type: nfs
+    server: 192.168.0.217
+    path: /volume1/Media
+    globalMounts:
+      - path: /data
