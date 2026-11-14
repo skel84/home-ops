@@ -1,0 +1,508 @@
+controllers:
+  homepage:
+    annotations:
+      reloader.stakater.com/auto: "true"
+    containers:
+      app:
+        image:
+          repository: ghcr.io/gethomepage/homepage
+          tag: v2.8.0
+        # A list keeps MY_POD_IP defined before it is referenced.
+        env:
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          # The pod IP entry lets the kubelet probes through the host check.
+          - name: HOMEPAGE_ALLOWED_HOSTS
+            value: $(MY_POD_IP):3000,home.rbl.lol
+        # API keys, referenced in the config as {{HOMEPAGE_VAR_*}}.
+        envFrom:
+          - secretRef:
+              name: homepage-secret
+          - secretRef:
+              name: homepage-external
+        probes:
+          liveness: &probes
+            enabled: true
+            custom: true
+            spec:
+              httpGet:
+                path: /api/healthcheck
+                port: &port 3000
+              periodSeconds: 15
+          readiness: *probes
+        resources:
+          requests:
+            cpu: 10m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+              - ALL
+
+defaultPodOptions:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    runAsGroup: 1000
+    seccompProfile:
+      type: RuntimeDefault
+
+service:
+  app:
+    controller: homepage
+    ports:
+      http:
+        port: *port
+
+route:
+  app:
+    hostnames:
+      - home.rbl.lol
+    parentRefs:
+      - name: internal
+        namespace: network
+        sectionName: https
+    rules:
+      - backendRefs:
+          - identifier: app
+            port: *port
+        matches:
+          - path:
+              type: PathPrefix
+              value: /
+
+# Read-only cluster access for pod stats, node/cluster usage and route discovery.
+rbac:
+  roles:
+    homepage:
+      type: ClusterRole
+      rules:
+        - apiGroups: [""]
+          resources: [namespaces, pods, nodes]
+          verbs: [get, list]
+        - apiGroups: [networking.k8s.io]
+          resources: [ingresses]
+          verbs: [get, list]
+        - apiGroups: [gateway.networking.k8s.io]
+          resources: [httproutes, gateways]
+          verbs: [get, list]
+        - apiGroups: [metrics.k8s.io]
+          resources: [nodes, pods]
+          verbs: [get, list]
+  bindings:
+    homepage:
+      type: ClusterRoleBinding
+      roleRef:
+        identifier: homepage
+      subjects:
+        - identifier: homepage
+
+persistence:
+  # Homepage writes skeleton files and logs next to its config, so the
+  # directory is writable and only our files come from the ConfigMap.
+  data:
+    type: emptyDir
+    globalMounts:
+      - path: /app/config
+  config:
+    type: configMap
+    identifier: config
+    globalMounts:
+      - path: /app/config/settings.yaml
+        subPath: settings.yaml
+      - path: /app/config/services.yaml
+        subPath: services.yaml
+      - path: /app/config/widgets.yaml
+        subPath: widgets.yaml
+      - path: /app/config/kubernetes.yaml
+        subPath: kubernetes.yaml
+      - path: /app/config/bookmarks.yaml
+        subPath: bookmarks.yaml
+
+configMaps:
+  config:
+    data:
+      kubernetes.yaml: |
+        mode: cluster
+        # Routes annotated with gethomepage.dev/enabled appear automatically.
+        ingress: true
+        gateway: true
+
+      settings.yaml: |
+        title: Home
+        theme: dark
+        color: slate
+        headerStyle: clean
+        statusStyle: dot
+        hideVersion: true
+        useEqualHeights: true
+        providers:
+          longhorn:
+            url: http://longhorn-frontend.longhorn-system.svc
+        layout:
+          Home:
+            style: row
+            columns: 3
+          Media:
+            style: row
+            columns: 4
+          Downloads:
+            style: row
+            columns: 4
+          Infrastructure:
+            style: row
+            columns: 4
+          Observability:
+            style: row
+            columns: 4
+          Apps:
+            style: row
+            columns: 4
+
+      bookmarks.yaml: |
+        []
+
+      widgets.yaml: |
+        - kubernetes:
+            cluster:
+              show: true
+              cpu: true
+              memory: true
+              showLabel: true
+              label: cluster
+            nodes:
+              show: true
+              cpu: true
+              memory: true
+              showLabel: true
+        - longhorn:
+            expanded: true
+            total: true
+            labels: true
+            nodes: true
+        - openmeteo:
+            label: Home
+            latitude: "{{HOMEPAGE_VAR_LATITUDE}}"
+            longitude: "{{HOMEPAGE_VAR_LONGITUDE}}"
+            timezone: Europe/Rome
+            units: metric
+            cache: 15
+        - datetime:
+            text_size: md
+            locale: it
+            format:
+              dateStyle: long
+              timeStyle: short
+        - search:
+            provider: duckduckgo
+            target: _blank
+
+      services.yaml: |
+        - Home:
+            - Home Assistant:
+                icon: home-assistant.svg
+                href: https://hass.rbl.lol
+                namespace: home-system
+                app: home-assistant
+                widget:
+                  type: homeassistant
+                  url: http://home-assistant.home-system.svc:8123
+                  key: "{{HOMEPAGE_VAR_HASS_KEY}}"
+            - Frigate:
+                icon: frigate.svg
+                href: https://frigate.rbl.lol
+                namespace: home-system
+                app: frigate
+                widget:
+                  type: frigate
+                  url: http://frigate-web.home-system.svc:5000
+                  enableRecentEvents: true
+            - Scrypted:
+                icon: scrypted.png
+                href: https://scrypted.rbl.lol:10443
+                namespace: home-system
+                app: scrypted
+            - Music Assistant:
+                icon: music-assistant.svg
+                href: http://192.168.0.51:8095
+                namespace: home-system
+                app: music-assistant
+            - Mosquitto:
+                icon: mosquitto.svg
+                description: MQTT broker
+                namespace: home-system
+                app: mosquitto
+            - CUPS:
+                icon: cups.svg
+                description: AirPrint for the Canon MG6100
+                namespace: home-system
+                app: cups
+
+        - Media:
+            - Plex:
+                icon: plex.svg
+                href: https://plex.rbl.lol
+                namespace: media
+                app: plex
+                widget:
+                  type: plex
+                  url: http://plex.media.svc:32400
+                  key: "{{HOMEPAGE_VAR_PLEX_KEY}}"
+            - Overseerr:
+                icon: overseerr.svg
+                href: https://overseer.rbl.lol
+                namespace: downloads
+                app: overseer
+                widget:
+                  type: seerr
+                  url: http://overseer.downloads.svc:5055
+                  key: "{{HOMEPAGE_VAR_SEERR_KEY}}"
+            - Audiobookshelf:
+                icon: audiobookshelf.svg
+                href: https://audiobookshelf.rbl.lol
+                namespace: media
+                app: audiobookshelf
+                widget:
+                  type: audiobookshelf
+                  url: http://audiobookshelf.media.svc
+                  key: "{{HOMEPAGE_VAR_ABS_KEY}}"
+            - Calibre-Web:
+                icon: calibre-web.svg
+                href: https://calibre-web.rbl.lol
+                namespace: media
+                app: calibre-web
+                widget:
+                  type: calibreweb
+                  url: http://calibre-web.media.svc:8083
+                  username: "{{HOMEPAGE_VAR_CALIBREWEB_USER}}"
+                  password: "{{HOMEPAGE_VAR_CALIBREWEB_PASS}}"
+            - Calibre:
+                icon: calibre.svg
+                href: https://calibre.rbl.lol
+                namespace: media
+                app: calibre
+            - Komga:
+                icon: komga.svg
+                href: https://komga.rbl.lol
+                namespace: media
+                app: komga
+            - Calendar:
+                icon: mdi-calendar
+                widget:
+                  type: calendar
+                  view: agenda
+                  maxEvents: 10
+                  previousDays: 1
+                  timezone: Europe/Rome
+                  integrations:
+                    - type: sonarr
+                      service_group: Downloads
+                      service_name: Sonarr
+                      baseUrl: https://sonarr.rbl.lol
+                    - type: radarr
+                      service_group: Downloads
+                      service_name: Radarr
+                      baseUrl: https://radarr.rbl.lol
+                    - type: readarr
+                      service_group: Downloads
+                      service_name: Readarr
+                      baseUrl: https://readarr.rbl.lol
+
+        - Downloads:
+            - Sonarr:
+                icon: sonarr.svg
+                href: https://sonarr.rbl.lol
+                namespace: downloads
+                app: sonarr
+                widget:
+                  type: sonarr
+                  url: http://sonarr.downloads.svc
+                  key: "{{HOMEPAGE_VAR_SONARR_KEY}}"
+            - Radarr:
+                icon: radarr.svg
+                href: https://radarr.rbl.lol
+                namespace: downloads
+                app: radarr
+                widget:
+                  type: radarr
+                  url: http://radarr.downloads.svc:7878
+                  key: "{{HOMEPAGE_VAR_RADARR_KEY}}"
+            - Readarr:
+                icon: readarr.svg
+                href: https://readarr.rbl.lol
+                namespace: downloads
+                app: readarr
+                widget:
+                  type: readarr
+                  url: http://readarr.downloads.svc:8787
+                  key: "{{HOMEPAGE_VAR_READARR_KEY}}"
+            - Prowlarr:
+                icon: prowlarr.svg
+                href: https://prowlarr.rbl.lol
+                namespace: downloads
+                app: prowlarr
+                widget:
+                  type: prowlarr
+                  url: http://prowlarr.downloads.svc:9696
+                  key: "{{HOMEPAGE_VAR_PROWLARR_KEY}}"
+            - Bazarr:
+                icon: bazarr.svg
+                href: https://bazarr.rbl.lol
+                namespace: downloads
+                app: bazarr
+                widget:
+                  type: bazarr
+                  url: http://bazarr.downloads.svc:6767
+                  key: "{{HOMEPAGE_VAR_BAZARR_KEY}}"
+            - Maintainerr:
+                icon: maintainerr.svg
+                href: https://maintainerr.rbl.lol
+                namespace: downloads
+                app: maintainerr
+                widget:
+                  type: maintainerr
+                  url: http://maintainerr.downloads.svc:6246
+            - Shelfarr:
+                icon: mdi-bookshelf
+                href: https://shelfarr.rbl.lol
+                namespace: downloads
+                app: shelfarr
+            - Sortarr:
+                icon: mdi-sort
+                href: https://sortarr.rbl.lol
+                namespace: downloads
+                app: sortarr
+
+        - Infrastructure:
+            - Argo CD:
+                icon: argo-cd.svg
+                href: https://argo.rbl.lol
+                namespace: argo-system
+                app: argo-cd
+                podSelector: app.kubernetes.io/instance=argo-cd
+                widget:
+                  type: argocd
+                  url: http://argo-cd-argocd-server.argo-system.svc
+                  key: "{{HOMEPAGE_VAR_ARGOCD_KEY}}"
+            - Longhorn:
+                icon: longhorn.svg
+                href: https://longhorn.rbl.lol
+                namespace: longhorn-system
+                app: longhorn
+                podSelector: ""
+            - UniFi:
+                icon: unifi.svg
+                href: https://192.168.0.1
+                widget:
+                  type: unifi
+                  url: https://192.168.0.1
+                  key: "{{HOMEPAGE_VAR_UNIFI_KEY}}"
+            - FRITZ!Box:
+                icon: fritzbox.svg
+                href: http://192.168.178.1
+                description: VDSL backup WAN
+                widget:
+                  type: fritzbox
+                  url: http://192.168.178.1
+            - Forgejo:
+                icon: forgejo.svg
+                href: https://forgejo.rbl.lol
+                namespace: forgejo
+                app: forgejo
+                widget:
+                  type: gitea
+                  url: http://forgejo-http.forgejo.svc:3000
+                  key: "{{HOMEPAGE_VAR_FORGEJO_KEY}}"
+            - Harbor:
+                icon: harbor.svg
+                href: https://harbor.rbl.lol
+                namespace: harbor
+                app: harbor
+            - Kargo:
+                icon: kargo.svg
+                href: https://kargo.rbl.lol
+                namespace: kargo
+                app: kargo
+            - Kubero:
+                icon: kubero.svg
+                href: https://kubero.rbl.lol
+                namespace: kubero
+                app: kubero
+            - KubeVirt Manager:
+                icon: kubevirt.svg
+                href: https://kubevirt-manager.rbl.lol
+                namespace: kubevirt-manager
+                app: kubevirt-manager
+                podSelector: app=kubevirt-manager
+
+        - Observability:
+            - Grafana:
+                icon: grafana.svg
+                href: https://grafana.rbl.lol
+                namespace: observability
+                app: grafana
+                widget:
+                  type: grafana
+                  version: 2
+                  url: http://grafana.observability.svc
+                  username: "{{HOMEPAGE_VAR_GRAFANA_USER}}"
+                  password: "{{HOMEPAGE_VAR_GRAFANA_PASS}}"
+            - Prometheus:
+                icon: prometheus.svg
+                href: https://prometheus.rbl.lol
+                namespace: observability
+                app: prometheus
+                widget:
+                  type: prometheus
+                  url: http://prometheus-operated.observability.svc:9090
+            - Alertmanager:
+                icon: alertmanager.svg
+                href: https://alertmanager.rbl.lol
+                namespace: observability
+                app: alertmanager
+            - Coroot:
+                icon: coroot.svg
+                href: https://coroot.rbl.lol
+                namespace: coroot
+                app: coroot
+                podSelector: app.kubernetes.io/component=coroot
+            - HyperDX:
+                icon: hyperdx.svg
+                href: https://hyperdx.rbl.lol
+                namespace: observability
+                app: clickstack
+            - Plausible:
+                icon: plausible.svg
+                href: https://plausible.rbl.lol
+                namespace: observability
+                app: plausible-analytics
+            - SonarQube:
+                icon: sonarqube.svg
+                href: https://sonarqube.rbl.lol
+                namespace: observability
+                app: sonarqube
+                podSelector: app=sonarqube
+
+        - Apps:
+            - Zulip:
+                icon: zulip.svg
+                href: https://zulip.rbl.lol
+                namespace: zulip
+                app: zulip
+            - Classbook:
+                icon: mdi-book-education
+                href: https://classbook.rbl.lol
+                namespace: classbook
+                app: classbook
+
+global:
+  # Homepage's own {{HOMEPAGE_VAR_*}} placeholders must reach the pod untouched.
+  templateEvaluation:
+    excludePaths:
+      - [configMaps, config, data]
