@@ -7,7 +7,7 @@ controllers:
       app:
         image:
           repository: lscr.io/linuxserver/calibre
-          tag: latest@sha256:5b5c0cba9fa70d65b5d92da73b8d486d4acf0d03ea648062586c4e3789700d89
+          tag: latest@sha256:fa5ae5f55859544ec026f82165b01bff913e812c7d67078744fcd119c1531ea3
           pullPolicy: IfNotPresent
         env:
           PUID: 999
