@@ -46,6 +46,8 @@ controllers:
               - ALL
 
 defaultPodOptions:
+  # app-template v5 leaves the token out; Homepage needs it to read the cluster.
+  automountServiceAccountToken: true
   securityContext:
     runAsNonRoot: true
     runAsUser: 1000
