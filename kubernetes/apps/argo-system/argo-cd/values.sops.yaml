@@ -12,6 +12,10 @@ configs:
     kustomize.buildOptions: --enable-alpha-plugins --enable-exec
     helm.valuesFileSchemes: secrets+gpg-import, secrets+gpg-import-kubernetes, secrets+age-import, secrets+age-import-kubernetes, secrets, secrets+literal, https
     application.resourceTrackingMethod: label
+    # Read-only API account for the Homepage dashboard widget.
+    accounts.homepage: apiKey
+  rbac:
+    policy.csv: g, homepage, role:readonly
   secret:
     argocdServerAdminPassword: $2a$10$7Hns5EjR9Vg9K/wgSqelvOeiX0uOao16JHd3Dq2i8ZcAVUOv1KvJm
     argocdServerAdminPasswordMtime: 2025-05-11T22:11:02
