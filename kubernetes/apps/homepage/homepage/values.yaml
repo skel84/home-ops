@@ -142,6 +142,7 @@ configMaps:
         color: slate
         headerStyle: clean
         statusStyle: dot
+        showStats: true
         hideVersion: true
         useEqualHeights: true
         providers:
@@ -427,17 +428,17 @@ configMaps:
                 namespace: harbor
                 app: harbor
             - Kargo:
-                icon: kargo.svg
+                icon: mdi-truck-fast
                 href: https://kargo.rbl.lol
                 namespace: kargo
                 app: kargo
             - Kubero:
-                icon: kubero.svg
+                icon: sh-kubero.svg
                 href: https://kubero.rbl.lol
                 namespace: kubero
                 app: kubero
             - KubeVirt Manager:
-                icon: kubevirt.svg
+                icon: kubernetes.svg
                 href: https://kubevirt-manager.rbl.lol
                 namespace: kubevirt-manager
                 app: kubevirt-manager
@@ -469,13 +470,13 @@ configMaps:
                 namespace: observability
                 app: alertmanager
             - Coroot:
-                icon: coroot.svg
+                icon: mdi-radar
                 href: https://coroot.rbl.lol
                 namespace: coroot
                 app: coroot
                 podSelector: app.kubernetes.io/component=coroot
             - HyperDX:
-                icon: hyperdx.svg
+                icon: sh-hyperdx.svg
                 href: https://hyperdx.rbl.lol
                 namespace: observability
                 app: clickstack
