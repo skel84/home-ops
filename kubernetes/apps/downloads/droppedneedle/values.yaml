@@ -64,6 +64,9 @@ controllers:
           SLSKD_DOWNLOADS_DIR: /data/.music-downloads/slskd/complete
           SLSKD_INCOMPLETE_DIR: /data/.music-downloads/slskd/incomplete
           SLSKD_SHARED_DIR: /data/Music
+          # Cap sharing so uploads leave room on the radio WAN (about 37 Mbit/s up).
+          SLSKD_UPLOAD_SLOTS: "4"
+          SLSKD_UPLOAD_SPEED_LIMIT: "2048"
         envFrom:
           - secretRef:
               name: droppedneedle-secret
