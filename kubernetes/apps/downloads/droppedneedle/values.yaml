@@ -9,12 +9,14 @@ controllers:
       app:
         image:
           repository: ghcr.io/droppedneedle/droppedneedle
-          tag: v2.15.0
+          tag: v3.0.0
         env:
           TZ: Europe/Rome
           PORT: &dnPort 8688
           UMASK: "002"
           SLSKD_DOWNLOADS_PATH: /data/.music-downloads/slskd/complete
+          # Cilium's Envoy reaches the pod from the pod network; v3 checks the origin of UI changes.
+          TRUSTED_PROXY_IPS: 10.42.0.0/16
         probes:
           liveness: &dnProbes
             enabled: true
