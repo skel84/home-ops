@@ -46,6 +46,14 @@ persistence:
     storageClass: longhorn
     globalMounts:
       - path: /data
+  # DroppedNeedle's library on the NAS, for MA's local filesystem provider.
+  music:
+    type: nfs
+    server: 192.168.0.217
+    path: /volume1/Media/Music
+    globalMounts:
+      - path: /media/music
+        readOnly: true
 
 global:
   createDefaultServiceAccount: false

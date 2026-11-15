@@ -107,6 +107,17 @@ service:
     ports:
       http:
         port: *slskdPort
+  # Soulseek peer port, forwarded from the primary WAN by UniFi.
+  slskd-peer:
+    controller: slskd
+    type: LoadBalancer
+    externalTrafficPolicy: Cluster
+    annotations:
+      lbipam.cilium.io/ips: 192.168.0.53
+    ports:
+      peer:
+        port: 50300
+        protocol: TCP
 
 route:
   app:
