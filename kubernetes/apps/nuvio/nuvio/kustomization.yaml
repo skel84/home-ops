@@ -20,6 +20,7 @@ resources:
   - functions.yaml
   - account-dashboard.yaml
   - route.yaml
+  - seed-avatars-job.yaml
 
 configMapGenerator:
   - name: nuvio-db-init
@@ -59,6 +60,12 @@ configMapGenerator:
     files:
       - config/kong.yml
       - config/kong-entrypoint.sh
+    options:
+      disableNameSuffixHash: true
+  - name: nuvio-avatars
+    files:
+      - config/avatars.txt
+      - config/seed-avatars.sh
     options:
       disableNameSuffixHash: true
   - name: nuvio-functions

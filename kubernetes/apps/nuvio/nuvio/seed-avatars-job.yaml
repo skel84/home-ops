@@ -1,0 +1,54 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nuvio-seed-avatars
+  namespace: nuvio
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "5"
+  labels:
+    app.kubernetes.io/name: nuvio-seed-avatars
+    app.kubernetes.io/part-of: nuvio
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 900
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nuvio-seed-avatars
+        app.kubernetes.io/part-of: nuvio
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: seed
+          image: curlimages/curl:8.12.1@sha256:94e9e444bcba979c2ea12e27ae39bee4cd10bc7041a472c4727a558e213744e6
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - /config/seed-avatars.sh
+          env:
+            - name: BASE_URL
+              value: http://kong:8000
+            - name: UPSTREAM
+              value: https://raw.githubusercontent.com/NuvioMedia/self-host/30f156807ae77b2aec80b091b0d513841a25ab91/assets/avatars
+            - name: SERVICE_ROLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: SERVICE_ROLE_KEY
+          resources:
+            requests:
+              cpu: 20m
+              memory: 32Mi
+            limits:
+              memory: 128Mi
+          volumeMounts:
+            - name: avatars
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: avatars
+          configMap:
+            name: nuvio-avatars
