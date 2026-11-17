@@ -37,6 +37,8 @@ spec:
           env:
             - name: POSTGRES_HOST
               value: /var/run/postgresql
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
             - name: PGPORT
               value: "5432"
             - name: POSTGRES_PORT
