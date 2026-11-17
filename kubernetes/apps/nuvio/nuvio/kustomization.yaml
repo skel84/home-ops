@@ -15,7 +15,6 @@ resources:
   - rest.yaml
   - realtime.yaml
   - storage.yaml
-  - imgproxy.yaml
   - kong.yaml
   - functions.yaml
   - account-dashboard.yaml
