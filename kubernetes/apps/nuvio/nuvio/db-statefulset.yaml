@@ -24,6 +24,17 @@ spec:
       securityContext:
         fsGroup: 999
         fsGroupChangePolicy: OnRootMismatch
+      initContainers:
+        - name: seed-postgresql-config
+          image: supabase/postgres:17.6.1.084@sha256:95d92e9563121189086690a4b7f8f2b711a4809a2499f45592199aae68ebae5f
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+            - cp -a -n /etc/postgresql-custom/. /config/
+          volumeMounts:
+            - name: config
+              mountPath: /config
       containers:
         - name: db
           image: supabase/postgres:17.6.1.084@sha256:95d92e9563121189086690a4b7f8f2b711a4809a2499f45592199aae68ebae5f
