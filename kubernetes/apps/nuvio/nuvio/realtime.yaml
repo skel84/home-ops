@@ -123,7 +123,5 @@ spec:
             limits:
               memory: 1Gi
           securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
+            runAsUser: 0
+            allowPrivilegeEscalation: true
