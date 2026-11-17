@@ -58,8 +58,9 @@ volume and `imgproxy` runs as a sidecar in the same pod.
 
 ## Notes
 
-- Public signup is currently open (`GOTRUE_DISABLE_SIGNUP=false`). Set it to
-  `true` after creating the first account.
+- Public signup is disabled (`GOTRUE_DISABLE_SIGNUP=true`). The initial admin
+  account is `admin@nuvio.rbl.lol`; its password is in the macOS Keychain under
+  service `nuvio`, account `admin` (and should be copied to 1Password).
 - The Apple TV build must support a custom backend URL. Use
   `https://nuvio.rbl.lol`; supported clients fetch the publishable key from
   `/.well-known/nuvio`.
