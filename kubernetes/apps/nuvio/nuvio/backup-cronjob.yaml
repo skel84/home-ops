@@ -1,0 +1,66 @@
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nuvio-db-backup
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-backup
+    app.kubernetes.io/part-of: nuvio
+spec:
+  schedule: "15 3 * * *"
+  timeZone: Europe/Rome
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 3600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: nuvio-backup
+            app.kubernetes.io/part-of: nuvio
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: pg-dump
+              image: supabase/postgres:17.6.1.084@sha256:95d92e9563121189086690a4b7f8f2b711a4809a2499f45592199aae68ebae5f
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/bash
+                - -c
+                - |
+                  set -euo pipefail
+                  stamp="$(date +%Y%m%d-%H%M)"
+                  out="/backups/nuvio-${stamp}.dump"
+                  pg_dump -Fc -f "$out"
+                  find /backups -maxdepth 1 -name 'nuvio-*.dump' -mtime +14 -delete
+                  echo "wrote $out"
+              env:
+                - name: PGHOST
+                  value: db
+                - name: PGUSER
+                  value: supabase_admin
+                - name: PGDATABASE
+                  value: postgres
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: nuvio-secrets
+                      key: POSTGRES_PASSWORD
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  memory: 512Mi
+              volumeMounts:
+                - name: backups
+                  mountPath: /backups
+          volumes:
+            - name: backups
+              persistentVolumeClaim:
+                claimName: nuvio-backups
