@@ -1,0 +1,105 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rest
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-rest
+    app.kubernetes.io/part-of: nuvio
+spec:
+  selector:
+    app.kubernetes.io/name: nuvio-rest
+  ports:
+    - name: http
+      port: 3000
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rest
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-rest
+    app.kubernetes.io/part-of: nuvio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nuvio-rest
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nuvio-rest
+        app.kubernetes.io/part-of: nuvio
+    spec:
+      containers:
+        - name: rest
+          image: postgrest/postgrest:v14.12@sha256:54000f24847d01a2c2302e0041cf0618b875c57fb48507d743cfa9aaa50bf43c
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: POSTGRES_PASSWORD
+            - name: PGRST_DB_URI
+              value: postgres://authenticator:$(POSTGRES_PASSWORD)@db:5432/postgres
+            - name: PGRST_DB_SCHEMAS
+              value: public,storage,graphql_public
+            - name: PGRST_DB_MAX_ROWS
+              value: "1000"
+            - name: PGRST_DB_EXTRA_SEARCH_PATH
+              value: public
+            - name: PGRST_DB_ANON_ROLE
+              value: anon
+            - name: PGRST_ADMIN_SERVER_PORT
+              value: "3001"
+            - name: PGRST_ADMIN_SERVER_HOST
+              value: localhost
+            - name: PGRST_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: JWT_SECRET
+            - name: PGRST_DB_USE_LEGACY_GUCS
+              value: "false"
+            - name: PGRST_APP_SETTINGS_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: JWT_SECRET
+            - name: PGRST_APP_SETTINGS_JWT_EXP
+              value: "7200"
+          ports:
+            - name: http
+              containerPort: 3000
+          readinessProbe:
+            exec:
+              command:
+                - postgrest
+                - --ready
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - postgrest
+                - --ready
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL

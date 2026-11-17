@@ -1,0 +1,127 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: functions
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-functions
+    app.kubernetes.io/part-of: nuvio
+spec:
+  selector:
+    app.kubernetes.io/name: nuvio-functions
+  ports:
+    - name: http
+      port: 9000
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: functions
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-functions
+    app.kubernetes.io/part-of: nuvio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nuvio-functions
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nuvio-functions
+        app.kubernetes.io/part-of: nuvio
+    spec:
+      containers:
+        - name: functions
+          image: supabase/edge-runtime:v1.74.0@sha256:2781daf92394db91f7e94129cc3d04ec474ad16a8fe64b3fbeef6e7d557ab120
+          imagePullPolicy: IfNotPresent
+          args:
+            - start
+            - --main-service
+            - /home/deno/functions/main
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: POSTGRES_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: JWT_SECRET
+            - name: SUPABASE_URL
+              value: http://kong:8000
+            - name: SUPABASE_PUBLIC_URL
+              value: https://nuvio.rbl.lol
+            - name: SUPABASE_ANON_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: ANON_KEY
+            - name: SUPABASE_SERVICE_ROLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: SERVICE_ROLE_KEY
+            - name: SUPABASE_PUBLISHABLE_KEYS
+              value: '{"default":""}'
+            - name: SUPABASE_SECRET_KEYS
+              value: '{"default":""}'
+            - name: SUPABASE_DB_URL
+              value: postgresql://postgres:$(POSTGRES_PASSWORD)@db:5432/postgres
+            - name: VERIFY_JWT
+              value: "false"
+          ports:
+            - name: http
+              containerPort: 9000
+          readinessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: functions
+              mountPath: /home/deno/functions
+              readOnly: true
+            - name: deno-cache
+              mountPath: /root/.cache/deno
+      volumes:
+        - name: functions
+          configMap:
+            name: nuvio-functions
+            items:
+              - key: main-index.ts
+                path: main/index.ts
+              - key: delete-account-index.ts
+                path: delete-account/index.ts
+              - key: health-check-index.ts
+                path: health-check/index.ts
+              - key: tracker-tv-logins-exchange-index.ts
+                path: tracker-tv-logins-exchange/index.ts
+              - key: tv-logins-exchange-index.ts
+                path: tv-logins-exchange/index.ts
+        - name: deno-cache
+          emptyDir: {}

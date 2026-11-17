@@ -1,0 +1,180 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-auth
+    app.kubernetes.io/part-of: nuvio
+spec:
+  selector:
+    app.kubernetes.io/name: nuvio-auth
+  ports:
+    - name: http
+      port: 9999
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-auth
+    app.kubernetes.io/part-of: nuvio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nuvio-auth
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nuvio-auth
+        app.kubernetes.io/part-of: nuvio
+    spec:
+      containers:
+        - name: auth
+          image: supabase/gotrue:v2.189.0@sha256:385184459f57569c54c25209f51f3b2be99ddd7c4ce9e3555b5d3eea8447b7cf
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: POSTGRES_PASSWORD
+            - name: GOTRUE_API_HOST
+              value: 0.0.0.0
+            - name: GOTRUE_API_PORT
+              value: "9999"
+            - name: API_EXTERNAL_URL
+              value: https://nuvio.rbl.lol
+            - name: GOTRUE_DB_DRIVER
+              value: postgres
+            - name: GOTRUE_DB_DATABASE_URL
+              value: postgres://supabase_auth_admin:$(POSTGRES_PASSWORD)@db:5432/postgres
+            - name: GOTRUE_DB_MAX_POOL_SIZE
+              value: "60"
+            - name: GOTRUE_DB_MAX_IDLE_POOL_SIZE
+              value: "30"
+            - name: GOTRUE_DB_CONN_MAX_LIFETIME
+              value: 10m
+            - name: GOTRUE_DB_CONN_MAX_IDLE_TIME
+              value: 2m
+            - name: GOTRUE_SITE_URL
+              value: https://nuvio.rbl.lol
+            - name: GOTRUE_URI_ALLOW_LIST
+              value: https://nuvio.rbl.lol
+            - name: GOTRUE_DISABLE_SIGNUP
+              value: "false"
+            - name: GOTRUE_JWT_ADMIN_ROLES
+              value: service_role
+            - name: GOTRUE_JWT_AUD
+              value: authenticated
+            - name: GOTRUE_JWT_DEFAULT_GROUP_NAME
+              value: authenticated
+            - name: GOTRUE_JWT_EXP
+              value: "7200"
+            - name: GOTRUE_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: JWT_SECRET
+            - name: GOTRUE_JWT_KEYS
+              value: "[]"
+            - name: GOTRUE_JWT_ISSUER
+              value: https://nuvio.rbl.lol/auth/v1
+            - name: GOTRUE_EXTERNAL_EMAIL_ENABLED
+              value: "true"
+            - name: GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED
+              value: "true"
+            - name: GOTRUE_MAILER_AUTOCONFIRM
+              value: "true"
+            - name: GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED
+              value: "true"
+            - name: GOTRUE_MAILER_EXTERNAL_HOSTS
+              value: nuvio.rbl.lol
+            - name: GOTRUE_PASSWORD_MIN_LENGTH
+              value: "6"
+            - name: GOTRUE_SECURITY_REFRESH_TOKEN_ROTATION_ENABLED
+              value: "true"
+            - name: GOTRUE_SECURITY_REFRESH_TOKEN_REUSE_INTERVAL
+              value: "120"
+            - name: GOTRUE_RATE_LIMIT_TOKEN_REFRESH
+              value: "150"
+            - name: GOTRUE_RATE_LIMIT_ANONYMOUS_USERS
+              value: "600"
+            - name: GOTRUE_RATE_LIMIT_VERIFY
+              value: "3000"
+            - name: GOTRUE_RATE_LIMIT_HEADER
+              value: X-Forwarded-For
+            - name: GOTRUE_PASSKEY_ENABLED
+              value: "false"
+            - name: GOTRUE_WEBAUTHN_RP_ID
+              value: nuvio.rbl.lol
+            - name: GOTRUE_WEBAUTHN_RP_DISPLAY_NAME
+              value: Nuvio
+            - name: GOTRUE_WEBAUTHN_RP_ORIGINS
+              value: https://nuvio.rbl.lol
+            - name: GOTRUE_SMTP_ADMIN_EMAIL
+              value: admin@nuvio.rbl.lol
+            - name: GOTRUE_SMTP_HOST
+              value: smtp.example.com
+            - name: GOTRUE_SMTP_PORT
+              value: "587"
+            - name: GOTRUE_SMTP_USER
+              value: unused
+            - name: GOTRUE_SMTP_PASS
+              value: unused
+            - name: GOTRUE_SMTP_SENDER_NAME
+              value: Nuvio
+            - name: GOTRUE_MAILER_URLPATHS_INVITE
+              value: /auth/v1/verify
+            - name: GOTRUE_MAILER_URLPATHS_CONFIRMATION
+              value: /auth/v1/verify
+            - name: GOTRUE_MAILER_URLPATHS_RECOVERY
+              value: /auth/v1/verify
+            - name: GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE
+              value: /auth/v1/verify
+            - name: GOTRUE_EXTERNAL_PHONE_ENABLED
+              value: "false"
+            - name: GOTRUE_SMS_AUTOCONFIRM
+              value: "false"
+            - name: GOTRUE_MFA_TOTP_ENROLL_ENABLED
+              value: "true"
+            - name: GOTRUE_MFA_TOTP_VERIFY_ENABLED
+              value: "true"
+            - name: GOTRUE_MFA_MAX_ENROLLED_FACTORS
+              value: "10"
+            - name: GOTRUE_LOG_LEVEL
+              value: info
+          ports:
+            - name: http
+              containerPort: 9999
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL

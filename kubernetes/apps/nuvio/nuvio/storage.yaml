@@ -1,0 +1,149 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: storage-data
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-storage
+    app.kubernetes.io/part-of: nuvio
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: storage
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-storage
+    app.kubernetes.io/part-of: nuvio
+spec:
+  selector:
+    app.kubernetes.io/name: nuvio-storage
+  ports:
+    - name: http
+      port: 5000
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: storage
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-storage
+    app.kubernetes.io/part-of: nuvio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nuvio-storage
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nuvio-storage
+        app.kubernetes.io/part-of: nuvio
+    spec:
+      containers:
+        - name: storage
+          image: supabase/storage-api:v1.60.4@sha256:c8eb9858eafec891a97c27125470aaad54703c3f4eb4d55ca7f1bf6c6411febf
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: POSTGRES_PASSWORD
+            - name: ANON_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: ANON_KEY
+            - name: SERVICE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: SERVICE_ROLE_KEY
+            - name: POSTGREST_URL
+              value: http://rest:3000
+            - name: AUTH_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: JWT_SECRET
+            - name: JWT_JWKS
+              value: '{"keys":[]}'
+            - name: DATABASE_URL
+              value: postgres://supabase_storage_admin:$(POSTGRES_PASSWORD)@db:5432/postgres
+            - name: STORAGE_PUBLIC_URL
+              value: https://nuvio.rbl.lol
+            - name: REQUEST_ALLOW_X_FORWARDED_PATH
+              value: "true"
+            - name: FILE_SIZE_LIMIT
+              value: "52428800"
+            - name: STORAGE_BACKEND
+              value: file
+            - name: GLOBAL_S3_BUCKET
+              value: nuvio
+            - name: FILE_STORAGE_BACKEND_PATH
+              value: /var/lib/storage
+            - name: TENANT_ID
+              value: nuvio
+            - name: REGION
+              value: local
+            - name: ENABLE_IMAGE_TRANSFORMATION
+              value: "true"
+            - name: IMGPROXY_URL
+              value: http://imgproxy:5001
+            - name: S3_PROTOCOL_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: S3_PROTOCOL_ACCESS_KEY_ID
+            - name: S3_PROTOCOL_ACCESS_KEY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: S3_PROTOCOL_ACCESS_KEY_SECRET
+          ports:
+            - name: http
+              containerPort: 5000
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: storage-data
+              mountPath: /var/lib/storage
+      volumes:
+        - name: storage-data
+          persistentVolumeClaim:
+            claimName: storage-data

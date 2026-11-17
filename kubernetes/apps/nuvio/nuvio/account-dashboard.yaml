@@ -1,0 +1,79 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: account-dashboard
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-account-dashboard
+    app.kubernetes.io/part-of: nuvio
+spec:
+  selector:
+    app.kubernetes.io/name: nuvio-account-dashboard
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: account-dashboard
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-account-dashboard
+    app.kubernetes.io/part-of: nuvio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nuvio-account-dashboard
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nuvio-account-dashboard
+        app.kubernetes.io/part-of: nuvio
+    spec:
+      containers:
+        - name: account-dashboard
+          image: ghcr.io/nuviomedia/nuvio-account-dashboard:latest@sha256:6b6976985906df71bb8603422e7e199d309d60f8114481e959838ce00cb29013
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NUVIO_SUPABASE_URL
+              value: https://nuvio.rbl.lol
+            - name: NUVIO_SUPABASE_ANON_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: ANON_KEY
+            - name: NUVIO_PUBLIC_SITE_URL
+              value: https://nuvio.tv
+          ports:
+            - name: http
+              containerPort: 8080
+          readinessProbe:
+            httpGet:
+              path: /account/login
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /account/login
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL

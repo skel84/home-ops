@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-config
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-db
+    app.kubernetes.io/part-of: nuvio
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 1Gi

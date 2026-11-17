@@ -1,0 +1,129 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: realtime
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-realtime
+    app.kubernetes.io/part-of: nuvio
+spec:
+  selector:
+    app.kubernetes.io/name: nuvio-realtime
+  ports:
+    - name: http
+      port: 4000
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: realtime
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: nuvio-realtime
+    app.kubernetes.io/part-of: nuvio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nuvio-realtime
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nuvio-realtime
+        app.kubernetes.io/part-of: nuvio
+    spec:
+      containers:
+        - name: realtime
+          image: supabase/realtime:v2.102.3@sha256:aa1c92c0cf326007563641730ec9da9c60478caa6853887775365fa2c097a471
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "4000"
+            - name: DB_HOST
+              value: db
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              value: supabase_admin
+            - name: DB_NAME
+              value: postgres
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: POSTGRES_PASSWORD
+            - name: DB_AFTER_CONNECT_QUERY
+              value: SET search_path TO _realtime
+            - name: DB_ENC_KEY
+              value: supabaserealtime
+            - name: API_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: JWT_SECRET
+            - name: API_JWT_JWKS
+              value: '{"keys":[]}'
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: SECRET_KEY_BASE
+            - name: METRICS_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: JWT_SECRET
+            - name: ERL_AFLAGS
+              value: -proto_dist inet_tcp
+            - name: DNS_NODES
+              value: "''"
+            - name: RLIMIT_NOFILE
+              value: "10000"
+            - name: APP_NAME
+              value: realtime
+            - name: SEED_SELF_HOST
+              value: "true"
+            - name: RUN_JANITOR
+              value: "true"
+            - name: DISABLE_HEALTHCHECK_LOGGING
+              value: "true"
+            - name: ANON_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: ANON_KEY
+          ports:
+            - name: http
+              containerPort: 4000
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'curl -sSfL --head -o /dev/null -H "Authorization: Bearer ${ANON_KEY}" http://localhost:4000/api/tenants/realtime-dev/health'
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - 'curl -sSfL --head -o /dev/null -H "Authorization: Bearer ${ANON_KEY}" http://localhost:4000/api/tenants/realtime-dev/health'
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL

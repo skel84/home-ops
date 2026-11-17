@@ -1,0 +1,70 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: nuvio
+
+resources:
+  - external-secret.yaml
+  - db-service.yaml
+  - db-config-pvc.yaml
+  - db-statefulset.yaml
+  - migrate-job.yaml
+  - auth.yaml
+  - rest.yaml
+  - realtime.yaml
+  - storage.yaml
+  - imgproxy.yaml
+  - kong.yaml
+  - functions.yaml
+  - account-dashboard.yaml
+  - route.yaml
+
+configMapGenerator:
+  - name: nuvio-db-init
+    files:
+      - sql/00-webhooks.sql
+      - sql/01-roles.sql
+      - sql/02-jwt.sql
+      - sql/03-_supabase.sql
+      - sql/04-logs.sql
+      - sql/05-pooler.sql
+      - sql/06-realtime.sql
+      - sql/run.sh
+    options:
+      disableNameSuffixHash: true
+  - name: nuvio-db-baseline
+    files:
+      - sql/00000000000000_baseline.sql
+    options:
+      disableNameSuffixHash: true
+  - name: nuvio-db-migrations
+    files:
+      - sql/00000000000001_auth_trigger.sql
+      - sql/00000000000002_storage.sql
+      - sql/00000000000003_instance_settings.sql
+      - sql/00000000000004_function_security.sql
+      - sql/00000000000005_avatar_catalog.sql
+      - sql/00000000000006_auth_session_fk.sql
+      - sql/00000000000007_clean_account_restore.sql
+      - sql/00000000000008_client_rpc_permissions.sql
+      - sql/00000000000009_guard_profile_settings_writes.sql
+      - sql/00000000000010_dashboard_profile_patch.sql
+      - sql/00000000000011_hosted_sync_updates.sql
+    options:
+      disableNameSuffixHash: true
+  - name: nuvio-kong
+    files:
+      - config/kong.yml
+      - config/kong-entrypoint.sh
+    options:
+      disableNameSuffixHash: true
+  - name: nuvio-functions
+    files:
+      - main-index.ts=functions/main/index.ts
+      - delete-account-index.ts=functions/delete-account/index.ts
+      - health-check-index.ts=functions/health-check/index.ts
+      - tracker-tv-logins-exchange-index.ts=functions/tracker-tv-logins-exchange/index.ts
+      - tv-logins-exchange-index.ts=functions/tv-logins-exchange/index.ts
+    options:
+      disableNameSuffixHash: true
