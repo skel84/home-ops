@@ -4,7 +4,7 @@ controllers:
       main:
         image:
           repository: harbor.rbl.lol/library/lg-tv-camera-overlay
-          tag: "0.1.1"
+          tag: "0.2.0"
         command: ["/bin/sh", "-c"]
         args:
           - >-
@@ -16,10 +16,13 @@ controllers:
             --frame-url http://192.168.0.61/frame.jpg
             --entity binary_sensor.camera_pippi_baby_crying
             --camera camera.camera_pippi_fluent
+            --activity-entity select.soggiorno_192_168_0_111_activity
+            --activity-name "Camera Pippi"
             --label "Ricky piange"
         env:
           TV_SSH_KEY: /tmp/tv-key
           TZ: Europe/Rome
+          LOG_LEVEL: INFO
         envFrom:
           - secretRef:
               name: lg-tv-camera-overlay-secret

@@ -50,4 +50,9 @@ Update `tag` in `values.yaml` after each push.
   (`home-assistant.home-system.svc.cluster.local:8123`).
 - The watcher is always running (listening); the proxy/overlay only run during
   an event.
+- The watcher also launches the interactive control app (`org.local.tvcontrol`)
+  when `select.soggiorno_192_168_0_111_activity` is `Camera Pippi`; see the app
+  README for the Sofabaton activity requirement.
+- Logging: `LOG_LEVEL=INFO|DEBUG`; watcher and proxy log to the pod log
+  (`kubectl -n home-system logs deploy/lg-tv-camera-overlay`).
 - `luna` calls go through `ssh` (`TV_SSH_KEY`, `TV_SSH_PORT`).
