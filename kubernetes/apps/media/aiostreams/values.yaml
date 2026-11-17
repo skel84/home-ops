@@ -85,9 +85,6 @@ persistence:
 
 route:
   app:
-    annotations:
-      # Public DNS is a DNS-only record managed outside Cloudflare's proxy.
-      external-dns.alpha.kubernetes.io/exclude: "true"
     hostnames:
       - aiostreams.rbl.lol
     parentRefs:
