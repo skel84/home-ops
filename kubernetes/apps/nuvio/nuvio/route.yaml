@@ -4,7 +4,7 @@ kind: HTTPRoute
 metadata:
   name: nuvio
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "4"
   namespace: nuvio
   labels:
     app.kubernetes.io/name: nuvio

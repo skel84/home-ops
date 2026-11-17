@@ -9,6 +9,7 @@ resources:
   - db-service.yaml
   - db-config-pvc.yaml
   - db-statefulset.yaml
+  - bootstrap-job.yaml
   - migrate-job.yaml
   - auth.yaml
   - rest.yaml
@@ -31,6 +32,7 @@ configMapGenerator:
       - sql/05-pooler.sql
       - sql/06-realtime.sql
       - sql/run.sh
+      - sql/bootstrap.sh
     options:
       disableNameSuffixHash: true
   - name: nuvio-db-baseline

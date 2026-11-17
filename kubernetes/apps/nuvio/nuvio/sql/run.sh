@@ -16,6 +16,8 @@ schema_exists="$("${PSQL[@]}" -Atqc "select to_regclass('nuvio_migrations.schema
 
 if [ "$schema_exists" != "t" ]; then
   # Supabase base schema, followed by Nuvio's baseline and auth trigger.
+  psql -v ON_ERROR_STOP=1 -h db -U supabase_admin -d postgres -c "DO \$\$ BEGIN IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'supabase_functions_admin') THEN CREATE USER supabase_functions_admin NOINHERIT CREATEROLE LOGIN NOREPLICATION; END IF; END \$\$;"
+  
   for file in \
     00-webhooks.sql \
     01-roles.sql \

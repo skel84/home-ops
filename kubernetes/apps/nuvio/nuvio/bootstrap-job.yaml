@@ -1,0 +1,61 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nuvio-db-bootstrap
+  namespace: nuvio
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    app.kubernetes.io/name: nuvio-db-bootstrap
+    app.kubernetes.io/part-of: nuvio
+spec:
+  backoffLimit: 6
+  activeDeadlineSeconds: 900
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nuvio-db-bootstrap
+        app.kubernetes.io/part-of: nuvio
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: bootstrap
+          image: supabase/postgres:17.6.1.084@sha256:95d92e9563121189086690a4b7f8f2b711a4809a2499f45592199aae68ebae5f
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/bash
+            - /sql/bootstrap.sh
+          env:
+            - name: POSTGRES_USER
+              value: supabase_admin
+            - name: POSTGRES_DB
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: POSTGRES_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: nuvio-secrets
+                  key: JWT_SECRET
+            - name: JWT_EXP
+              value: "7200"
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              memory: 256Mi
+          volumeMounts:
+            - name: db-init
+              mountPath: /sql
+              readOnly: true
+      volumes:
+        - name: db-init
+          configMap:
+            name: nuvio-db-init
