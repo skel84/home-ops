@@ -106,17 +106,13 @@ spec:
             - name: http
               containerPort: 8000
           readinessProbe:
-            exec:
-              command:
-                - kong
-                - health
+            tcpSocket:
+              port: http
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
-            exec:
-              command:
-                - kong
-                - health
+            tcpSocket:
+              port: http
             initialDelaySeconds: 30
             periodSeconds: 20
             failureThreshold: 6
