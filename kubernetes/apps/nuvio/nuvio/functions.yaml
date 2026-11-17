@@ -36,6 +36,19 @@ spec:
         app.kubernetes.io/name: nuvio-functions
         app.kubernetes.io/part-of: nuvio
     spec:
+      initContainers:
+        - name: stage-functions
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - cp -Lr /cm/. /work/
+          volumeMounts:
+            - name: functions
+              mountPath: /cm
+              readOnly: true
+            - name: functions-work
+              mountPath: /work
       containers:
         - name: functions
           image: supabase/edge-runtime:v1.74.0@sha256:2781daf92394db91f7e94129cc3d04ec474ad16a8fe64b3fbeef6e7d557ab120
@@ -103,9 +116,8 @@ spec:
               drop:
                 - ALL
           volumeMounts:
-            - name: functions
+            - name: functions-work
               mountPath: /home/deno/functions
-              readOnly: true
             - name: deno-cache
               mountPath: /root/.cache/deno
       volumes:
@@ -123,5 +135,7 @@ spec:
                 path: tracker-tv-logins-exchange/index.ts
               - key: tv-logins-exchange-index.ts
                 path: tv-logins-exchange/index.ts
+        - name: functions-work
+          emptyDir: {}
         - name: deno-cache
           emptyDir: {}
