@@ -1,0 +1,56 @@
+controllers:
+  atvloadly:
+    containers:
+      app:
+        image:
+          repository: docker.io/bitxeno/atvloadly
+          tag: v0.8.4
+        env:
+          TZ: Europe/Rome
+          # Talos has no host avahi-daemon for mDNS discovery, so the Apple TV
+          # is added by IP (192.168.0.40) in the UI instead. That also keeps
+          # the pod off hostNetwork.
+          ZEROCONF_ENABLED: "false"
+        resources:
+          requests:
+            cpu: 10m
+          limits:
+            memory: 2Gi
+
+service:
+  app:
+    controller: atvloadly
+    ports:
+      http:
+        port: &port 80
+
+# No authentication in the app: keep it on the internal Gateway only.
+route:
+  app:
+    hostnames:
+      - atvloadly.rbl.lol
+    parentRefs:
+      - name: internal
+        namespace: network
+        sectionName: https
+    rules:
+      - backendRefs:
+          - identifier: app
+            port: *port
+        matches:
+          - path:
+              type: PathPrefix
+              value: /
+
+persistence:
+  # Pairing records, Apple ID session, signing keys and IPAs.
+  data:
+    type: persistentVolumeClaim
+    accessMode: ReadWriteOnce
+    size: 2Gi
+    storageClass: longhorn
+    globalMounts:
+      - path: /data
+
+global:
+  createDefaultServiceAccount: false
