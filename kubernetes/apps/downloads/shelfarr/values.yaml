@@ -15,7 +15,7 @@ controllers:
       app:
         image:
           repository: ghcr.io/pedro-revez-silva/shelfarr
-          tag: latest@sha256:49c1968b07d0f2b476611221073bc692034028fd5951060ddb1bcf2bdbb495d6
+          tag: latest@sha256:97270513a75354d1b8cf2fa68f22cd31f021d03c3695186437e448f2a9255d9e
           pullPolicy: IfNotPresent
         env:
           CHOWN_ON_START: auto
