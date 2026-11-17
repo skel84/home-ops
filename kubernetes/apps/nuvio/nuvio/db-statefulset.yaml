@@ -33,6 +33,8 @@ spec:
             - -c
             - config_file=/etc/postgresql/postgresql.conf
             - -c
+            - data_directory=/var/lib/postgresql/data/pgdata
+            - -c
             - log_min_messages=fatal
           env:
             - name: POSTGRES_HOST
