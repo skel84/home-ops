@@ -20,7 +20,7 @@ kind: Deployment
 metadata:
   name: realtime
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "3"
   namespace: nuvio
   labels:
     app.kubernetes.io/name: nuvio-realtime
