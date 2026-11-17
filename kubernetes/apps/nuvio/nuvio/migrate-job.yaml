@@ -32,11 +32,11 @@ spec:
             - name: PGHOST
               value: db
             - name: PGUSER
-              value: postgres
+              value: supabase_admin
             - name: PGDATABASE
               value: postgres
             - name: POSTGRES_USER
-              value: postgres
+              value: supabase_admin
             - name: POSTGRES_DB
               value: postgres
             - name: POSTGRES_PASSWORD

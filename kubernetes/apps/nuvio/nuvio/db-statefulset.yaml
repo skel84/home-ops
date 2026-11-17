@@ -31,7 +31,7 @@ spec:
           command:
             - /bin/sh
             - -c
-            - cp -a -n /etc/postgresql-custom/. /config/
+            - cp -a /etc/postgresql-custom/. /config/
           volumeMounts:
             - name: config
               mountPath: /config
