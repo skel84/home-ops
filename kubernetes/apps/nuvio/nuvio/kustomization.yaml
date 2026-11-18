@@ -6,6 +6,7 @@ namespace: nuvio
 
 resources:
   - external-secret.yaml
+  - aiostreams-client-external-secret.yaml
   - db-service.yaml
   - db-config-pvc.yaml
   - db-statefulset.yaml
