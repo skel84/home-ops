@@ -1,0 +1,131 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aiometadata
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: aiometadata
+    app.kubernetes.io/part-of: nuvio
+spec:
+  selector:
+    app.kubernetes.io/name: aiometadata
+  ports:
+    - name: http
+      port: 3232
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aiometadata
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: aiometadata
+    app.kubernetes.io/part-of: nuvio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: aiometadata
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: aiometadata
+        app.kubernetes.io/part-of: nuvio
+    spec:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      containers:
+        - name: aiometadata
+          image: ghcr.io/cedya77/aiometadata:4.1.0@sha256:c17e1aa7c670055e14dea99087cfe18ff07fa6ea4dfce9c3484830a718e066ce
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PORT
+              value: "3232"
+            - name: HOST_NAME
+              value: https://aiometadata.rbl.lol
+            - name: NODE_ENV
+              value: production
+            - name: LOG_LEVEL
+              value: info
+            - name: DISABLE_METRICS
+              value: "true"
+            - name: DATABASE_URI
+              value: sqlite://addon/data/db.sqlite
+            - name: REDIS_URL
+              value: redis://aiometadata-redis:6379
+            - name: BUILT_IN_TMDB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aiometadata-secrets
+                  key: BUILT_IN_TMDB_API_KEY
+            - name: ADMIN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aiometadata-secrets
+                  key: ADMIN_KEY
+          ports:
+            - name: http
+              containerPort: 3232
+          readinessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: http
+            initialDelaySeconds: 40
+            periodSeconds: 20
+            failureThreshold: 6
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: data
+              mountPath: /app/addon/data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: aiometadata-data
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: aiometadata
+  namespace: nuvio
+  labels:
+    app.kubernetes.io/name: aiometadata
+    app.kubernetes.io/part-of: nuvio
+spec:
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: external
+      namespace: network
+      sectionName: https
+  hostnames:
+    - aiometadata.rbl.lol
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: aiometadata
+          port: 3232
+          weight: 1
