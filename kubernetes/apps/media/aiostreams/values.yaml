@@ -27,7 +27,7 @@ controllers:
           DATABASE_URI: sqlite://./data/db.sqlite
           DISK_CACHE_DIR: /app/data/cache
           LOG_FORMAT: json
-          ALLOW_PRIVATE_URLS: "false"
+          ALLOW_PRIVATE_URLS: "true"
           AIOSTREAMS_AUTH_REQUIRED: "true"
           SYSTEM_LIFECYCLE_ENABLED: "false"
           # SECRET_KEY, AIOSTREAMS_AUTH and FORCED_SERVICE_CREDENTIALS come
