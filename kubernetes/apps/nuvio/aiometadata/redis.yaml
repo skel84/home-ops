@@ -70,10 +70,8 @@ spec:
             limits:
               memory: 256Mi
           securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
+            runAsUser: 0
+            allowPrivilegeEscalation: true
           volumeMounts:
             - name: cache
               mountPath: /data
