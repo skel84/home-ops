@@ -1,0 +1,57 @@
+controllers:
+  main:
+    containers:
+      main:
+        image:
+          repository: harbor.rbl.lol/library/lg-tv-camera-overlay
+          tag: "0.2.0"
+        command: ["/bin/sh", "-c"]
+        args:
+          - >-
+            cp /secrets/tv-key /tmp/tv-key &&
+            chmod 600 /tmp/tv-key &&
+            exec python3 /app/scripts/watch.py
+            --ha-url http://home-assistant.home-system.svc.cluster.local:8123
+            --tv 192.168.0.214
+            --frame-url http://192.168.0.61/frame.jpg
+            --entity binary_sensor.camera_pippi_baby_crying
+            --camera camera.camera_pippi_fluent
+            --activity-entity select.soggiorno_192_168_0_111_activity
+            --activity-name "Camera Pippi"
+            --label "Ricky piange"
+        env:
+          TV_SSH_KEY: /tmp/tv-key
+          TZ: Europe/Rome
+          LOG_LEVEL: INFO
+        envFrom:
+          - secretRef:
+              name: lg-tv-camera-overlay-secret
+        securityContext:
+          allowPrivilegeEscalation: false
+        resources:
+          requests:
+            cpu: 20m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
+defaultPodOptions:
+  securityContext:
+    runAsUser: 0
+    runAsGroup: 0
+service:
+  main:
+    controller: main
+    type: LoadBalancer
+    annotations:
+      lbipam.cilium.io/ips: 192.168.0.61
+    ports:
+      http:
+        port: 80
+        targetPort: 9000
+persistence:
+  secrets:
+    type: secret
+    name: lg-tv-camera-overlay-secret
+    globalMounts:
+      - path: /secrets
+        readOnly: true
