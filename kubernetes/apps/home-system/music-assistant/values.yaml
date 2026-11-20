@@ -18,10 +18,12 @@ defaultPodOptions:
   # host on port 8097, so the pod needs the LAN, like Home Assistant.
   hostNetwork: true
   dnsPolicy: ClusterFirstWithHostNet
+  # AirPlay 2 multi-room sync uses PTP on UDP 319/320, which needs root; as
+  # uid 1000 MA logs "Cannot bind UDP 319" and falls back to NTP timing.
+  # Upstream's image and the HA add-on run as root as well.
   securityContext:
-    runAsNonRoot: true
-    runAsUser: 1000
-    runAsGroup: 1000
+    runAsUser: 0
+    runAsGroup: 0
     fsGroup: 1000
     fsGroupChangePolicy: OnRootMismatch
 
