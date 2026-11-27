@@ -16,25 +16,12 @@ data:
 
     go2rtc:
       streams:
-        terrazzo_ovest:
-          - "ffmpeg:http://192.168.0.92/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=admin&password={FRIGATE_RTSP_PASSWORD}#video=copy#audio=copy#audio=opus"
-        terrazzo_ovest_sub:
-          - "ffmpeg:http://192.168.0.92/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=admin&password={FRIGATE_RTSP_PASSWORD}"
         balcone_est:
           - "ffmpeg:http://192.168.0.141/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=admin&password={FRIGATE_RTSP_PASSWORD}#video=copy#audio=copy#audio=opus"
         balcone_est_sub:
           - "ffmpeg:http://192.168.0.141/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=admin&password={FRIGATE_RTSP_PASSWORD}"
 
     cameras:
-      terrazzo_ovest:
-        ffmpeg:
-          inputs:
-            - path: rtsp://127.0.0.1:8554/terrazzo_ovest
-              input_args: preset-rtsp-restream
-              roles: [record]
-            - path: rtsp://127.0.0.1:8554/terrazzo_ovest_sub
-              input_args: preset-rtsp-restream
-              roles: [detect]
       balcone_est:
         ffmpeg:
           inputs:
